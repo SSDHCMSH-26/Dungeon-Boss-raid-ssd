@@ -85,7 +85,7 @@ input{flex:1;min-width:90px;padding:9px;border:3px solid var(--ln);background:va
 <div id="un" class="r"></div><div id="pn"></div>
 </div>
 </main>
-<script>
+<script id="main" type="text/plain">
 
 const T3A={"cleric_idle": "art/t3a/cleric_idle.png", "cleric_move": "art/t3a/cleric_move.png", "cleric_atk": "art/t3a/cleric_atk.png", "cleric_cast": "art/t3a/cleric_cast.png", "cleric_hit": "art/t3a/cleric_hit.png", "cleric_dead": "art/t3a/cleric_dead.png", "mage_idle": "art/t3a/mage_idle.png", "mage_move": "art/t3a/mage_move.png", "mage_atk": "art/t3a/mage_atk.png", "mage_cast": "art/t3a/mage_cast.png", "mage_hit": "art/t3a/mage_hit.png", "mage_dead": "art/t3a/mage_dead.png", "knight_idle": "art/t3a/knight_idle.png", "knight_move": "art/t3a/knight_move.png", "knight_atk": "art/t3a/knight_atk.png", "knight_cast": "art/t3a/knight_cast.png", "knight_hit": "art/t3a/knight_hit.png", "knight_dead": "art/t3a/knight_dead.png", "fx_heal": "art/t3a/fx_heal.png", "fx_burst": "art/t3a/fx_burst.png", "fx_shield": "art/t3a/fx_shield.png", "fx_purify": "art/t3a/fx_purify.png", "fx_revive": "art/t3a/fx_revive.png", "fx_judge": "art/t3a/fx_judge.png", "fx_fire": "art/t3a/fx_fire.png", "fx_tele": "art/t3a/fx_tele.png", "fx_mana": "art/t3a/fx_mana.png"};
 const K="#1d1526";
@@ -194,10 +194,10 @@ function tiles(id,dv){if(dv===undefined)dv=V()&&id=="vince"?(T2()?"vince2":"vinc
 function spURL(k){if(!UC[k]){const c=document.createElement("canvas");c.width=c.height=48;const g=c.getContext("2d");g.imageSmoothingEnabled=false;g.drawImage(SC[k],0,0,48,48);UC[k]=c.toDataURL()}return UC[k]}
 function tURL(id){const dv=id=="vince"&&(T2())?(T2()?"vince2":"vince"):id=="gron"&&T2()?"gron":"",k="t"+id+dv;if(!UC[k]){const t=tiles(id,dv),c=document.createElement("canvas");c.width=64;c.height=16;const g=c.getContext("2d");[t.f[0],t.f[1],t.f[2],t.w].forEach((q,i)=>g.drawImage(q,i*16,0));UC[k]=c.toDataURL()}return UC[k]}
 /* ── 데이터 ── */
-const CLS={knight:{n:"기사",hp:80,mv:3,sk:[{n:"베기",c:2,r:1,a:0,t:"d",v:28},{n:"방패막기",c:2,r:1,t:"g",cd:2,sm:"반경 1칸 아군 받는 피해 -75% (턴 종료까지)",d:"자신에게 사용 · 턴이 끝날 때까지 반경 1칸 안 아군(자신 포함)이 받는 피해 75% 경감 · 쿨타임 2턴"},{n:"방패돌진",c:2,r:6,t:"r",cd:4,sm:"직선 6칸 돌진 · 적 30 · 기세",d:"지정한 직선 방향으로 6칸 돌진 · 유닛·벽에 부딪히면 정지(적이면 피해 30, 벽은 파괴) · 기세: 함정·구덩이·컨베이어 효과 무시, 지나간 함정 상자 제거 · 무시한 효과 1개당 7 피해, 1개라도 있으면 다음 1턴 행동불능 · 쿨타임 4턴"}]},
-cleric:{n:"성직자",hp:70,mv:2,pas:"사용하지 않고 남은 AP는 다음 턴으로 이월(초과 충전, 최대 12)",sk:[{n:"치유",c:2,r:1,t:"h",v:25,cd:2,sm:"인접 아군 HP +25",d:"사거리 1 · 아군 HP +25 · 쿨타임 2턴"},{n:"성광",c:2,r:5,t:"l",sm:"직선 5칸 · 적 -10 / 아군 +10 · 반동 1칸",d:"지정한 방향 직선(8방향) 5칸: 적 피해 10, 아군 회복 10 · 반동으로 반대 방향 1칸 이동"},{n:"✨ 천상의 계시",c:10,r:10,t:"u",cd:6,sm:"숨은 함정 전부 공개 + 적 1기 속박 1턴",d:"궁극기 · 사거리 10 · 가려진 함정·스킬 영역·함정 상자·구덩이를 전부 공개하고, 선택한 적 1기를 1턴간 속박(기본 이동·이동 스킬 불가) · 쿨타임 6턴"}]},
-archer:{n:"궁수",hp:60,mv:3,sk:[{n:"저격",c:2,r:7,a:0,t:"d",v:26},{n:"속사",c:1,r:4,a:0,t:"d",v:12}]},
-mage:{n:"마법사",hp:50,mv:2,sk:[{n:"파이어볼",c:3,r:7,a:1,t:"d",v:34},{n:"순간이동",c:1,r:5,t:"b",cd:3,sm:"5칸 안 지정 칸에 나타남 · 쿨타임 3턴",d:"사거리 5 · 지정한 칸에 바로 나타남(걸어가지 않음) · AP 1 · 쿨타임 3턴"},{n:"마력 방출",c:2,r:0,t:"o",cd:6,sm:"3칸 이내 적 50 · 그 밖 전체 적 10",d:"자신 중심 · 반경 3칸 이내 적에게 피해 50, 3칸 밖 맵 전체 적에게 피해 10(아군 제외) · 설치한 벽도 피해 · AP 2 · 쿨타임 6턴"}]}};
+/* 용사 기본 수치(이름·체력·이동·패시브)는 data/heroes.json 에서 읽음. 스킬은 아래 HSK */
+const HSK={"knight":[{"n":"베기","c":2,"r":1,"a":0,"t":"d","v":28},{"n":"방패막기","c":2,"r":1,"t":"g","cd":2,"sm":"반경 1칸 아군 받는 피해 -75% (턴 종료까지)","d":"자신에게 사용 · 턴이 끝날 때까지 반경 1칸 안 아군(자신 포함)이 받는 피해 75% 경감 · 쿨타임 2턴"},{"n":"방패돌진","c":2,"r":6,"t":"r","cd":4,"sm":"직선 6칸 돌진 · 적 30 · 기세","d":"지정한 직선 방향으로 6칸 돌진 · 유닛·벽에 부딪히면 정지(적이면 피해 30, 벽은 파괴) · 기세: 함정·구덩이·컨베이어 효과 무시, 지나간 함정 상자 제거 · 무시한 효과 1개당 7 피해, 1개라도 있으면 다음 1턴 행동불능 · 쿨타임 4턴"}],"cleric":[{"n":"치유","c":2,"r":1,"t":"h","v":25,"cd":2,"sm":"인접 아군 HP +25","d":"사거리 1 · 아군 HP +25 · 쿨타임 2턴"},{"n":"성광","c":2,"r":5,"t":"l","sm":"직선 5칸 · 적 -10 / 아군 +10 · 반동 1칸","d":"지정한 방향 직선(8방향) 5칸: 적 피해 10, 아군 회복 10 · 반동으로 반대 방향 1칸 이동"},{"n":"✨ 천상의 계시","c":10,"r":10,"t":"u","cd":6,"sm":"숨은 함정 전부 공개 + 적 1기 속박 1턴","d":"궁극기 · 사거리 10 · 가려진 함정·스킬 영역·함정 상자·구덩이를 전부 공개하고, 선택한 적 1기를 1턴간 속박(기본 이동·이동 스킬 불가) · 쿨타임 6턴"}],"archer":[{"n":"저격","c":2,"r":7,"a":0,"t":"d","v":26},{"n":"속사","c":1,"r":4,"a":0,"t":"d","v":12}],"mage":[{"n":"파이어볼","c":3,"r":7,"a":1,"t":"d","v":34},{"n":"순간이동","c":1,"r":5,"t":"b","cd":3,"sm":"5칸 안 지정 칸에 나타남 · 쿨타임 3턴","d":"사거리 5 · 지정한 칸에 바로 나타남(걸어가지 않음) · AP 1 · 쿨타임 3턴"},{"n":"마력 방출","c":2,"r":0,"t":"o","cd":6,"sm":"3칸 이내 적 50 · 그 밖 전체 적 10","d":"자신 중심 · 반경 3칸 이내 적에게 피해 50, 3칸 밖 맵 전체 적에게 피해 10(아군 제외) · 설치한 벽도 피해 · AP 2 · 쿨타임 6턴"}]};
+const CLS={};for(const k in DATA.heroes)CLS[k]={...DATA.heroes[k],sk:HSK[k]};
+
 const CH={
 gron:{n:"던전메이커 그론",s:"안경 쓴 개구쟁이 미로 설계자",m:"장난감 미로 던전",ok:1,bash:1,
  at:[{n:"돌덩이 던지기",c:2,r:12,pk:1,sh:"sq",k:2,v:28,d:"5×5 · 구덩이를 맞히면 가장 먼 구덩이에서도 같은 범위로 재개 후 구덩이 소멸"},{n:"큰 바위 굴리기",c:3,r:14,pk:1,sh:"cross",k:9,v:30,d:"십자 길게 · 구덩이를 맞히면 가장 먼 구덩이에서도 같은 범위로 재개 후 구덩이 소멸"}],
@@ -651,4 +651,12 @@ else p=BT("⏭ 턴 종료 → 보스 공격 발동","endHero()","end")+(L.menu?"
 $("pn").innerHTML=p;save()}
 window.addEventListener("error",e=>{try{console.error(e.error||e.message);const l=$("lg");if(l)l.textContent="⚠️ 오류가 났지만 게임은 유지돼요. 계속 진행해 보세요."}catch(x){}});
 ui();
+</script>
+<script>
+/* 수치 데이터(data/*.json)를 먼저 읽은 뒤 위의 게임 코드(#main)를 실행 */
+const DATA={};
+(async()=>{const FILES=["heroes"];
+try{await Promise.all(FILES.map(async f=>{const r=await fetch("data/"+f+".json",{cache:"no-cache"});if(!r.ok)throw new Error(f+".json ("+r.status+")");DATA[f]=await r.json()}))}
+catch(e){document.body.insertAdjacentHTML("afterbegin",'<div style="background:#5a1d1d;color:#fff;padding:12px;font:14px sans-serif">⚠️ 게임 데이터를 불러오지 못했어요: '+e.message+'<br>index.html 을 파일로 직접 열면 안 돼요. 웹 주소(GitHub Pages)나 로컬 웹서버(python3 -m http.server)로 열어 주세요.</div>');return}
+const s=document.createElement("script");s.textContent=document.getElementById("main").textContent;document.body.appendChild(s);window.GAME_READY=1})();
 </script></body></html>
