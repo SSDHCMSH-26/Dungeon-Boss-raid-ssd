@@ -467,7 +467,7 @@ if(L.mode!="solo")return;
 if(S.ph=="setup"){if(L.role=="hero"&&!S.champ)pickChamp(["gron","vince"][rn(2)]);else if(L.role=="boss"&&S.champ&&S.pick.length<3)aiSetup();return}
 if(own()!=L.role)S.ph=="boss"?aiBoss():aiHero()}
 /* ── 네트워크 ── */
-async function net(){if(db)return 1;db=await claude.use("db");usr=await claude.use("user");if(!db||!usr){alert("이 기능은 claude.ai 로그인 상태에서만 가능해요.");return 0}uid=await usr.id();return 1}
+async function net(){if(db)return 1;if(typeof claude=="undefined"){alert("둘이서 하기(온라인)는 claude.ai 아티팩트 링크에서만 가능해요. 이 주소에서는 혼자 하기·한 기기 테스트를 이용하세요.");return 0}db=await claude.use("db");usr=await claude.use("user");if(!db||!usr){alert("이 기능은 claude.ai 로그인 상태에서만 가능해요.");return 0}uid=await usr.id();return 1}
 const ref=()=>db.doc("games/"+L.code);
 function push(){if(L.mode=="multi"&&db){S.v=(S.v||0)+1;ref().set({b:L.bu,h:L.hu,s:JSON.stringify(S)}).catch(e=>console.error(e))}}
 function listen(){ref().onSnapshot(s=>{if(!s.exists)return;const v=s.data(),pp=S&&S.ph,nv=JSON.parse(v.s);L.bu=v.b;L.hu=v.h;if(S&&S.v&&nv.v&&nv.v<S.v)return;S=nv;L.wait=!(L.bu&&L.hu);if(S.ph!=pp){L.menu=1;L.act=null;L.picks=[];if(S.ph=="hero")L.si=Math.max(0,S.heroes.findIndex(h=>!h.dead))}ui();tick()},e=>console.error(e))}

@@ -1,0 +1,33 @@
+# game/ 폴더를 GitHub Pages 에 자동 배포
+# main 브랜치의 game/ 이 바뀌면 자동 실행. Actions 탭에서 "Run workflow" 로 직접 실행도 가능.
+name: Deploy game to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['game/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: game
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,7 +1,8 @@
 # 픽셀 던전 레이드 — 인수인계 문서 (README)
 
 > 새 대화나 새 프로젝트에서 이어서 작업할 때 **이 파일부터** 읽게 하세요.
-> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v59** (`game/index.html` + `game/art/`)
+> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v60** (`game/index.html` + `game/art/`)
+> 폰/웹 주소(GitHub Pages): https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ — 설정 방법 `docs/DEPLOY_PAGES.md`
 
 ## 1. 한 줄 요약
 30×30 칸 던전에서 **보스 1명(그론 / 빈센토) vs 용사 3명(기사·성직자·궁수·마법사 중 선택)** 이 턴제로 싸우는 단일 HTML 게임.
@@ -17,6 +18,7 @@
 | `CODE_MAP.md` | 코드 구조, 상태 객체, 주요 함수, 수정할 때 주의점 |
 | `ONLINE_PLAN.md` | 온라인 대전·랭킹·스팀 출시 계획과 작업량 추정 |
 | `VISION_ROADMAP.md` | 장기 비전(스토리 2라인·계정 성장·공정 랭크 PvP) 로드맵과 토큰/기간 추정 |
+| `DEPLOY_PAGES.md` | GitHub Pages 배포(폰에서 열기) 설정 방법 |
 | `LAUNCH_LEGAL_GUIDE.md` | 런칭·배포·법률(한국 기준) 단계별 가이드 |
 | `tools/` | 테스트·컴퓨터끼리 대전 시뮬레이션·스프라이트 추출 스크립트 |
 

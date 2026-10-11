@@ -1,6 +1,9 @@
 # CHANGELOG
 (세부 번호는 v36부터 정확. 그 이전은 기능 순서로 요약. 최신이 위.)
 
+## v60 — GitHub Pages 배포
+- `.github/workflows/pages.yml`: main 의 `game/` 폴더를 GitHub Pages 로 자동 배포. 주소 https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ (설정 방법 `docs/DEPLOY_PAGES.md`).
+- claude.ai 밖(Pages 등)에서 "둘이서 하기"를 누르면 아무 반응 없이 멈추던 것을 안내 창으로 변경(`net()`).
 ## v59 — 그림 파일 분리 (게임 규칙·화면 변화 없음)
 - `game/index.html` 안의 base64 그림 134개를 `game/art/` 폴더의 PNG/JPG 파일로 분리. HTML 1.54MB → 약 120KB.
 - 코드의 그림 변수(T3A·ART·ART2·ART3·FACE·FACEG·MOBA·FXD·크리스탈)는 이제 `"art/..."` 경로를 담음. `"data:image/png;base64,"+` 를 붙이던 5곳은 경로를 그대로 쓰도록 수정.
