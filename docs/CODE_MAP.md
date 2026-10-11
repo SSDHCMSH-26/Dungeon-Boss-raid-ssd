@@ -1,7 +1,9 @@
-# CODE_MAP — `boss-raid-v58.html` 구조
+# CODE_MAP — `game/index.html` 구조 (v59)
 
 ## 파일 형태
-- 한 줄이 매우 긴 단일 HTML. 이미지(base64)가 들어 있는 줄은 7개 정도(줄 길이 10만~26만 자)이고 전체 1.54MB 중 약 1.4MB 입니다. 줄 길이로 찾으세요: `awk '{print NR, length}' boss-raid-v58.html | sort -k2 -n -r | head`. 그 줄들은 읽지 마세요. 이미지 변수: `T3A`(테마3 용사·효과), `ART`/`ART2`/`ART3`(디자인별 스프라이트), `MOBA`(미믹·고블린).
+- 코드만 든 HTML(약 120KB). 그림은 v59부터 `game/art/` 폴더의 파일(약 1.4MB, 134개)이고, HTML 에는 `"art/t3a/cleric_idle.png"` 같은 **상대 경로**만 있음 → 이제 파일 전체를 읽어도 부담이 적음.
+- 그림 변수 → 폴더: `T3A`→`art/t3a/`(테마3 용사·효과), `ART`→`art/art1/`, `ART2`→`art/art2/`, `ART3`→`art/art3/`(+ `Object.assign(ART3,…)` 의 상자·아이템 → `art/art3b/`), `FACE`/`FACEG`→`art/face/`, `MOBA`→`art/mob/`(미믹·고블린), `FXD`→`art/fx/`, 번개 크리스탈→`art/crystal/`. `art/art3/t_spear.png`·`t_flame.png` 는 `art3b` 것으로 덮어써져 실제로는 안 쓰임(원본과 동일하게 보존).
+- 그림 추가/교체: 파일을 해당 폴더에 넣고 변수에 `"이름": "art/폴더/이름.png"` 한 줄 추가. 그림은 비동기로 열리므로 쓰는 쪽은 기존처럼 `i.complete&&i.naturalWidth` 확인 후 그리고, `onload` 에서 `draw()`.
 - 코드 부분은 약 100~150KB. 함수 이름으로 검색(Grep)해서 해당 줄만 읽는 방식 권장.
 - `<script>` 는 두 개 이상일 수 있으니 문법 검사는 "가장 긴 script" 를 추출해서 `node --check`.
 

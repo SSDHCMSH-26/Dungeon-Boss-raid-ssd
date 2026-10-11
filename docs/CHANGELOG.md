@@ -1,6 +1,15 @@
 # CHANGELOG
 (세부 번호는 v36부터 정확. 그 이전은 기능 순서로 요약. 최신이 위.)
 
+## v60 — GitHub Pages 배포
+- `.github/workflows/pages.yml`: main 의 `game/` 폴더를 GitHub Pages 로 자동 배포. 주소 https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ (설정 방법 `docs/DEPLOY_PAGES.md`).
+- 게임 페이지에 `noindex` 표시 추가: 구글·네이버 등 검색엔진이 게임 주소를 검색 결과에 넣지 않음(주소를 아는 사람만 접속).
+- claude.ai 밖(Pages 등)에서 "둘이서 하기"를 누르면 아무 반응 없이 멈추던 것을 안내 창으로 변경(`net()`).
+## v59 — 그림 파일 분리 (게임 규칙·화면 변화 없음)
+- `game/index.html` 안의 base64 그림 134개를 `game/art/` 폴더의 PNG/JPG 파일로 분리. HTML 1.54MB → 약 120KB.
+- 코드의 그림 변수(T3A·ART·ART2·ART3·FACE·FACEG·MOBA·FXD·크리스탈)는 이제 `"art/..."` 경로를 담음. `"data:image/png;base64,"+` 를 붙이던 5곳은 경로를 그대로 쓰도록 수정.
+- 도구 추가: `tools/extract_art.py`(분리 스크립트), `tools/test_art_split.py`(분리 전/후 비교: 파일 바이트·그림 크기·디자인 3종×챔피언 2명 화면 픽셀·규칙 테스트·대전 시뮬 결과가 모두 동일함을 확인).
+- 주의: 이제 게임은 `index.html` 혼자로는 그림이 안 나옴 → `art/` 폴더와 함께 두어야 함(아티팩트 게시 때도 함께 올림).
 ## v58 — 상자 방치 12턴
 - 보물상자·함정 상자는 생성 후 12턴 방치되면 소멸. 함정 상자는 몬스터(미믹 60/고블린 40)가 튀어나옴(제압 없이 추적).
 ## v57 — 함정 상자 개봉 이펙트 교체
