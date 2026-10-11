@@ -3,6 +3,7 @@
 
 ## v60 — GitHub Pages 배포
 - `.github/workflows/pages.yml`: main 의 `game/` 폴더를 GitHub Pages 로 자동 배포. 주소 https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ (설정 방법 `docs/DEPLOY_PAGES.md`).
+- 게임 페이지에 `noindex` 표시 추가: 구글·네이버 등 검색엔진이 게임 주소를 검색 결과에 넣지 않음(주소를 아는 사람만 접속).
 - claude.ai 밖(Pages 등)에서 "둘이서 하기"를 누르면 아무 반응 없이 멈추던 것을 안내 창으로 변경(`net()`).
 ## v59 — 그림 파일 분리 (게임 규칙·화면 변화 없음)
 - `game/index.html` 안의 base64 그림 134개를 `game/art/` 폴더의 PNG/JPG 파일로 분리. HTML 1.54MB → 약 120KB.
