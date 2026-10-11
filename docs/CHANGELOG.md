@@ -1,6 +1,8 @@
 # CHANGELOG
 (세부 번호는 v36부터 정확. 그 이전은 기능 순서로 요약. 최신이 위.)
 
+## v61 — 화면 버튼 위치 변경
+- 게임 화면의 ➖·➕·👹 보스·🧙 용사·🎨 디자인 버튼 줄을 맵 아래에서 **게임 상황 문구 바로 아래(맵 위)** 로 이동 (`#tb`). 기능 변화 없음.
 ## v60 — GitHub Pages 배포
 - `.github/workflows/pages.yml`: main 의 `game/` 폴더를 GitHub Pages 로 자동 배포. 주소 https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ (설정 방법 `docs/DEPLOY_PAGES.md`).
 - 게임 페이지에 `noindex` 표시 추가: 구글·네이버 등 검색엔진이 게임 주소를 검색 결과에 넣지 않음(주소를 아는 사람만 접속).

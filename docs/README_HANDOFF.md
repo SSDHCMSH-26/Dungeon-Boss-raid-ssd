@@ -1,7 +1,7 @@
 # 픽셀 던전 레이드 — 인수인계 문서 (README)
 
 > 새 대화나 새 프로젝트에서 이어서 작업할 때 **이 파일부터** 읽게 하세요.
-> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v60** (`game/index.html` + `game/art/`)
+> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v61** (`game/index.html` + `game/art/`)
 > 폰/웹 주소(GitHub Pages): https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ — 설정 방법 `docs/DEPLOY_PAGES.md`
 
 ## 1. 한 줄 요약
