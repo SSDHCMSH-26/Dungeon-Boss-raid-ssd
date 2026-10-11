@@ -194,18 +194,12 @@ function tiles(id,dv){if(dv===undefined)dv=V()&&id=="vince"?(T2()?"vince2":"vinc
 function spURL(k){if(!UC[k]){const c=document.createElement("canvas");c.width=c.height=48;const g=c.getContext("2d");g.imageSmoothingEnabled=false;g.drawImage(SC[k],0,0,48,48);UC[k]=c.toDataURL()}return UC[k]}
 function tURL(id){const dv=id=="vince"&&(T2())?(T2()?"vince2":"vince"):id=="gron"&&T2()?"gron":"",k="t"+id+dv;if(!UC[k]){const t=tiles(id,dv),c=document.createElement("canvas");c.width=64;c.height=16;const g=c.getContext("2d");[t.f[0],t.f[1],t.f[2],t.w].forEach((q,i)=>g.drawImage(q,i*16,0));UC[k]=c.toDataURL()}return UC[k]}
 /* ── 데이터 ── */
-/* 용사 기본 수치(이름·체력·이동·패시브)는 data/heroes.json 에서 읽음. 스킬은 아래 HSK */
-const HSK={"knight":[{"n":"베기","c":2,"r":1,"a":0,"t":"d","v":28},{"n":"방패막기","c":2,"r":1,"t":"g","cd":2,"sm":"반경 1칸 아군 받는 피해 -75% (턴 종료까지)","d":"자신에게 사용 · 턴이 끝날 때까지 반경 1칸 안 아군(자신 포함)이 받는 피해 75% 경감 · 쿨타임 2턴"},{"n":"방패돌진","c":2,"r":6,"t":"r","cd":4,"sm":"직선 6칸 돌진 · 적 30 · 기세","d":"지정한 직선 방향으로 6칸 돌진 · 유닛·벽에 부딪히면 정지(적이면 피해 30, 벽은 파괴) · 기세: 함정·구덩이·컨베이어 효과 무시, 지나간 함정 상자 제거 · 무시한 효과 1개당 7 피해, 1개라도 있으면 다음 1턴 행동불능 · 쿨타임 4턴"}],"cleric":[{"n":"치유","c":2,"r":1,"t":"h","v":25,"cd":2,"sm":"인접 아군 HP +25","d":"사거리 1 · 아군 HP +25 · 쿨타임 2턴"},{"n":"성광","c":2,"r":5,"t":"l","sm":"직선 5칸 · 적 -10 / 아군 +10 · 반동 1칸","d":"지정한 방향 직선(8방향) 5칸: 적 피해 10, 아군 회복 10 · 반동으로 반대 방향 1칸 이동"},{"n":"✨ 천상의 계시","c":10,"r":10,"t":"u","cd":6,"sm":"숨은 함정 전부 공개 + 적 1기 속박 1턴","d":"궁극기 · 사거리 10 · 가려진 함정·스킬 영역·함정 상자·구덩이를 전부 공개하고, 선택한 적 1기를 1턴간 속박(기본 이동·이동 스킬 불가) · 쿨타임 6턴"}],"archer":[{"n":"저격","c":2,"r":7,"a":0,"t":"d","v":26},{"n":"속사","c":1,"r":4,"a":0,"t":"d","v":12}],"mage":[{"n":"파이어볼","c":3,"r":7,"a":1,"t":"d","v":34},{"n":"순간이동","c":1,"r":5,"t":"b","cd":3,"sm":"5칸 안 지정 칸에 나타남 · 쿨타임 3턴","d":"사거리 5 · 지정한 칸에 바로 나타남(걸어가지 않음) · AP 1 · 쿨타임 3턴"},{"n":"마력 방출","c":2,"r":0,"t":"o","cd":6,"sm":"3칸 이내 적 50 · 그 밖 전체 적 10","d":"자신 중심 · 반경 3칸 이내 적에게 피해 50, 3칸 밖 맵 전체 적에게 피해 10(아군 제외) · 설치한 벽도 피해 · AP 2 · 쿨타임 6턴"}]};
-const CLS={};for(const k in DATA.heroes)CLS[k]={...DATA.heroes[k],sk:HSK[k]};
-
+/* 용사 기본 수치는 data/heroes.json, 용사 스킬은 data/skills.json 의 heroes */
+const CLS={};for(const k in DATA.heroes)CLS[k]={...DATA.heroes[k],sk:DATA.skills.heroes[k]};
+/* 챔피언 이름·설명은 여기, 공격·설치 스킬(at/gx/ex)은 data/skills.json 의 champions */
 const CH={
-gron:{n:"던전메이커 그론",s:"안경 쓴 개구쟁이 미로 설계자",m:"장난감 미로 던전",ok:1,bash:1,
- at:[{n:"돌덩이 던지기",c:2,r:12,pk:1,sh:"sq",k:2,v:28,d:"5×5 · 구덩이를 맞히면 가장 먼 구덩이에서도 같은 범위로 재개 후 구덩이 소멸"},{n:"큰 바위 굴리기",c:3,r:14,pk:1,sh:"cross",k:9,v:30,d:"십자 길게 · 구덩이를 맞히면 가장 먼 구덩이에서도 같은 범위로 재개 후 구덩이 소멸"}],
- ex:[{id:"wall",n:"🧱 벽 쌓기",c:2,pk:3,r:12,esc:1,d:"3칸 · 한 턴의 첫 벽은 2턴 유지, 같은 턴 두 번째부터는 1턴 유지 · 쓸 때마다 AP +1 · 같은 칸에 겹쳐 쌓으면 Lv↑(최대 Lv3), 레벨업마다 유지 +2턴"},{id:"trap",n:"🗡️ 가시 함정",c:1,pk:1,r:12,d:"통과해도 발동 · 피해 20"},{id:"dig",n:"⛏️ 벽 부수기",c:2,pk:10,vr:1,r:12,lim:2,d:"벽 최대 10칸 · 원하는 만큼"},{id:"pit",n:"⚫ 구덩이 파기",c:2,pk:0,d:"서 있는 곳에 2×2 은신 구덩이 · 최대 6개 · 용사가 빠지면 피해 20 + 가장 먼 구덩이로 이동 + 다음 턴 행동불능 · 빠진 구덩이는 소멸 · 공개된 구덩이는 안전"},{id:"hop",n:"🌀 구덩이 이동",c:3,cd:5,pk:1,r:10,d:"10칸 이내 구덩이로 이동 · 이동 중 모습이 사라짐 · 드나든 구덩이 위치는 용사에게 영구 공개"},{id:"tchest",n:"📦 함정 상자",c:2,cd:4,pk:1,r:60,d:"일반 보물상자처럼 보이는 함정 상자 설치 · 사거리 맵 전체 · 다른 상자 주변 3×3과는 간격을 둬야 함 · 쿨타임 4턴 · 용사가 다가가면 피해 없이 미믹(60%) 또는 보물 고블린(40%)이 나타남 · 그론이 다가가면 회수 + 쿨타임 초기화"}]},
-vince:{n:"공장장 빈센토",s:"깐깐한 안경 쓴 공장장 할아버지 · 공격은 발전기 유닛이 맡아요",m:"자동화 로봇 공장",ok:1,bn:"빈센토",gen:1,
- at:[{n:"전기 방출",c:2,r:10,pk:1,sh:"sq",k:2,v:30,d:"5×5"},{n:"과부하 광선",c:3,r:14,pk:1,sh:"cross",dg:1,k:10,v:28,par:1,d:"십자+대각선(✱) 길게 · 명중 시 ⚡마비(이동 -2, 1턴)"}],
- gx:{id:"charge",n:"⚡ 발전",c:1,d:"다음 턴 사용할 AP +3 충전 · 턴당 1회"},
- ex:[{id:"fac",n:"🏭 공장 설치",c:5,pk:1,r:10,lim:1,d:"2×2 · 3턴마다 로봇 · 매 턴 체력 -4(0이 되면 가라앉아 사라짐) · 공격에 맞아 강화되면 체력 +20·생산 1턴 단축(1턴 유지) · 겹쳐 설치=업그레이드(로봇 초기화)"},{id:"bomb",n:"💣 폭탄로봇(숨김)",c:2,pk:2,r:12,lim:2,d:"시작칸→방향칸 · 턴마다 1칸 · 피해 30"},{id:"belt",n:"🛤️ 컨베이어 설치",c:2,pk:2,r:12,lim:2,d:"시작→끝 한 줄 최대 8칸 · 덮어쓰면 방향 변경"},{id:"run",n:"⚙️ 컨베이어 가동",c:1,pk:0,lim:1,d:"벨트 위 모든 유닛(빈센토·발전기·로봇·폭탄로봇·용사·공장)이 4칸 이동"}]},
+gron:{n:"던전메이커 그론",s:"안경 쓴 개구쟁이 미로 설계자",m:"장난감 미로 던전",ok:1,bash:1,...DATA.skills.champions.gron},
+vince:{n:"공장장 빈센토",s:"깐깐한 안경 쓴 공장장 할아버지 · 공격은 발전기 유닛이 맡아요",m:"자동화 로봇 공장",ok:1,bn:"빈센토",gen:1,...DATA.skills.champions.vince},
 terna:{n:"불꽃 대장간의 테르나",s:"고글 쓴 붉은 머리 대장장이",m:"불꽃 대장간",ok:0},
 on:{n:"심연의 방랑자 온",s:"푸른 두건의 떠돌이",m:"심연의 해저 신전",ok:0},
 pharaoh:{n:"피라미드의 파라오",s:"보물을 지키는 왕",m:"보물이 묻힌 피라미드",ok:0}};
@@ -655,7 +649,7 @@ ui();
 <script>
 /* 수치 데이터(data/*.json)를 먼저 읽은 뒤 위의 게임 코드(#main)를 실행 */
 const DATA={};
-(async()=>{const FILES=["heroes"];
+(async()=>{const FILES=["heroes","skills"];
 try{await Promise.all(FILES.map(async f=>{const r=await fetch("data/"+f+".json",{cache:"no-cache"});if(!r.ok)throw new Error(f+".json ("+r.status+")");DATA[f]=await r.json()}))}
 catch(e){document.body.insertAdjacentHTML("afterbegin",'<div style="background:#5a1d1d;color:#fff;padding:12px;font:14px sans-serif">⚠️ 게임 데이터를 불러오지 못했어요: '+e.message+'<br>index.html 을 파일로 직접 열면 안 돼요. 웹 주소(GitHub Pages)나 로컬 웹서버(python3 -m http.server)로 열어 주세요.</div>');return}
 const s=document.createElement("script");s.textContent=document.getElementById("main").textContent;document.body.appendChild(s);window.GAME_READY=1})();
