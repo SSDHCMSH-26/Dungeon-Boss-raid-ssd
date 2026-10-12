@@ -12,7 +12,8 @@
  5. 화면 글자: 모든 유닛 정보 창(정보·스킬 탭)·행동 메뉴·빠른 버튼·확정 창, 상태별(발전기 파괴, 마비, 크리스탈 등)
     + 보스·용사 행동 기록(발전, 크리스탈, 빈센토 피해 감소, 공장 파괴 보상 등)이 같은지
  6. 스킬 시나리오: 모든 용사·보스 스킬을 직접 써 본 결과(기록·체력·위치·벽·구덩이·함정 한도 등)가 같은지
- 7. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
+ 7. 실제 진행 루프(혼자 하기 타이머·화면 정리·sync)로 양쪽 컴퓨터 대전 4판의 최종 상태가 같은지
+ 8. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
 """
 import functools, http.server, json, os, re, sys, tempfile, threading
 from playwright.sync_api import sync_playwright
@@ -126,19 +127,26 @@ for(const c of ['gron','vince']){
  r.push('부수기 '+act(K3,'x',12,19)+' '+act(K3,'x',11,19),S.log,st());
 }
 // 그론: 벽 쌓기 겹치기 Lv1→3, 가시 함정 최대, 구덩이 최대·낙하
-base('gron',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};const W=CH.gron.ex.find(e=>e.id=='wall'),T=CH.gron.ex.find(e=>e.id=='trap'),P=CH.gron.ex.find(e=>e.id=='pit');
+base('gron',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};S.used={};const W=CH.gron.ex.find(e=>e.id=='wall'),T=CH.gron.ex.find(e=>e.id=='trap'),P=CH.gron.ex.find(e=>e.id=='pit');
 const wp=[[13,15],[14,15],[15,15]];for(let i=0;i<4;i++){r.push('벽'+i+' '+bEx(W,wp),S.log,JSON.stringify(S.walls))}
-L.traps=[];for(let i=0;i<8;i++)r.push('함정'+i+' '+bEx(T,[[5+i,8]]));r.push(JSON.stringify(L.traps));
+L.traps=[];S.sec&&(S.sec.traps=[]);for(let i=0;i<8;i++)r.push('함정'+i+' '+bEx(T,[[5+i,8]]));r.push(JSON.stringify(S.sec?S.sec.traps:L.traps));
 S.pits=[];for(let i=0;i<8;i++){S.boss.x=3+i*3;S.boss.y=5;r.push('구덩이'+i+' '+bEx(P,[]))}r.push(JSON.stringify(S.pits));
 S.ph='hero';const H=S.heroes[0];H.x=S.pits[0].x;H.y=S.pits[0].y+3;H.ap=3;H.mc=0;r.push('낙하 '+act(H,'m',H.x,S.pits[0].y),S.log,st());
 // 빈센토: 벨트 길이 한도, 컨베이어 가동, 폭탄 한도
-base('vince',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};const BE=CH.vince.ex.find(e=>e.id=='belt'),RU=CH.vince.ex.find(e=>e.id=='run'),BO=CH.vince.ex.find(e=>e.id=='bomb');
-r.push('벨트 9칸 '+bEx(BE,[[2,20],[10,20]]),'벨트 8칸 '+bEx(BE,[[2,21],[9,21]]));L.used={};S.heroes[0].x=2;S.heroes[0].y=21;r.push('가동 '+bEx(RU,[]),S.log,st());
-L.bombs=[];for(let i=0;i<6;i++){L.used={};r.push('폭탄'+i+' '+bEx(BO,[[3+i,8],[3+i,9]]))}
+base('vince',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};S.used={};const BE=CH.vince.ex.find(e=>e.id=='belt'),RU=CH.vince.ex.find(e=>e.id=='run'),BO=CH.vince.ex.find(e=>e.id=='bomb');
+r.push('벨트 9칸 '+bEx(BE,[[2,20],[10,20]]),'벨트 8칸 '+bEx(BE,[[2,21],[9,21]]));L.used={};S.used={};S.heroes[0].x=2;S.heroes[0].y=21;r.push('가동 '+bEx(RU,[]),S.log,st());
+L.bombs=[];S.sec&&(S.sec.bombs=[]);for(let i=0;i<6;i++){L.used={};S.used={};r.push('폭탄'+i+' '+bEx(BO,[[3+i,8],[3+i,9]]))}
 S.ph='hero';S.heroes[1].par=1;r.push('마비 이동 '+mvOf(S.heroes[1])+' '+mvOf(S.heroes[0]));
 for(let i=0;i<8;i++){S=newS();L.mode='solo';L.role='hero';L.scr='game';L.wait=0;tickB();r.push('혼자하기 챔피언 '+S.champ+' '+S.map.split('1').length)}L.mode='local';
 {const d0=L.design,seq=[];for(const st of ['old','t2','t3','vince','zzz']){L.design=st;setDesign();seq.push(st+'→'+L.design)}setDesign('old');r.push('디자인 버튼 '+seq.join(' '))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""
+
+# 실제 진행 루프(보스 비밀·사용 횟수는 v67 부터 S 안에 있어 L/S 어디에 있든 같은 뜻으로 비교, 폭탄 번호는 판마다 1부터): 혼자 하기 타이머 루프(tick → AI → 정산 → 화면 정리 → sync)를 양쪽 다 컴퓨터로 끝까지 돌림
+LOOP = """async ()=>{const r=[];AI.delayMs=0;
+for(const c of ['gron','vince','gron','vince']){S=newS();L.bid=0;L.traps=[];L.bombs=[];L.used={};L.mode='solo';L.role='none';L.scr='game';L.wait=0;S.champ=c;S.map=genMap(c);S.pick=c=='gron'?['knight','cleric','mage']:['archer','cleric','knight'];start();
+let n=0;while(!S.end&&S.round<=25&&n++<6000)await new Promise(z=>setTimeout(z,2));
+const sec=S.sec||{traps:L.traps,bombs:L.bombs,bid:L.bid},o=Object.assign({},S);delete o.sec;delete o.used;delete o.seed;delete o.rng;r.push(c+' 라운드 '+S.round+' '+S.end,JSON.stringify(o),JSON.stringify({sec,used:S.used||L.used}),JSON.stringify({a:L.act,p:L.picks,m:L.menu,si:L.si,bag:L.bag}))}
+L.scr='menu';return r}"""
 
 RULES_MOBS = open(os.path.join(ROOT, 'tools', 'test_mobs_example.py'), encoding='utf-8').read()
 RULES_WALLS = open(os.path.join(ROOT, 'tools', 'test_walls_example.py'), encoding='utf-8').read()
@@ -173,7 +181,7 @@ def run(url, tag, b, shots):
             f = os.path.join(shots, f'{tag}_{design}_{champ}.png'); pg.screenshot(path=f, full_page=True)
             res['shots'][design + '_' + champ] = f
     pg.close()
-    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS), ('ui_text', UITEXT), ('skills', SKILLS)]:
+    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS), ('ui_text', UITEXT), ('skills', SKILLS), ('loop', LOOP)]:
         p2 = page(b, url, errs); res[name] = p2.evaluate(js); p2.close()
     p3 = page(b, url, errs)
     res['sim'] = [p3.evaluate(SIM_JS, [c, None, GAMES, 40]) for c in ['gron', 'vince']]
@@ -198,7 +206,7 @@ def main():
     for k in A['shots']:
         ia, ib = Image.open(A['shots'][k]).convert('RGB'), Image.open(B['shots'][k]).convert('RGB')
         check(ia.size == ib.size and ImageChops.difference(ia, ib).getbbox() is None, f'화면 픽셀 동일: {k}')
-    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios', 'ui_text', 'skills']:
+    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios', 'ui_text', 'skills', 'loop']:
         err = any('ERR' in str(x)[:4] for x in B[k])
         check(A[k] == B[k] and not err, f'{k} 결과 동일 ({len(B[k])}항목)')
     sims = B['sim']

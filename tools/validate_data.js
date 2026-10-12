@@ -30,7 +30,10 @@ function check(raw) {
   if (!errs.length) errs.push(...V.links(D));
   // 도구 전용: 코드(index.html)가 쓰는 글자 이름표가 text/ko.json 에 모두 있는지, 안 쓰는 이름표는 없는지
   if (!errs.length && D.text && D.text.text && !raw.__skipCode) {
-    const html = fs.readFileSync(path.join(GAME, "index.html"), "utf8");
+    // index.html + src/ 아래 모든 .js
+    const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".js") ? [path.join(d, e.name)] : []);
+    const srcDir = path.join(GAME, "src");
+    const html = [path.join(GAME, "index.html")].concat(fs.existsSync(srcDir) ? walk(srcDir) : []).map(f => fs.readFileSync(f, "utf8")).join("\n");
     const used = new Set([...html.matchAll(/\bT\("([^"]+)"\)/g)].map(m => m[1]).concat([...html.matchAll(/data-t="([^"]+)"/g)].map(m => m[1]), ["html.docTitle"]));
     used.forEach(k => { if (!(k in D.text.text)) errs.push('data/text/ko.json › text: 코드가 쓰는 "' + k + '" 가 없어요'); });
     Object.keys(D.text.text).forEach(k => { if (!used.has(k)) errs.push('data/text/ko.json › text.' + k + ": 코드에서 안 쓰는 이름표예요"); });
