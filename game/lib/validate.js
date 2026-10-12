@@ -75,12 +75,21 @@
         if (s.cd !== undefined) c.int(s.cd, p + ".cd", 0);
       };
       // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
-      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"] };
+      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"] };
       const FX_ID = { wall: ["hpPerLv", "turns", "turnsLater", "stackTurns", "maxLv"], trap: ["dmg", "max"], pit: ["fallDmg", "max"], belt: ["maxLen"], run: ["move", "enhancedMove"] };
       const fx = (s, keys, p) => {
         if (!keys || !c.obj(s.fx, p + ".fx")) return;
         keys.forEach(k => c.num(s.fx[k], p + ".fx." + k, 0));
         if (keys.includes("damageTaken")) c.prob(s.fx.damageTaken, p + ".fx.damageTaken");
+        // 마법진(t:c): 종류 + 레벨별 수치 val[Lv1, Lv2, ...] / 영창(t:w): 종류(power 위력 · spread 확산)
+        if (s.t === "c") {
+          c.need(["meteor", "frost", "shield"].includes(s.fx.kind), p + ".fx.kind", "meteor · frost · shield 중 하나여야 해요");
+          if (c.need(Array.isArray(s.fx.val) && s.fx.val.length > 0, p + ".fx.val", "레벨별 수치 목록([ ])이어야 해요")) s.fx.val.forEach((v, i) => c.num(v, p + ".fx.val[" + i + "]", 0));
+          if (s.fx.kind === "frost" && c.need(Array.isArray(s.fx.slow) && s.fx.slow.length === s.fx.val.length, p + ".fx.slow", "val 과 같은 길이의 목록이어야 해요")) s.fx.slow.forEach((v, i) => c.int(v, p + ".fx.slow[" + i + "]", 0));
+          if (s.fx.kind === "frost") c.int(s.fx.stunLv, p + ".fx.stunLv", 1);
+          if (s.fx.kind === "meteor") { c.num(s.fx.burn, p + ".fx.burn", 0); c.int(s.fx.burnLv, p + ".fx.burnLv", 1); }
+        }
+        if (s.t === "w") c.need(["power", "spread"].includes(s.fx.kind), p + ".fx.kind", "power · spread 중 하나여야 해요");
       };
       if (c.obj(b.heroes, "heroes"))
         for (const k in b.heroes) if (Array.isArray(b.heroes[k])) b.heroes[k].forEach((s, i) => isObj(s) && fx(s, FX_T[s.t], "heroes." + k + "[" + i + "]"));
@@ -155,6 +164,7 @@
         c.int(b.hero.breakDmg, "hero.breakDmg", 0); c.int(b.hero.breakRange, "hero.breakRange", 1);
       }
       if (c.obj(b.status, "status")) c.int(b.status.paralyzeMove, "status.paralyzeMove", 0);
+      if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); c.int(b.circle.breakDmg, "circle.breakDmg", 1); }
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

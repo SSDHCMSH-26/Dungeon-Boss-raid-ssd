@@ -14,4 +14,4 @@ for(const k in DATA.items){const {effect,...m}=DATA.items[k];ITEMS[k]=m;ITEF[k]=
 const bag0=()=>{const o={};for(const k in ITEMS)o[k]=0;return o},CHR=RULE.chest,LOOT=DATA.loot.treasureChest;
 const LOOTW=LOOT.gold.reduce((a,g)=>a+g[1],0),LOOTI=[];
 {let a=0;LOOT.items.forEach(([k,p])=>{a=Math.round((a+p)*1e9)/1e9;LOOTI.push([k,a])})}
-const CRY=RULE.crystal,CRMAX=CRY.max,CRLIFE=CRY.life;
+const CIRC=RULE.circle,CRY=RULE.crystal,CRMAX=CRY.max,CRLIFE=CRY.life;
