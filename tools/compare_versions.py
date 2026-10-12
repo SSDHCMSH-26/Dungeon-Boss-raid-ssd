@@ -8,7 +8,7 @@
  1. 게임 데이터(용사·스킬·챔피언·아이템·몬스터 수치)가 같은지
  2. 메뉴·용사 선택 화면, 디자인 3종 × 챔피언 2명 게임 화면 픽셀이 같은지
  3. 규칙 테스트(상자·몬스터, 벽) 결과가 같은지
- 4. 미믹·고블린 전용 시나리오 결과가 같은지
+ 4. 미믹·고블린 전용 시나리오(상자 개봉 문구·정보 창·제압·추격·강탈·처치) 결과가 같은지
  5. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
 """
 import functools, http.server, json, os, re, sys, tempfile, threading
@@ -65,7 +65,7 @@ const run=(champ,pick)=>{S=newS();S.champ=champ;S.pick=pick;S.map='0'.repeat(N*N
 L.mode='local';L.role='hero';L.scr='game';S.chests=[];S.mobs=[];S.rob=[];S.fac=[];S.walls=[];S.boss.x=27;S.boss.y=27;
 S.heroes.forEach((h,i)=>{h.x=4+i*6;h.y=5;h.gold=5+i*3});S.bag={b:{potion:0,scroll:0,gem:0},h:{potion:1,scroll:1,gem:1}}};
 for(let t=0;t<30;t++){run(t%2?'vince':'gron',[['knight','cleric','archer'],['mage','archer','cleric'],['knight','mage','archer']][t%3]);
-const u=S.heroes[t%3];const c={x:u.x+1,y:u.y,k:'x',id:500+t};S.chests.push(c);const m0=chOpen(c,'h',u);const lg=[m0,JSON.stringify(S.mobs),u.sup,u.hp];
+const u=S.heroes[t%3];const c={x:u.x+1,y:u.y,k:'x',id:500+t};S.chests.push(c);const m0=chOpen(c,'h',u);const lg=[m0,JSON.stringify(S.mobs),u.sup,u.hp];L.act=null;S.ph='hero';L.insp={t:'m',i:S.mobs[0].id};L.itab='info';lg.push(ipH());L.itab='skill';lg.push(ipH());L.itab='info';L.insp=null;
 for(let i=0;i<6;i++){S.ph='resolve';S.atks=[];resolve();lg.push(S.log,JSON.stringify(S.mobs),JSON.stringify(S.heroes.map(h=>[h.x,h.y,h.hp,h.sup,h.gold,h.dead])),JSON.stringify(S.bag.h))}
 if(S.mobs[0]){dealHits([{o:S.mobs[0],n:'몹'}],99,CLS.archer,'x');lg.push(S.log,JSON.stringify(S.heroes.map(h=>h.gold)),JSON.stringify(S.bag.h))}
 r.push(lg)}

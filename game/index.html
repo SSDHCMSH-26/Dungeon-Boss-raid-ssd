@@ -243,22 +243,24 @@ function genMap(id){if(id=="gron")return mazeMap();let m="";for(let y=0;y<N;y++)
 function pickChamp(id){if(!CH[id].ok){$("lg").textContent="🔒 아직 준비 중인 챔피언이에요 (캐릭터·맵 디자인만 공개)";return}S.champ=id;S.map=genMap(id);S.fac=[];S.rob=[];S.walls=[];S.log=CH[id].n+" 선택! 맵: "+CH[id].m;sync()}
 /* ── 행동 ── */
 const MOBA={"mimic_idle": "art/mob/mimic_idle.png", "mimic_wake": "art/mob/mimic_wake.png", "mimic_atk": "art/mob/mimic_atk.png", "mimic_atk2": "art/mob/mimic_atk2.png", "mimic_hit": "art/mob/mimic_hit.png", "mimic_dead": "art/mob/mimic_dead.png", "gob_idle": "art/mob/gob_idle.png", "gob_move": "art/mob/gob_move.png", "gob_atk": "art/mob/gob_atk.png", "gob_atk2": "art/mob/gob_atk2.png", "gob_hit": "art/mob/gob_hit.png", "gob_dead": "art/mob/gob_dead.png"};const MOBI={};function mobi(k){let i=MOBI[k];if(i===undefined){const d=MOBA[k];if(!d)return MOBI[k]=null;i=MOBI[k]=new Image();i.onload=()=>{if(L.scr=="game")draw()};i.src=d}return i&&i.complete&&i.naturalWidth?i:null}
+/* 미믹·보물 고블린 수치는 data/monsters.json */
+const MOB=DATA.monsters,pct=v=>Math.round(v*100)+"%";
 const mobAt=(x,y)=>(S.mobs||[]).find(m=>m.x==x&&m.y==y);
 function mobClean(){let m="";S.bag=S.bag||{b:{potion:0,scroll:0,gem:0},h:{potion:0,scroll:0,gem:0}};(S.mobs||[]).filter(x=>x.hp<=0).forEach(x=>{if(x.k=="mimic"){const v=S.heroes[x.vi];if(v&&v.sup>0){v.sup=0;m+=" 🔓미믹 처치! "+CLS[v.k].n+" 제압 해제"}else m+=" 💀미믹 처치!"}else{m+=" 💀보물 고블린 처치!";let any=0;(x.loot||[]).forEach(([i,n])=>{const h=S.heroes[i];if(h){h.gold=(h.gold||0)+n;any=1}});(x.items||[]).forEach(k=>{S.bag.h[k]++;any=1});if(any)m+=" 훔친 물건 회수!"}});S.mobs=(S.mobs||[]).filter(x=>x.hp>0);return m}
 function mobSpawn(c,k,u){S.mobs=S.mobs||[];S.mid=S.mid||1;let x=c.x,y=c.y;if(hAt(x,y)||mobAt(x,y)||inB(x,y)||inG(x,y)||rb(x,y)){const cs=[];for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)cs.push([c.x+dx,c.y+dy]);cs.sort((a,b)=>ch(a[0],a[1],c.x,c.y)-ch(b[0],b[1],c.x,c.y)||Math.random()-.5);const q=cs.find(z=>!bad(z[0],z[1])&&!mobAt(z[0],z[1]));if(q){x=q[0];y=q[1]}}
-const m=k=="mimic"?{id:S.mid++,k,x,y,hp:20,mx:20,hold:u?1:0,vi:u?S.heroes.indexOf(u):-1}:{id:S.mid++,k,x,y,hp:30,mx:30,gold:0,loot:[],items:[]};S.mobs.push(m);return m}
+const m=k=="mimic"?{id:S.mid++,k,x,y,hp:MOB.mimic.hp,mx:MOB.mimic.hp,hold:u?1:0,vi:u?S.heroes.indexOf(u):-1}:{id:S.mid++,k,x,y,hp:MOB.gob.hp,mx:MOB.gob.hp,gold:0,loot:[],items:[]};S.mobs.push(m);return m}
 function mobStep(m,t,n){if(ch(t.x,t.y,m.x,m.y)<=1)return;const st=m.y*N+m.x,pv={[st]:-1},q=[[m.x,m.y]];let end=-1;while(q.length){const [x,y]=q.shift();if(ch(x,y,t.x,t.y)<=1){end=y*N+x;break}for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=x+dx,ny=y+dy,i=ny*N+nx;if((dx||dy)&&pv[i]===undefined&&!bad(nx,ny)){pv[i]=y*N+x;q.push([nx,ny])}}}
 if(end<0)return;const path=[];for(let i=end;i!=st;i=pv[i])path.unshift(i);const pc=path.slice(0,n).map(z=>[z%N,(z/N)|0]);if(!pc.length)return;vpath("m"+m.id,pc);const l=pc[pc.length-1];m.x=l[0];m.y=l[1]}
 function mobAct(m,o){const al=()=>S.heroes.filter(h=>!h.dead);if(!al().length)return;
 if(m.k=="mimic"){const v=S.heroes[m.vi];if(m.hold){if(v&&!v.dead&&v.sup>0)return;m.hold=0;o.push("👾 미믹이 깨어나 움직이기 시작!")}
-const t=al().sort((a,b)=>ch(a.x,a.y,m.x,m.y)-ch(b.x,b.y,m.x,m.y))[0];mobStep(m,t,2);if(ch(t.x,t.y,m.x,m.y)<=1){m.aT=Date.now();o.push("👾미믹→"+CLS[t.k].n+" -"+hurt(t,17))}return}
-let ap=2,moved=0,gd=0;while(ap>0&&gd++<6){const hs=al();if(!hs.length)break;const t=hs.sort((a,b)=>(b.gold||0)-(a.gold||0)||ch(a.x,a.y,m.x,m.y)-ch(b.x,b.y,m.x,m.y))[0];
-if(ch(t.x,t.y,m.x,m.y)<=1){ap--;m.aT=Date.now();let msg="💰고블린→"+CLS[t.k].n+" 훔치기 -"+hurt(t,15);const r=Math.random();
-if(r<.6){const n=Math.min(t.gold||0,3+rn(5));if(n>0){t.gold-=n;m.gold+=n;m.loot.push([S.heroes.indexOf(t),n]);msg+=" · 금화 "+n+" 강탈!"}else msg+=" · 훔칠 금화가 없다"}
-else if(r<.8){const bg=S.bag.h,ks=Object.keys(ITEMS).filter(k=>bg[k]>0);if(ks.length){const k=ks[rn(ks.length)];bg[k]--;m.items.push(k);ap++;moved=0;msg+=" · "+ITEMS[k].n+" 강탈! (AP +1 · 이동 1회 추가)"}else msg+=" · 훔칠 아이템이 없다"}
+const t=al().sort((a,b)=>ch(a.x,a.y,m.x,m.y)-ch(b.x,b.y,m.x,m.y))[0];mobStep(m,t,MOB.mimic.move);if(ch(t.x,t.y,m.x,m.y)<=1){m.aT=Date.now();o.push("👾미믹→"+CLS[t.k].n+" -"+hurt(t,MOB.mimic.bite))}return}
+let ap=MOB.gob.ap,moved=0,gd=0;while(ap>0&&gd++<6){const hs=al();if(!hs.length)break;const t=hs.sort((a,b)=>(b.gold||0)-(a.gold||0)||ch(a.x,a.y,m.x,m.y)-ch(b.x,b.y,m.x,m.y))[0];
+if(ch(t.x,t.y,m.x,m.y)<=1){ap--;m.aT=Date.now();let msg="💰고블린→"+CLS[t.k].n+" 훔치기 -"+hurt(t,MOB.gob.steal);const r=Math.random();
+if(r<MOB.gob.goldChance){const n=Math.min(t.gold||0,MOB.gob.goldMin+rn(MOB.gob.goldMax-MOB.gob.goldMin+1));if(n>0){t.gold-=n;m.gold+=n;m.loot.push([S.heroes.indexOf(t),n]);msg+=" · 금화 "+n+" 강탈!"}else msg+=" · 훔칠 금화가 없다"}
+else if(r<MOB.gob.goldChance+MOB.gob.itemChance){const bg=S.bag.h,ks=Object.keys(ITEMS).filter(k=>bg[k]>0);if(ks.length){const k=ks[rn(ks.length)];bg[k]--;m.items.push(k);ap++;moved=0;msg+=" · "+ITEMS[k].n+" 강탈! (AP +1 · 이동 1회 추가)"}else msg+=" · 훔칠 아이템이 없다"}
 else msg+=" · 훔치기 실패";o.push(msg)}
-else if(!moved){moved=1;mobStep(m,t,8);if(ch(t.x,t.y,m.x,m.y)>1)break}else break}}
-function chAge(o){(S.chests||[]).slice().forEach(c=>{c.age=(c.age||0)+1;if(c.age<12)return;S.chests=S.chests.filter(z=>z!==c);S.cfx=(S.cfx||[]).filter(f=>Date.now()-f.t<4000);if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:Date.now(),k:"trap"});const mim=Math.random()<.6;mobSpawn(c,mim?"mimic":"gob",null);o.push("📦 방치된 함정 상자에서 "+(mim?"👾미믹":"💰보물 고블린")+"이(가) 튀어나왔다!")}else o.push("📦 방치된 보물상자가 사라졌다…")})}
+else if(!moved){moved=1;mobStep(m,t,MOB.gob.move);if(ch(t.x,t.y,m.x,m.y)>1)break}else break}}
+function chAge(o){(S.chests||[]).slice().forEach(c=>{c.age=(c.age||0)+1;if(c.age<12)return;S.chests=S.chests.filter(z=>z!==c);S.cfx=(S.cfx||[]).filter(f=>Date.now()-f.t<4000);if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:Date.now(),k:"trap"});const mim=Math.random()<MOB.trapChest.mimicChance;mobSpawn(c,mim?"mimic":"gob",null);o.push("📦 방치된 함정 상자에서 "+(mim?"👾미믹":"💰보물 고블린")+"이(가) 튀어나왔다!")}else o.push("📦 방치된 보물상자가 사라졌다…")})}
 function mobsAct(o){(S.mobs||[]).slice().forEach(m=>{if(m.hp>0)mobAct(m,o)})}
 function hits(x,y,a){const r=[],B=S.boss;if(Math.abs(x-B.x)<=1+a&&Math.abs(y-B.y)<=1+a)r.push({o:B,n:CH[S.champ].bn||"보스"});if(S.gen&&S.gen.hp>0&&Math.abs(x-S.gen.x)<=1+a&&Math.abs(y-S.gen.y)<=1+a)r.push({o:S.gen,n:"발전기"});
 S.fac.forEach(f=>{if(f.x<=x+a&&f.x+1>=x-a&&f.y<=y+a&&f.y+1>=y-a)r.push({o:f,n:"공장"})});S.rob.forEach(q=>{if(Math.abs(q.x-x)<=a&&Math.abs(q.y-y)<=a)r.push({o:q,n:"로봇"})});(S.mobs||[]).forEach(m=>{if(Math.abs(m.x-x)<=a&&Math.abs(m.y-y)<=a)r.push({o:m,n:m.k=="mimic"?"미믹":"보물 고블린"})});S.walls.forEach(w=>{if(w.hp==null)w.hp=20*(w.lv||1);if(Math.abs(w.x-x)<=a&&Math.abs(w.y-y)<=a)r.push({o:w,n:"벽"})});S.mw=S.mw||{};for(let yy=Math.max(1,y-a);yy<=Math.min(N-2,y+a);yy++)for(let xx=Math.max(1,x-a);xx<=Math.min(N-2,x+a);xx++)if(sw(xx,yy)){const k=yy*N+xx;r.push({o:S.mw[k]||(S.mw[k]={x:xx,y:yy,hp:20,mw:1}),n:"벽"})}return r}
@@ -322,7 +324,7 @@ function bAtk(i,p,fb){const c=CH[S.champ],a=c.at[i],U=c.gen&&!gDead()&&!(fb&&S.b
 const SS={wall:"벽 3칸 설치 · 겹치면 Lv↑(최대 3)",trap:"통과 시 피해 20",dig:"벽 최대 10칸 제거",pit:"2×2 은신 구덩이 설치",hop:"구덩이로 이동",tchest:"보물상자로 위장한 함정",fac:"2×2 공장 설치",bomb:"숨은 폭탄로봇 설치",belt:"컨베이어 한 줄 설치",run:"벨트 위 유닛 4칸 이동"},sm=d=>String(d).split(" · ")[0];const ITEMS={potion:{n:"체력 포션",ic:"it_pot",d:"HP +30"},scroll:{n:"순간이동 스크롤",ic:"it_scr",d:"10칸 이내 순간이동"},gem:{n:"AP 보석",ic:"it_gem",d:"AP +2"}};
 function chSpawn(n){S.chests=S.chests||[];S.cid=S.cid||1;let made=0;for(let k=0;k<n&&S.chests.length<6;k++){for(let a=0;a<80;a++){const x=1+rn(N-2),y=4+rn(N-8);if(bad(x,y)||beltAt(x,y)||pitAt(x,y)>=0||S.chests.some(c=>ch(c.x,c.y,x,y)<3)||(S.cry||[]).some(c=>c.x==x&&c.y==y)||S.heroes.some(h=>ch(h.x,h.y,x,y)<=3)||ch(S.boss.x,S.boss.y,x,y)<=4||(S.gen&&ch(S.gen.x,S.gen.y,x,y)<=4))continue;S.chests.push({id:S.cid++,x,y,k:"t"});made++;break}}return made}
 function chOpen(c,side,u){S.chests=S.chests.filter(z=>z!==c);S.cfx=(S.cfx||[]).filter(f=>Date.now()-f.t<4000);S.gold=S.gold||{b:0,h:0};S.bag=S.bag||{b:{potion:0,scroll:0,gem:0},h:{potion:0,scroll:0,gem:0}};
-if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:Date.now(),k:"trap"});if(side=="b"){S.cd=S.cd||{};S.cd.tchest=0;return "📦 그론이 상자를 회수! 함정 상자였다 (설치 쿨타임 초기화)"}const mim=Math.random()<.6;if(mim){u.sup=3;u.ap=0;u.mc=9;mobSpawn(c,"mimic",u);return "👾 미믹이었다! "+CLS[u.k].n+" 제압당했다! (최대 3턴 행동불능 · 턴마다 7 피해 · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제)"}mobSpawn(c,"gob",u);return "💰 보물 고블린이 튀어나왔다! 금화를 가장 많이 가진 용사를 노린다"}
+if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:Date.now(),k:"trap"});if(side=="b"){S.cd=S.cd||{};S.cd.tchest=0;return "📦 그론이 상자를 회수! 함정 상자였다 (설치 쿨타임 초기화)"}const mim=Math.random()<MOB.trapChest.mimicChance;if(mim){u.sup=MOB.mimic.suppressTurns;u.ap=0;u.mc=9;mobSpawn(c,"mimic",u);return "👾 미믹이었다! "+CLS[u.k].n+" 제압당했다! (최대 "+MOB.mimic.suppressTurns+"턴 행동불능 · 턴마다 "+MOB.mimic.suppressDmg+" 피해 · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제)"}mobSpawn(c,"gob",u);return "💰 보물 고블린이 튀어나왔다! 금화를 가장 많이 가진 용사를 노린다"}
 const gw=[[3,1],[4,3],[5,4],[6,4],[7,3],[8,2],[9,1],[10,1]];let gq=Math.random()*19,gl=3;for(const [v,w] of gw){if(gq<w){gl=v;break}gq-=w}
 const r=Math.random(),it=r<.1?"scroll":r<.35?"gem":r<.65?"potion":"empty";if(side=="b")S.gold.b+=gl;else u.gold=(u.gold||0)+gl;if(it!="empty")S.bag[side][it]++;S.cfx.push({x:c.x,y:c.y,t:Date.now(),k:it=="empty"?"gold":it});
 return "🎁 "+(side=="b"?"보스":"용사 진영")+"이(가) 보물상자를 열었다! 💰 금화 +"+gl+(it!="empty"?" · "+ITEMS[it].n+" 획득":"")}
@@ -335,7 +337,7 @@ S.heroes.forEach(h=>{if(h.dead)return;S.chests.slice().forEach(c=>{if(S.chests.i
 [S.boss,S.gen&&S.gen.hp>0?S.gen:null].forEach(u=>{if(!u)return;S.chests.slice().forEach(c=>{if(S.chests.includes(c)&&ch(u.x,u.y,c.x,c.y)<=2)m.push(chOpen(c,"b",u))})});
 S.heroes.forEach(h=>{if(!h.dead&&h.sup>0&&S.heroes.some(z=>z!==h&&!z.dead&&ch(z.x,z.y,h.x,h.y)<=1)){h.sup=0;m.push("🤝 "+CLS[h.k].n+" 제압 해제!")}});
 if(m.length)S.log=(S.log?S.log+" ":"")+m.join(" ")}
-function supTick(o){S.heroes.forEach(h=>{if(h.dead||!(h.sup>0))return;if(S.heroes.some(z=>z!==h&&!z.dead&&ch(z.x,z.y,h.x,h.y)<=1)){h.sup=0;o.push("🤝 "+CLS[h.k].n+" 제압 해제");return}h.hp-=7;h.sup--;o.push("⛓ "+CLS[h.k].n+" 제압 -7");if(h.hp<=0){h.hp=0;h.dead=1}})}
+function supTick(o){S.heroes.forEach(h=>{if(h.dead||!(h.sup>0))return;if(S.heroes.some(z=>z!==h&&!z.dead&&ch(z.x,z.y,h.x,h.y)<=1)){h.sup=0;o.push("🤝 "+CLS[h.k].n+" 제압 해제");return}h.hp-=MOB.mimic.suppressDmg;h.sup--;o.push("⛓ "+CLS[h.k].n+" 제압 -"+MOB.mimic.suppressDmg);if(h.hp<=0){h.hp=0;h.dead=1}})}
 function useItem(k){const side=S.ph=="boss"?"b":"h";if(!mine()||!S.bag||!S.bag[side][k])return;const bs=S.ph=="boss";let u,nm;
 if(bs){const g=S.champ=="vince"&&L.bsel=="g"&&S.gen&&S.gen.hp>0;u=g?S.gen:S.boss;nm=g?"발전기":(CH[S.champ].bn||CH[S.champ].n)}else{u=sel();if(!u||u.dead)return;nm=CLS[u.k].n}
 if(k=="potion"){const mx=u.max||u.mx;if(u.hp>=mx){$("lg").textContent="이미 체력이 가득 차 있어요";return}u.hp=Math.min(mx,u.hp+30)}
@@ -586,8 +588,8 @@ sk=[["🦶 이동",1,bMv(),"직선·대각선 "+bMv()+"칸"]].concat(c.gen&&!gDe
 else if(u.t=="G"){const g=S.gen;if(!g||g.hp<=0)return"";nm="발전기";ic=img("gen",28);hp=g.hp;mx=g.mx;side="boss";
 rows=[["AP",g.ap+" / "+GAP+(g.bonus?"  (다음 턴 +"+g.bonus+")":"")],["최대 이동","컨베이어 위에서만 · 4칸 (강화 8칸) · 유닛에 막히지 않음"]];sk=c.at.map(a=>[a.n,a.c,a.r,"피해 "+a.v+" · "+a.d]).concat(c.gx?[[c.gx.n,c.gx.c,"-",c.gx.d]]:[])}
 else if(u.t=="m"){const m=(S.mobs||[]).find(z=>z.id==u.i);if(!m)return"";nm=m.k=="mimic"?"미믹":"보물 고블린";ic=m.k=="mimic"?"👾":"💰";hp=m.hp;mx=m.mx;side="boss";
-if(m.k=="mimic"){const v=S.heroes[m.vi];rows=[["이동","2칸/턴 (제압 중에는 움직이지 않음)"],["상태",m.hold&&v&&v.sup>0?"⛓ "+CLS[v.k].n+" 제압 중 ("+v.sup+"턴 남음)":"깨어남 · 추격 중"]];sk=[["제압","-",1,"상자를 연 용사를 최대 3턴 제압(턴마다 7 피해) · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제"],["물어뜯기","-",1,"해제 후 인접한 용사에게 피해 17"]]}
-else{rows=[["AP","최대 2"],["최대 이동","8칸 · 턴당 기본 이동 1회"],["가진 금화","💰 "+(m.gold||0)],["상태","금화를 가장 많이 가진 용사를 추격"]];sk=[["훔치기","1",1,"피해 15 · 금화 60% / 아이템 20% / 실패 20% · 아이템 성공 시 AP +1, 이동 1회 추가"]]}}
+if(m.k=="mimic"){const v=S.heroes[m.vi];rows=[["이동",MOB.mimic.move+"칸/턴 (제압 중에는 움직이지 않음)"],["상태",m.hold&&v&&v.sup>0?"⛓ "+CLS[v.k].n+" 제압 중 ("+v.sup+"턴 남음)":"깨어남 · 추격 중"]];sk=[["제압","-",1,"상자를 연 용사를 최대 "+MOB.mimic.suppressTurns+"턴 제압(턴마다 "+MOB.mimic.suppressDmg+" 피해) · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제"],["물어뜯기","-",1,"해제 후 인접한 용사에게 피해 "+MOB.mimic.bite]]}
+else{rows=[["AP","최대 "+MOB.gob.ap],["최대 이동",MOB.gob.move+"칸 · 턴당 기본 이동 1회"],["가진 금화","💰 "+(m.gold||0)],["상태","금화를 가장 많이 가진 용사를 추격"]];sk=[["훔치기","1",1,"피해 "+MOB.gob.steal+" · 금화 "+pct(MOB.gob.goldChance)+" / 아이템 "+pct(MOB.gob.itemChance)+" / 실패 "+pct(1-MOB.gob.goldChance-MOB.gob.itemChance)+" · 아이템 성공 시 AP +1, 이동 1회 추가"]]}}
 else if(u.t=="r"){const r=S.rob.find(z=>z.id==u.i);if(!r)return"";nm="로봇 Lv"+r.lv;ic="🤖";hp=r.hp;mx=r.mx;side="boss";
 rows=[["최대 이동",(r.en?4:2)+"칸/턴 · 반경 7칸 안에 용사가 있으면 추격"],["상태",r.en?"🔷 강화 "+r.en+"턴 남음 (체력·이동 2배)":"기본"]];sk=[["접근 공격","-",1,"인접한 용사에게 피해 "+(12+6*(r.lv-1))]]}
 else if(u.t=="f"){const f=S.fac.find(z=>z.id==u.i);if(!f)return"";nm="로봇 공장 Lv"+f.lv;ic="🏭";hp=f.hp;mx=f.mx;side="boss";
@@ -649,7 +651,7 @@ ui();
 <script>
 /* 수치 데이터(data/*.json)를 먼저 읽은 뒤 위의 게임 코드(#main)를 실행 */
 const DATA={};
-(async()=>{const FILES=["heroes","skills"];
+(async()=>{const FILES=["heroes","skills","monsters"];
 try{await Promise.all(FILES.map(async f=>{const r=await fetch("data/"+f+".json",{cache:"no-cache"});if(!r.ok)throw new Error(f+".json ("+r.status+")");DATA[f]=await r.json()}))}
 catch(e){document.body.insertAdjacentHTML("afterbegin",'<div style="background:#5a1d1d;color:#fff;padding:12px;font:14px sans-serif">⚠️ 게임 데이터를 불러오지 못했어요: '+e.message+'<br>index.html 을 파일로 직접 열면 안 돼요. 웹 주소(GitHub Pages)나 로컬 웹서버(python3 -m http.server)로 열어 주세요.</div>');return}
 const s=document.createElement("script");s.textContent=document.getElementById("main").textContent;document.body.appendChild(s);window.GAME_READY=1})();
