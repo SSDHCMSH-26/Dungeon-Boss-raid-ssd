@@ -71,4 +71,9 @@ module.exports = [
   ["맵 목록에 없는 기본 맵", r => { r.mapIndex.default.gron = "nope"; }, "maps 목록에 없는 맵"],
   ["기본 맵이 다른 챔피언 맵", r => { r.mapIndex.default.gron = "vince_factory"; }, "gron 맵이 아니에요"],
   ["챔피언 기본 맵 없음", r => { delete r.mapIndex.default.vince; }, '"vince" 의 기본 맵이 없어요'],
+  // ── AI ──
+  ["AI 확률 1 초과", r => { r.ai.boss.gron.wall.chance = 1.2; }, "boss.gron.wall.chance"],
+  ["AI 치유 기준 음수", r => { r.ai.hero.healBelow = -0.1; }, "hero.healBelow"],
+  ["AI 시도 횟수 소수", r => { r.ai.boss.attackTries = 2.5; }, "boss.attackTries"],
+  ["AI 벨트 길이 뒤집힘", r => { r.ai.boss.vince.belt.lenMin = 9; }, "lenMin 이 lenMax"],
 ];

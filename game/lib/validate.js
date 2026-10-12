@@ -14,6 +14,7 @@
     items: { path: "data/items.json", format: "pdr-items", version: 1 },
     loot: { path: "data/loot.json", format: "pdr-loot", version: 1 },
     mapIndex: { path: "data/maps/index.json", format: "pdr-map-index", version: 1 },
+    ai: { path: "data/ai.json", format: "pdr-ai", version: 1 },
   };
   // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
   const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
@@ -180,6 +181,22 @@
         const need = { potion: "heal", scroll: "range", gem: "ap" }[k];
         c.need(isNum(b[k].effect[need]), k + ".effect." + need, "이 아이템 효과에 필요한 숫자예요");
       });
+    },
+    ai(b, c) {
+      // 이름이 chance 면 확률(0~1), healBelow 도 비율, 나머지 숫자는 0 이상 정수
+      const walk = (o, p) => {
+        if (!c.obj(o, p)) return;
+        for (const k in o) {
+          const v = o[k], q = p ? p + "." + k : k;
+          if (isObj(v)) walk(v, q);
+          else if (/chance$/i.test(k) || k === "healBelow") c.prob(v, q);
+          else c.int(v, q, 0);
+        }
+      };
+      walk(b, "");
+      ["boss", "hero"].forEach(k => c.obj(b[k], k));
+      if (isObj(b.boss) && isObj(b.boss.vince) && isObj(b.boss.vince.belt))
+        c.need(b.boss.vince.belt.lenMin <= b.boss.vince.belt.lenMax, "boss.vince.belt", "lenMin 이 lenMax 보다 클 수 없어요");
     },
     mapIndex(b, c) {
       if (c.need(Array.isArray(b.maps) && b.maps.length > 0, "maps", "맵 ID 목록이어야 해요"))

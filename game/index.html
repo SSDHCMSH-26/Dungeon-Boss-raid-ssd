@@ -437,38 +437,40 @@ S.atks=[];S.mv=[];try{if(Math.random()<CHR.spawnChance&&chSpawn(1))S.log+=" 📦
 if(S.heroes.every(h=>h.dead))S.end="👹 보스 진영 승리! 용사가 전멸했습니다."}
 function start(){if(!S.champ||S.pick.length!=3)return;const MP=mapOf(S.champ).spawns;S.heroes=S.pick.map((k,i)=>({k,x:MP.heroes[i].x,y:MP.heroes[i].y,hp:CLS[k].hp,max:CLS[k].hp,ap:RULE.hero.ap,mc:0,guard:0,dead:0,gold:0}));S.boss.x=MP.boss.x;S.boss.y=MP.boss.y;S.boss.hp=S.boss.max=CST().hp;S.boss.ap=CST().ap;S.gen=CH[S.champ].gen?{x:MP.generator.x,y:MP.generator.y,hp:CST().generator.hp,mx:CST().generator.hp,ap:GAP()}:null;S.cry=[];S.pits=[];S.chests=[];S.cid=1;(mapOf(S.champ).objects||[]).forEach(o=>{if(o.type=="pit")S.pits.push({x:o.x,y:o.y});else S.chests.push({id:S.cid++,x:o.x,y:o.y,k:o.type=="trapChest"?"x":"t"})});S.mobs=[];S.mid=1;S.gold={b:0,h:0};S.bag={b:bag0(),h:bag0()};L.bag=0;S.scan=null;S.scanB=[];S.facRef=0;S.genDead=0;S.sink=[];S.cfx=[];S.gh=[];if(Math.random()<CHR.startChance)chSpawn(CHR.startMin+rn(CHR.startMax-CHR.startMin+1));crSpawn(CRY.start);S.ph="boss";S.log="👹 "+CH[S.champ].n+": AP "+CST().ap+"으로 이동·설치·공격 예고를 하고 턴을 종료하세요.";L.si=0;L.used={};L.menu=1;sync();setTimeout(()=>jump(0),50)}
 /* ── 컴퓨터 ── */
+/* 컴퓨터(AI) 확률·기준값은 data/ai.json. 판단 순서·조준 방식은 아래 코드 */
+const AI=DATA.ai,AB=AI.boss,AH=AI.hero,cex=(c,id)=>c.ex.find(e=>e.id==id);
 function aiSetup(){S.pick=Object.keys(CLS).sort(()=>Math.random()-.5).slice(0,3);start()}
 function aiBoss(){const B=S.boss,c=CH[S.champ],al=S.heroes.filter(h=>!h.dead).sort((a,b)=>ch(a.x,a.y,B.x,B.y)-ch(b.x,b.y,B.x,B.y)),t=al[0];
-if((!c.gen||gDead())&&ch(t.x,t.y,B.x,B.y)>6){let mx=cl(t.x-B.x,-bMv(),bMv()),my=cl(t.y-B.y,-bMv(),bMv());if(mx&&my){const m=Math.min(Math.abs(mx),Math.abs(my));mx=Math.sign(mx)*m;my=Math.sign(my)*m}if(!bMove(B.x+mx,B.y+my)&&mx&&my)bMove(B.x+mx,B.y)}
-if(S.champ=="gron"){if(B.ap>=2&&!(S.cd&&S.cd.tchest>0)&&Math.random()<.3){const e=c.ex[5];bExtra(e,[[cr(t.x+rn(7)-3,B.x,e.r),cr(t.y-2-rn(3),B.y,e.r)]])}if(B.ap>=1&&pitAt(B.x,B.y)<0&&Math.random()<.3)bExtra(c.ex[3],[]);if(B.ap>=1&&(S.pits||[]).length>=2&&Math.random()<.25){const ps=(S.pits||[]).filter(z=>(z.x!=B.x||z.y!=B.y)&&ch(z.x,z.y,B.x,B.y)<=10&&!hAt(z.x,z.y)).sort((a,b)=>ch(a.x,a.y,t.x,t.y)-ch(b.x,b.y,t.x,t.y));if(ps.length&&ch(ps[0].x,ps[0].y,t.x,t.y)<ch(B.x,B.y,t.x,t.y))bExtra(c.ex[4],[[ps[0].x,ps[0].y]])}if(Math.random()<.5){const e=c.ex[0],p=[];for(let n=0;n<12&&p.length<3;n++){const q=[cr(t.x+rn(5)-2,B.x,e.r),cr(t.y-1-rn(2),B.y,e.r)];if(!bad(q[0],q[1])&&!p.some(z=>z[0]==q[0]&&z[1]==q[1]))p.push(q)}if(p.length==3)bExtra(e,p)}
-for(let n=0;n<2;n++)if(Math.random()<.6)bExtra(c.ex[1],[[cr(t.x+rn(5)-2,B.x,12),cr(t.y-rn(3),B.y,12)]])}
-else{const f=S.fac.filter(z=>ch(z.x,z.y,B.x,B.y)<=10&&z.lv<3);
-if(B.ap>=5&&Math.random()<.5){if(S.fac.length>=2&&f.length&&Math.random()<.6){const z=f[rn(f.length)];bExtra(c.ex[0],[[z.x,z.y]])}else for(let m=0;m<20;m++)if(bExtra(c.ex[0],[[cr(B.x+rn(11)-5,B.x,10),cr(B.y+2+rn(6),B.y,10)]]))break}
-if(B.ap>=2&&Math.random()<.5){const sx=cr(t.x+rn(3)-1,B.x,12),sy=cr(t.y-4-rn(3),B.y,12);bExtra(c.ex[1],[[sx,sy],[sx+Math.sign(t.x-sx),sy+Math.sign(t.y-sy)]])}
-if(B.ap>=3&&Math.random()<.6){const o=S.rob.length?S.rob[rn(S.rob.length)]:B,ax=Math.abs(t.x-o.x)>Math.abs(t.y-o.y),dx=ax?Math.sign(t.x-o.x):0,dy=ax?0:Math.sign(t.y-o.y),len=2+rn(5);if(dx||dy){bExtra(c.ex[2],[[o.x,o.y],[cl(o.x+dx*len,0,N-1),cl(o.y+dy*len,0,N-1)]]);bExtra(c.ex[3],[])}}}
-const U=c.gen&&!gDead()?S.gen:B;if(c.gen&&!gDead()&&!B.en&&Math.random()<.35)bAtk(0,[[B.x,B.y]]);if(c.gen&&!gDead()&&U&&U.hp>0&&Math.random()<.4)genCharge();if(U&&U.hp>0)for(let n=0;n<3;n++){const o=c.at.filter(a=>a.c<=U.ap);if(!o.length)break;const a=o[rn(o.length)],i=c.at.indexOf(a),e=al[rn(al.length)];bAtk(i,[[cr(e.x+rn(3)-1,U.x,a.r),cr(e.y+rn(3)-1,U.y,a.r)]])}
-if(c.gen&&!gDead()&&B.en>0)for(let n=0;n<2;n++){const o=c.at.filter(a=>a.c<=B.ap);if(!o.length)break;const a=o[rn(o.length)],i=c.at.indexOf(a),e=al[rn(al.length)];bAtk(i,[[cr(e.x+rn(3)-1,B.x,a.r),cr(e.y+rn(3)-1,B.y,a.r)]],1)}
+if((!c.gen||gDead())&&ch(t.x,t.y,B.x,B.y)>AB.approachDist){let mx=cl(t.x-B.x,-bMv(),bMv()),my=cl(t.y-B.y,-bMv(),bMv());if(mx&&my){const m=Math.min(Math.abs(mx),Math.abs(my));mx=Math.sign(mx)*m;my=Math.sign(my)*m}if(!bMove(B.x+mx,B.y+my)&&mx&&my)bMove(B.x+mx,B.y)}
+if(S.champ=="gron"){const AG=AB.gron;if(B.ap>=AG.trapChest.minAp&&!(S.cd&&S.cd.tchest>0)&&Math.random()<AG.trapChest.chance){const e=cex(c,"tchest");bExtra(e,[[cr(t.x+rn(7)-3,B.x,e.r),cr(t.y-2-rn(3),B.y,e.r)]])}if(B.ap>=AG.digPit.minAp&&pitAt(B.x,B.y)<0&&Math.random()<AG.digPit.chance)bExtra(cex(c,"pit"),[]);if(B.ap>=AG.hopPit.minAp&&(S.pits||[]).length>=AG.hopPit.minPits&&Math.random()<AG.hopPit.chance){const ps=(S.pits||[]).filter(z=>(z.x!=B.x||z.y!=B.y)&&ch(z.x,z.y,B.x,B.y)<=AG.hopPit.range&&!hAt(z.x,z.y)).sort((a,b)=>ch(a.x,a.y,t.x,t.y)-ch(b.x,b.y,t.x,t.y));if(ps.length&&ch(ps[0].x,ps[0].y,t.x,t.y)<ch(B.x,B.y,t.x,t.y))bExtra(cex(c,"hop"),[[ps[0].x,ps[0].y]])}if(Math.random()<AG.wall.chance){const e=cex(c,"wall"),p=[];for(let n=0;n<AG.wall.tries&&p.length<e.pk;n++){const q=[cr(t.x+rn(5)-2,B.x,e.r),cr(t.y-1-rn(2),B.y,e.r)];if(!bad(q[0],q[1])&&!p.some(z=>z[0]==q[0]&&z[1]==q[1]))p.push(q)}if(p.length==e.pk)bExtra(e,p)}
+for(let n=0;n<AG.spikeTrap.tries;n++)if(Math.random()<AG.spikeTrap.chance){const e=cex(c,"trap");bExtra(e,[[cr(t.x+rn(5)-2,B.x,e.r),cr(t.y-rn(3),B.y,e.r)]])}}
+else{const AV=AB.vince,F=AV.factory,f=S.fac.filter(z=>ch(z.x,z.y,B.x,B.y)<=F.range&&z.lv<FAC.maxLv);
+if(B.ap>=F.minAp&&Math.random()<F.chance){const e=cex(c,"fac");if(S.fac.length>=F.upgradeMinFactories&&f.length&&Math.random()<F.upgradeChance){const z=f[rn(f.length)];bExtra(e,[[z.x,z.y]])}else for(let m=0;m<F.tries;m++)if(bExtra(e,[[cr(B.x+rn(11)-5,B.x,e.r),cr(B.y+2+rn(6),B.y,e.r)]]))break}
+if(B.ap>=AV.bomb.minAp&&Math.random()<AV.bomb.chance){const e=cex(c,"bomb"),sx=cr(t.x+rn(3)-1,B.x,e.r),sy=cr(t.y-4-rn(3),B.y,e.r);bExtra(e,[[sx,sy],[sx+Math.sign(t.x-sx),sy+Math.sign(t.y-sy)]])}
+if(B.ap>=AV.belt.minAp&&Math.random()<AV.belt.chance){const o=S.rob.length?S.rob[rn(S.rob.length)]:B,ax=Math.abs(t.x-o.x)>Math.abs(t.y-o.y),dx=ax?Math.sign(t.x-o.x):0,dy=ax?0:Math.sign(t.y-o.y),len=AV.belt.lenMin+rn(AV.belt.lenMax-AV.belt.lenMin+1);if(dx||dy){bExtra(cex(c,"belt"),[[o.x,o.y],[cl(o.x+dx*len,0,N-1),cl(o.y+dy*len,0,N-1)]]);bExtra(cex(c,"run"),[])}}}
+const U=c.gen&&!gDead()?S.gen:B;if(c.gen&&!gDead()&&!B.en&&Math.random()<AB.vince.selfCharge.chance)bAtk(0,[[B.x,B.y]]);if(c.gen&&!gDead()&&U&&U.hp>0&&Math.random()<AB.vince.generatorCharge.chance)genCharge();if(U&&U.hp>0)for(let n=0;n<AB.attackTries;n++){const o=c.at.filter(a=>a.c<=U.ap);if(!o.length)break;const a=o[rn(o.length)],i=c.at.indexOf(a),e=al[rn(al.length)];bAtk(i,[[cr(e.x+rn(3)-1,U.x,a.r),cr(e.y+rn(3)-1,U.y,a.r)]])}
+if(c.gen&&!gDead()&&B.en>0)for(let n=0;n<AB.vince.enhancedAttackTries;n++){const o=c.at.filter(a=>a.c<=B.ap);if(!o.length)break;const a=o[rn(o.length)],i=c.at.indexOf(a),e=al[rn(al.length)];bAtk(i,[[cr(e.x+rn(3)-1,B.x,a.r),cr(e.y+rn(3)-1,B.y,a.r)]],1)}
 endBoss()}
 function bfsD(sx,sy){const D=new Array(N*N).fill(999),q=[[sx,sy]];D[sy*N+sx]=0;while(q.length){const [x,y]=q.shift();for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N)continue;const i=ny*N+nx;if(D[i]==999&&!blk(nx,ny)){D[i]=D[y*N+x]+1;q.push([nx,ny])}}}return D}
 function aiHero(){const c=dangerSet(),B=S.boss,D=bfsD(B.x,B.y),bd=(x,y)=>D[y*N+x];
 S.heroes.forEach(h=>{if(h.dead)return;const k=CLS[h.k],dg=()=>c.has(h.y*N+h.x);
 const best=()=>{let b=null,d0=1e9;for(let dy=-mvOf(h);dy<=mvOf(h);dy++)for(let dx=-mvOf(h);dx<=mvOf(h);dx++){const x=h.x+dx,y=h.y+dy;if(c.has(y*N+x)||!qp(h,x,y,mvOf(h)))continue;if(bd(x,y)<d0){d0=bd(x,y);b=[x,y]}}return b};
 if(dg()){const b=best();if(b)act(h,"m",b[0],b[1])}
-for(let n=0;n<4&&h.ap>0&&!S.end;n++){let did=0;
+for(let n=0;n<AH.actionsPerTurn&&h.ap>0&&!S.end;n++){let did=0;
 k.sk.forEach((q,j)=>{if(did||h.ap<q.c)return;
 if(q.t=="d"){const T=[[cl(h.x,B.x-1,B.x+1),cl(h.y,B.y-1,B.y+1)]].concat(S.rob.map(r=>[r.x,r.y]).concat((S.mobs||[]).map(m=>[m.x,m.y])),S.fac.map(f=>[cl(h.x,f.x,f.x+1),cl(h.y,f.y,f.y+1)]),S.gen&&S.gen.hp>0?[[cl(h.x,S.gen.x-1,S.gen.x+1),cl(h.y,S.gen.y-1,S.gen.y+1)]]:[]).filter(z=>ch(z[0],z[1],h.x,h.y)<=q.r).sort((a,b)=>ch(a[0],a[1],h.x,h.y)-ch(b[0],b[1],h.x,h.y));if(T[0])did=act(h,j,T[0][0],T[0][1])}
-else if(q.t=="h"){const a=S.heroes.find(e=>!e.dead&&e.hp<e.max*.6&&ch(e.x,e.y,h.x,h.y)<=q.r);if(a)did=act(h,j,a.x,a.y)}
-else if(q.t=="l"){const dx=B.x-h.x,dy=B.y-h.y;if(Math.max(Math.abs(dx),Math.abs(dy))<=5&&(!dx||!dy||Math.abs(dx)==Math.abs(dy)))did=act(h,j,h.x+Math.sign(dx),h.y+Math.sign(dy))}
-else if(q.t=="g"&&dg())did=act(h,j,h.x,h.y);else if(q.t=="o"&&!(h.cd&&h.cd[j]>0)){const near=[S.boss].concat(S.gen&&S.gen.hp>0?[S.gen]:[],S.rob).filter(u=>ch(u.x,u.y,h.x,h.y)<=3).length;if(near>=1)did=act(h,j,h.x,h.y)}});
-if(!did&&h.ap>=1&&Math.random()<.6){const bb=S.belts.find(z=>ch(z.x,z.y,h.x,h.y)<=2);if(bb)did=act(h,"x",bb.x,bb.y)}
+else if(q.t=="h"){const a=S.heroes.find(e=>!e.dead&&e.hp<e.max*AH.healBelow&&ch(e.x,e.y,h.x,h.y)<=q.r);if(a)did=act(h,j,a.x,a.y)}
+else if(q.t=="l"){const dx=B.x-h.x,dy=B.y-h.y;if(Math.max(Math.abs(dx),Math.abs(dy))<=q.r&&(!dx||!dy||Math.abs(dx)==Math.abs(dy)))did=act(h,j,h.x+Math.sign(dx),h.y+Math.sign(dy))}
+else if(q.t=="g"&&dg())did=act(h,j,h.x,h.y);else if(q.t=="o"&&!(h.cd&&h.cd[j]>0)){const near=[S.boss].concat(S.gen&&S.gen.hp>0?[S.gen]:[],S.rob).filter(u=>ch(u.x,u.y,h.x,h.y)<=q.fx.radius).length;if(near>=AH.manaMinTargets)did=act(h,j,h.x,h.y)}});
+if(!did&&h.ap>=1&&Math.random()<AH.beltBreakChance){const bb=S.belts.find(z=>ch(z.x,z.y,h.x,h.y)<=RULE.hero.breakRange);if(bb)did=act(h,"x",bb.x,bb.y)}
 if(!did){const b=best();if(b&&bd(b[0],b[1])<bd(h.x,h.y))did=act(h,"m",b[0],b[1])}
 if(!did)break}});
 if(S.end)return sync();endHero()}
-function tick(){setTimeout(()=>{try{tickB()}catch(e){console.error(e);try{if(L.mode=="solo"&&own()!=L.role){if(S.ph=="boss")endBoss();else if(S.ph=="hero")endHero()}}catch(e2){console.error(e2)}}},500)}
+function tick(){setTimeout(()=>{try{tickB()}catch(e){console.error(e);try{if(L.mode=="solo"&&own()!=L.role){if(S.ph=="boss")endBoss();else if(S.ph=="hero")endHero()}}catch(e2){console.error(e2)}}},AI.delayMs)}
 function tickB(){if(S.end||L.scr!="game"||L.wait)return;
 if(S.ph=="resolve"){if(L.mode!="multi"||L.role=="boss"){resolve();sync()}return}
 if(L.mode!="solo")return;
-if(S.ph=="setup"){if(L.role=="hero"&&!S.champ)pickChamp(["gron","vince"][rn(2)]);else if(L.role=="boss"&&S.champ&&S.pick.length<3)aiSetup();return}
+if(S.ph=="setup"){if(L.role=="hero"&&!S.champ){const ids=Object.keys(CH).filter(id=>CH[id].ok);pickChamp(ids[rn(ids.length)])}else if(L.role=="boss"&&S.champ&&S.pick.length<3)aiSetup();return}
 if(own()!=L.role)S.ph=="boss"?aiBoss():aiHero()}
 /* ── 네트워크 ── */
 async function net(){if(db)return 1;if(typeof claude=="undefined"){alert("둘이서 하기(온라인)는 claude.ai 아티팩트 링크에서만 가능해요. 이 주소에서는 혼자 하기·한 기기 테스트를 이용하세요.");return 0}db=await claude.use("db");usr=await claude.use("user");if(!db||!usr){alert("이 기능은 claude.ai 로그인 상태에서만 가능해요.");return 0}uid=await usr.id();return 1}

@@ -1,0 +1,66 @@
+{
+  "format": "pdr-ai",
+  "version": 1,
+  "delayMs": 500,
+  "boss": {
+    "approachDist": 6,
+    "attackTries": 3,
+    "gron": {
+      "trapChest": {
+        "chance": 0.3,
+        "minAp": 2
+      },
+      "digPit": {
+        "chance": 0.3,
+        "minAp": 1
+      },
+      "hopPit": {
+        "chance": 0.25,
+        "minAp": 1,
+        "minPits": 2,
+        "range": 10
+      },
+      "wall": {
+        "chance": 0.5,
+        "tries": 12
+      },
+      "spikeTrap": {
+        "chance": 0.6,
+        "tries": 2
+      }
+    },
+    "vince": {
+      "factory": {
+        "chance": 0.5,
+        "minAp": 5,
+        "upgradeChance": 0.6,
+        "upgradeMinFactories": 2,
+        "range": 10,
+        "tries": 20
+      },
+      "bomb": {
+        "chance": 0.5,
+        "minAp": 2
+      },
+      "belt": {
+        "chance": 0.6,
+        "minAp": 3,
+        "lenMin": 2,
+        "lenMax": 6
+      },
+      "selfCharge": {
+        "chance": 0.35
+      },
+      "generatorCharge": {
+        "chance": 0.4
+      },
+      "enhancedAttackTries": 2
+    }
+  },
+  "hero": {
+    "actionsPerTurn": 4,
+    "healBelow": 0.6,
+    "manaMinTargets": 1,
+    "beltBreakChance": 0.6
+  }
+}
