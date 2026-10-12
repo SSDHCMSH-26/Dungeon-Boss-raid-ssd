@@ -28,6 +28,13 @@ function check(raw) {
     D.maps[id] = V.body(raw.maps[id]);
   }
   if (!errs.length) errs.push(...V.links(D));
+  // 도구 전용: 코드(index.html)가 쓰는 글자 이름표가 text/ko.json 에 모두 있는지, 안 쓰는 이름표는 없는지
+  if (!errs.length && D.text && D.text.text && !raw.__skipCode) {
+    const html = fs.readFileSync(path.join(GAME, "index.html"), "utf8");
+    const used = new Set([...html.matchAll(/\bT\("([^"]+)"\)/g)].map(m => m[1]).concat([...html.matchAll(/data-t="([^"]+)"/g)].map(m => m[1]), ["html.docTitle"]));
+    used.forEach(k => { if (!(k in D.text.text)) errs.push('data/text/ko.json › text: 코드가 쓰는 "' + k + '" 가 없어요'); });
+    Object.keys(D.text.text).forEach(k => { if (!used.has(k)) errs.push('data/text/ko.json › text.' + k + ": 코드에서 안 쓰는 이름표예요"); });
+  }
   // 도구 전용: art.json 의 그림 파일이 실제로 있는지
   if (!errs.length && D.art && D.art.images) for (const k in D.art.images) {
     const v = D.art.images[k], list = typeof v === "string" ? [v] : Object.values(v);

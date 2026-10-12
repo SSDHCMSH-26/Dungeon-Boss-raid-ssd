@@ -82,4 +82,10 @@ module.exports = [
   ["없는 그림 파일", r => { r.art.images.MOBA.gob_idle = "art/mob/gob_nap.png"; }, "그림 파일이 없어요"],
   ["코드가 쓰는 디자인 빠짐", r => { r.art.designs.order = ["old", "t3"]; }, '"t2" 디자인'],
   ["테마 색 형식 틀림", r => { r.art.themes.gron.hi = "purple"; }, "themes.gron.hi"],
+  // ── 글자 ──
+  ["글자 format 틀림", r => { r.text.format = "pdr-texts"; }, '"pdr-text"'],
+  ["글자에 HTML", r => { r.text.text["menu.7"] = "<b>모드</b>"; }, "HTML 금지"],
+  ["글자가 숫자", r => { r.text.text["menu.7"] = 7; }, "text.menu.7"],
+  ["코드가 쓰는 글자 빠짐", r => { delete r.text.text["menu.7"]; }, '"menu.7" 가 없어요'],
+  ["안 쓰는 글자 이름표", r => { r.text.text["menu.999"] = "?"; }, "안 쓰는 이름표"],
 ];
