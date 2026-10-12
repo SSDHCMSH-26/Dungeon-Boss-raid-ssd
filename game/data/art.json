@@ -1,0 +1,317 @@
+{
+ "format": "pdr-art",
+ "version": 1,
+ "designs": {
+  "order": [
+   "old",
+   "t2",
+   "t3"
+  ],
+  "legacy": {
+   "vince2": "t2",
+   "gron": "t2",
+   "vince": "t2"
+  }
+ },
+ "themes": {
+  "gron": {
+   "k": "toy",
+   "f": [
+    "#3d3366",
+    "#463b75"
+   ],
+   "hi": "#5a4d8f",
+   "ln": "#2c2450",
+   "sp": [
+    "#f2c230",
+    "#e0505a",
+    "#5ff0ff",
+    "#5fd07a"
+   ],
+   "w": [
+    "#8b86c7",
+    "#b8b4ee",
+    "#5b5696",
+    "#403a78"
+   ]
+  },
+  "vince": {
+   "k": "steel",
+   "f": [
+    "#39424b",
+    "#414b55"
+   ],
+   "hi": "#5a6672",
+   "ln": "#2a323a",
+   "sp": [
+    "#f2c230"
+   ],
+   "w": [
+    "#7f8b98",
+    "#aeb9c6",
+    "#566270",
+    "#2f3842"
+   ]
+  },
+  "terna": {
+   "k": "forge",
+   "f": [
+    "#3b2320",
+    "#46282a"
+   ],
+   "hi": "#5a3a34",
+   "ln": "#241210",
+   "sp": [
+    "#ff7a2a"
+   ],
+   "w": [
+    "#6a3a30",
+    "#a8582f",
+    "#40221d",
+    "#1d0f0c"
+   ]
+  },
+  "on": {
+   "k": "abyss",
+   "f": [
+    "#12304a",
+    "#163a58"
+   ],
+   "hi": "#245a80",
+   "ln": "#0c2238",
+   "sp": [
+    "#5ff0ff"
+   ],
+   "w": [
+    "#2f6a88",
+    "#5fb4d4",
+    "#1e4660",
+    "#0e2a3f"
+   ]
+  },
+  "vince2": {
+   "k": "steel2",
+   "f": [
+    "#222733",
+    "#272d3a"
+   ],
+   "hi": "#3a4254",
+   "ln": "#141821",
+   "sp": [
+    "#c9a24a"
+   ],
+   "w": [
+    "#4b5163",
+    "#7c8294",
+    "#2b303d",
+    "#12151c"
+   ]
+  },
+  "gron2": {
+   "k": "dungeon",
+   "f": [
+    "#2b2429",
+    "#30282e"
+   ],
+   "hi": "#473a41",
+   "ln": "#151014",
+   "sp": [
+    "#c02a2a"
+   ],
+   "w": [
+    "#4b3d40",
+    "#78605a",
+    "#2a2023",
+    "#140e11"
+   ]
+  },
+  "vince3": {
+   "k": "steel3",
+   "f": [
+    "#211e26",
+    "#26232d"
+   ],
+   "hi": "#3b3744",
+   "ln": "#131116",
+   "sp": [
+    "#e0902f"
+   ],
+   "w": [
+    "#46424f",
+    "#7a7585",
+    "#2a2730",
+    "#110f14"
+   ]
+  },
+  "pharaoh": {
+   "k": "sand",
+   "f": [
+    "#b79a62",
+    "#c2a46a"
+   ],
+   "hi": "#d6bb82",
+   "ln": "#8f7440",
+   "sp": [
+    "#e0b23a"
+   ],
+   "w": [
+    "#d6b46a",
+    "#f0d58a",
+    "#a98443",
+    "#7a5a28"
+   ]
+  }
+ },
+ "images": {
+  "T3A": {
+   "cleric_idle": "art/t3a/cleric_idle.png",
+   "cleric_move": "art/t3a/cleric_move.png",
+   "cleric_atk": "art/t3a/cleric_atk.png",
+   "cleric_cast": "art/t3a/cleric_cast.png",
+   "cleric_hit": "art/t3a/cleric_hit.png",
+   "cleric_dead": "art/t3a/cleric_dead.png",
+   "mage_idle": "art/t3a/mage_idle.png",
+   "mage_move": "art/t3a/mage_move.png",
+   "mage_atk": "art/t3a/mage_atk.png",
+   "mage_cast": "art/t3a/mage_cast.png",
+   "mage_hit": "art/t3a/mage_hit.png",
+   "mage_dead": "art/t3a/mage_dead.png",
+   "knight_idle": "art/t3a/knight_idle.png",
+   "knight_move": "art/t3a/knight_move.png",
+   "knight_atk": "art/t3a/knight_atk.png",
+   "knight_cast": "art/t3a/knight_cast.png",
+   "knight_hit": "art/t3a/knight_hit.png",
+   "knight_dead": "art/t3a/knight_dead.png",
+   "fx_heal": "art/t3a/fx_heal.png",
+   "fx_burst": "art/t3a/fx_burst.png",
+   "fx_shield": "art/t3a/fx_shield.png",
+   "fx_purify": "art/t3a/fx_purify.png",
+   "fx_revive": "art/t3a/fx_revive.png",
+   "fx_judge": "art/t3a/fx_judge.png",
+   "fx_fire": "art/t3a/fx_fire.png",
+   "fx_tele": "art/t3a/fx_tele.png",
+   "fx_mana": "art/t3a/fx_mana.png"
+  },
+  "ART": {
+   "r1": "art/art1/r1.png",
+   "r1b": "art/art1/r1b.png",
+   "r2": "art/art1/r2.png",
+   "r2b": "art/art1/r2b.png",
+   "r3": "art/art1/r3.png",
+   "r3b": "art/art1/r3b.png",
+   "e1": "art/art1/e1.png",
+   "e1b": "art/art1/e1b.png",
+   "e2": "art/art1/e2.png",
+   "e2b": "art/art1/e2b.png",
+   "e3": "art/art1/e3.png",
+   "e3b": "art/art1/e3b.png",
+   "f1": "art/art1/f1.png",
+   "f2": "art/art1/f2.png",
+   "f3": "art/art1/f3.png",
+   "F1": "art/art1/F1.png",
+   "F2": "art/art1/F2.png",
+   "F3": "art/art1/F3.png",
+   "gen": "art/art1/gen.png",
+   "bomb": "art/art1/bomb.png",
+   "bombE": "art/art1/bombE.png",
+   "v0": "art/art1/v0.png",
+   "v1": "art/art1/v1.png",
+   "v2": "art/art1/v2.png",
+   "portrait": "art/art1/portrait.jpg"
+  },
+  "ART2": {
+   "v0": "art/art2/v0.png",
+   "v1": "art/art2/v1.png",
+   "v2": "art/art2/v2.png",
+   "vc": "art/art2/vc.png",
+   "gen": "art/art2/gen.png",
+   "genE": "art/art2/genE.png",
+   "r1": "art/art2/r1.png",
+   "e1": "art/art2/e1.png",
+   "r2": "art/art2/r2.png",
+   "e2": "art/art2/e2.png",
+   "r3": "art/art2/r3.png",
+   "e3": "art/art2/e3.png",
+   "f1": "art/art2/f1.png",
+   "F1": "art/art2/F1.png",
+   "f2": "art/art2/f2.png",
+   "F2": "art/art2/F2.png",
+   "f3": "art/art2/f3.png",
+   "F3": "art/art2/F3.png",
+   "bomb": "art/art2/bomb.png",
+   "bombE": "art/art2/bombE.png",
+   "portrait": "art/art2/portrait.jpg"
+  },
+  "ART3": {
+   "g0": "art/art3/g0.png",
+   "g1": "art/art3/g1.png",
+   "g2": "art/art3/g2.png",
+   "g3": "art/art3/g3.png",
+   "g4": "art/art3/g4.png",
+   "u1": "art/art3/u1.png",
+   "u2": "art/art3/u2.png",
+   "u3": "art/art3/u3.png",
+   "u4": "art/art3/u4.png",
+   "u5": "art/art3/u5.png",
+   "u6": "art/art3/u6.png",
+   "u7": "art/art3/u7.png",
+   "f1": "art/art3/f1.png",
+   "f2": "art/art3/f2.png",
+   "f3": "art/art3/f3.png",
+   "f4": "art/art3/f4.png",
+   "f5": "art/art3/f5.png",
+   "bo": "art/art3/bo.png",
+   "t_pit": "art/art3/t_pit.png",
+   "t_spear": "art/art3/t_spear.png",
+   "t_flame": "art/art3/t_flame.png",
+   "t_saw": "art/art3/t_saw.png",
+   "t_drop": "art/art3/t_drop.png",
+   "t_maze": "art/art3/t_maze.png",
+   "t_wall": "art/art3/t_wall.png",
+   "t_secret": "art/art3/t_secret.png"
+  },
+  "MOBA": {
+   "mimic_idle": "art/mob/mimic_idle.png",
+   "mimic_wake": "art/mob/mimic_wake.png",
+   "mimic_atk": "art/mob/mimic_atk.png",
+   "mimic_atk2": "art/mob/mimic_atk2.png",
+   "mimic_hit": "art/mob/mimic_hit.png",
+   "mimic_dead": "art/mob/mimic_dead.png",
+   "gob_idle": "art/mob/gob_idle.png",
+   "gob_move": "art/mob/gob_move.png",
+   "gob_atk": "art/mob/gob_atk.png",
+   "gob_atk2": "art/mob/gob_atk2.png",
+   "gob_hit": "art/mob/gob_hit.png",
+   "gob_dead": "art/mob/gob_dead.png"
+  },
+  "FXD": {
+   "ystrike": "art/fx/ystrike.png",
+   "yburst": "art/fx/yburst.png",
+   "ypillar": "art/fx/ypillar.png",
+   "strike": "art/fx/strike.png",
+   "burst": "art/fx/burst.png",
+   "ring": "art/fx/ring.png",
+   "pillar": "art/fx/pillar.png",
+   "chain": "art/fx/chain.png"
+  },
+  "ART3_EXTRA": {
+   "ch_c": "art/art3b/ch_c.png",
+   "ch_o": "art/art3b/ch_o.png",
+   "ch_s": "art/art3b/ch_s.png",
+   "ch_t": "art/art3b/ch_t.png",
+   "it_gold": "art/art3b/it_gold.png",
+   "it_gem": "art/art3b/it_gem.png",
+   "it_pot": "art/art3b/it_pot.png",
+   "it_scr": "art/art3b/it_scr.png",
+   "pit2": "art/art3b/pit2.png",
+   "t_spear": "art/art3b/t_spear.png",
+   "t_flame": "art/art3b/t_flame.png"
+  },
+  "CRYSTAL": {
+   "y": "art/crystal/y.png",
+   "b": "art/crystal/b.png"
+  },
+  "FACE": "art/face/face.png",
+  "FACEG": "art/face/faceg.png"
+ }
+}
