@@ -24,4 +24,7 @@ module.exports = [
   ["용사 AP 음수", r => { r.rules.hero.ap = -1; }, "hero.ap"],
   ["성직자 이월 최대가 기본 AP 보다 작음", r => { r.rules.hero.clericApMax = 2; }, "hero.ap 이상"],
   ["크리스탈 생성 범위 뒤집힘", r => { r.rules.crystal.perTurnMin = 5; }, "perTurnMin 이 perTurnMax"],
+  ["로봇 체력이 목록이 아님", r => { r.monsters.robot.hp = 8; }, "robot.hp"],
+  ["공장 최대 레벨이 로봇 레벨 수보다 큼", r => { r.monsters.factory.maxLv = 4; }, "factory.maxLv"],
+  ["폭탄 피해 음수", r => { r.monsters.bomb.dmg = -5; }, "bomb.dmg"],
 ];

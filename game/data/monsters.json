@@ -20,5 +20,37 @@
   },
   "trapChest": {
     "mimicChance": 0.6
+  },
+  "robot": {
+    "hp": [
+      8,
+      14,
+      22
+    ],
+    "atkBase": 12,
+    "atkPerLv": 6,
+    "move": 2,
+    "enhancedMove": 4,
+    "chase": 7,
+    "max": 8,
+    "enhanceTurns": 3,
+    "enhanceMult": 2,
+    "wreckCount": 2,
+    "wreckLv": 3
+  },
+  "factory": {
+    "hp": 40,
+    "upgradeHp": 20,
+    "maxLv": 3,
+    "cycle": 3,
+    "decay": 4,
+    "max": 5,
+    "enhanceHp": 20
+  },
+  "bomb": {
+    "dmg": 30,
+    "max": 4,
+    "move": 1,
+    "enhancedMove": 2
   }
 }

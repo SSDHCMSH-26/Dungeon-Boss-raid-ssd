@@ -90,6 +90,20 @@
           c.need(g.goldMin <= g.goldMax, "gob", "goldMin 이 goldMax 보다 클 수 없어요");
       }
       if (c.obj(b.trapChest, "trapChest")) c.prob(b.trapChest.mimicChance, "trapChest.mimicChance");
+      if (c.obj(b.robot, "robot")) {
+        const r = b.robot;
+        if (c.need(Array.isArray(r.hp) && r.hp.length >= 1, "robot.hp", "레벨별 체력 목록([ ])이어야 해요")) r.hp.forEach((v, i) => c.int(v, "robot.hp[" + i + "]", 1));
+        ["atkBase", "atkPerLv", "move", "enhancedMove", "chase", "max", "enhanceTurns", "wreckCount"].forEach(k => c.int(r[k], "robot." + k, 0));
+        c.num(r.enhanceMult, "robot.enhanceMult", 1);
+        if (c.int(r.wreckLv, "robot.wreckLv", 1) && Array.isArray(r.hp)) c.need(r.wreckLv <= r.hp.length, "robot.wreckLv", "robot.hp 에 그 레벨의 체력이 없어요");
+      }
+      if (c.obj(b.factory, "factory")) {
+        const f = b.factory;
+        ["hp", "cycle"].forEach(k => c.int(f[k], "factory." + k, 1));
+        ["upgradeHp", "decay", "max", "enhanceHp"].forEach(k => c.int(f[k], "factory." + k, 0));
+        if (c.int(f.maxLv, "factory.maxLv", 1) && b.robot && Array.isArray(b.robot.hp)) c.need(f.maxLv <= b.robot.hp.length, "factory.maxLv", "robot.hp 레벨 수보다 클 수 없어요");
+      }
+      if (c.obj(b.bomb, "bomb")) ["dmg", "max", "move", "enhancedMove"].forEach(k => c.int(b.bomb[k], "bomb." + k, 0));
     },
     champions(b, c) {
       for (const k in b) {
