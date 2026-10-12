@@ -14,4 +14,5 @@ function save(){try{if(L.scr!="game"||!S||S.end){localStorage.removeItem(SAVEK);
 function loadSave(){try{const d=JSON.parse(localStorage.getItem(SAVEK)||"null");return d&&d.S&&!d.S.end?d:null}catch(e){return null}}
 async function rejoin(){if(!await net()){L.scr="menu";ui();return}const d=await ref().get();if(!d.exists){alert("방을 찾을 수 없어요");L.scr="menu";ui();return}const v=d.data();L.bu=v.b;L.hu=v.h;if(uid==L.bu)L.role="boss";else if(uid==L.hu)L.role="hero";else{alert("이 방의 참가자가 아니에요");L.scr="menu";ui();return}S=fixState(JSON.parse(v.s));L.wait=!(L.bu&&L.hu);listen();ui();tick()}
 function resume(){const d=loadSave();if(!d)return;S=d.S;L.mode=d.m;L.role=d.r;fixState(S,d);L.si=d.si||0;L.code=d.c||"";L.wait=0;L.act=null;L.picks=[];L.menu=1;L.fit=0;if(L.mode=="multi"){L.scr="game";rejoin()}else{L.scr="game";ui();tick()}}
-function sync(){try{chestScanAll()}catch(e){}try{if(L.mode!="multi"||L.role=="boss"){S.tp=(S.sec.traps||[]).map(t=>[t[0],t[1]]);S.bp=(S.sec.bombs||[]).map(b=>({id:b.id,x:b.x,y:b.y,dx:b.dx,dy:b.dy,en:b.en||0}))}}catch(e){}ui();push();tick()}
+/* 행동 뒤: 규칙 정리(settle: 상자 열기 판정·숨김 정보 복사) → 화면 → 전송 → 진행 */
+function sync(){try{apply({type:"settle"})}catch(e){}ui();push();tick()}

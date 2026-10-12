@@ -145,7 +145,7 @@ for(let i=0;i<8;i++){S=newS();L.mode='solo';L.role='hero';L.scr='game';L.wait=0;
 LOOP = """async ()=>{const r=[];AI.delayMs=0;
 for(const c of ['gron','vince','gron','vince']){S=newS();L.bid=0;L.traps=[];L.bombs=[];L.used={};L.mode='solo';L.role='none';L.scr='game';L.wait=0;S.champ=c;S.map=genMap(c);S.pick=c=='gron'?['knight','cleric','mage']:['archer','cleric','knight'];start();
 let n=0;while(!S.end&&S.round<=25&&n++<6000)await new Promise(z=>setTimeout(z,2));
-const sec=S.sec||{traps:L.traps,bombs:L.bombs,bid:L.bid},o=Object.assign({},S);delete o.sec;delete o.used;r.push(c+' 라운드 '+S.round+' '+S.end,JSON.stringify(o),JSON.stringify({sec,used:S.used||L.used}),JSON.stringify({a:L.act,p:L.picks,m:L.menu,si:L.si,bag:L.bag}))}
+const sec=S.sec||{traps:L.traps,bombs:L.bombs,bid:L.bid},o=Object.assign({},S);delete o.sec;delete o.used;delete o.seed;delete o.rng;r.push(c+' 라운드 '+S.round+' '+S.end,JSON.stringify(o),JSON.stringify({sec,used:S.used||L.used}),JSON.stringify({a:L.act,p:L.picks,m:L.menu,si:L.si,bag:L.bag}))}
 L.scr='menu';return r}"""
 
 RULES_MOBS = open(os.path.join(ROOT, 'tools', 'test_mobs_example.py'), encoding='utf-8').read()
