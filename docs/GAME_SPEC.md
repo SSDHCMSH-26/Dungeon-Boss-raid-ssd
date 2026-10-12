@@ -1,4 +1,5 @@
-# GAME_SPEC — 확정 규칙 (v65 기준)
+# GAME_SPEC — 확정 규칙 (v66 기준)
+> v66: 화면 고정 문구는 `game/data/text/ko.json`. 규칙 변화 없음.
 > v65: 컴퓨터(AI) 확률·기준값은 `game/data/ai.json`, 그림 경로·디자인·테마 색은 `game/data/art.json`. 규칙 변화 없음.
 > v64: 맵(빈센토 공장 지도·그론 랜덤 미로)과 시작 위치는 `game/data/maps/*.json`. 규칙 변화 없음.
 > v63: 용사·보스·스킬(효과 수치 fx 포함)·몬스터·로봇·공장·아이템·드롭표·상자·크리스탈 수치의 **실제 값은 `game/data/*.json`**(뜻: `game/data/README.md`)이 기준. 이 문서의 숫자와 다르면 JSON 이 맞음(수치를 바꾸면 이 문서도 갱신). 규칙 변화 없음.

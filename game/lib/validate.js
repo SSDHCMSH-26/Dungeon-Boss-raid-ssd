@@ -16,6 +16,7 @@
     mapIndex: { path: "data/maps/index.json", format: "pdr-map-index", version: 1 },
     ai: { path: "data/ai.json", format: "pdr-ai", version: 1 },
     art: { path: "data/art.json", format: "pdr-art", version: 1 },
+    text: { path: "data/text/ko.json", format: "pdr-text", version: 1 },
   };
   // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
   const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
@@ -182,6 +183,13 @@
         const need = { potion: "heal", scroll: "range", gem: "ap" }[k];
         c.need(isNum(b[k].effect[need]), k + ".effect." + need, "이 아이템 효과에 필요한 숫자예요");
       });
+    },
+    text(b, c) {
+      c.str(b.lang, "lang");
+      if (c.obj(b.text, "text")) for (const k in b.text) {
+        c.need(/^[A-Za-z0-9_]+\.[A-Za-z0-9_.]+$/.test(k), "text." + k, "이름표는 영어·숫자로 '묶음.이름' 형식이어야 해요");
+        c.need(isStr(b.text[k]) && b.text[k].length <= 300 && !/<|>/.test(b.text[k]), "text." + k, "300자 이하 글자, < > 는 쓸 수 없어요 (HTML 금지)");
+      }
     },
     art(b, c) {
       // 그림 경로는 game/art/ 아래 png·jpg 만 (바깥 주소·상위 폴더 금지)
