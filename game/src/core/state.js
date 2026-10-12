@@ -1,7 +1,7 @@
 /* [규칙] 게임 상태 S, 새 게임 상태, 칸·거리·막힘 판정 같은 기본 도구 */
 const N=30;
 let S;
-const ch=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=n=>Math.floor(Math.random()*n),cr=(v,b,r)=>cl(cl(v,b-r,b+r),0,N-1);
+const ch=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=n=>Math.floor(RAND()*n),cr=(v,b,r)=>cl(cl(v,b-r,b+r),0,N-1);
 /* 숨김 정보: S.sec = 보스만 아는 것(가시 함정·폭탄로봇), S.used = 이번 턴 스킬 사용 횟수.
    예전 저장·방 데이터(이 칸이 없던 버전)는 fixState 로 채움 */
 function fixState(st,old){if(!st)return st;if(!st.sec)st.sec={traps:(old&&old.t)||[],bombs:(old&&old.b)||[],bid:(old&&old.bid)||0};if(!st.used)st.used=(old&&old.u)||{};return st}
