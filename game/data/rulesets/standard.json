@@ -37,5 +37,9 @@
   },
   "status": {
     "paralyzeMove": 2
+  },
+  "circle": {
+    "maxLv": 3,
+    "breakDmg": 20
   }
 }

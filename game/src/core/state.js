@@ -24,7 +24,11 @@ const mobAt=(x,y)=>(S.mobs||[]).find(m=>m.x==x&&m.y==y);
 function echoSet(){const s=new Set();(S.atks||[]).filter(a=>a.echo).forEach(a=>cov(CH[S.champ].at[a.i],a.p).forEach(i=>s.add(i)));return s}
 const gDead=()=>!!(CH[S.champ]&&CH[S.champ].gen&&(!S.gen||S.gen.hp<=0));
 const bMax=()=>gDead()?CST().apNoGen:CST().ap;
-const bMv=()=>CST().move+(gDead()?CST().moveNoGen:0)+(S.boss.mvb||0);
+const bMv=()=>CST().move+(gDead()?CST().moveNoGen:0)+(S.boss.mvb||0)-slowOf(S.boss);
+/* 빙결 결계: o.sl={n 이동 감소, r 이 라운드까지}, o.fz=이 라운드까지 행동불능 (마법진 발동 때 설정) */
+const slowOf=o=>o&&o.sl&&o.sl.r>=S.round?o.sl.n:0,frozen=o=>!!(o&&o.fz>=S.round);
+/* 마법진 범위(정사각형) 안인지 */
+const inSq=(ox,oy,r,x,y)=>Math.abs(x-ox)<=r&&Math.abs(y-oy)<=r;
 const crAt=(x,y)=>(S.cry||[]).findIndex(c=>c.x==x&&c.y==y);
 const ecost=e=>e.c+(e.esc?(S.used[e.id]||0):0);
 const pitAt=(x,y)=>(S.pits||[]).findIndex(p=>x>=p.x&&x<=p.x+1&&y>=p.y&&y<=p.y+1);
