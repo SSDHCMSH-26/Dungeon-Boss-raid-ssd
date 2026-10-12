@@ -1,0 +1,22 @@
+{
+  "mimic": {
+    "hp": 20,
+    "move": 2,
+    "bite": 17,
+    "suppressTurns": 3,
+    "suppressDmg": 7
+  },
+  "gob": {
+    "hp": 30,
+    "ap": 2,
+    "move": 8,
+    "steal": 15,
+    "goldChance": 0.6,
+    "itemChance": 0.2,
+    "goldMin": 3,
+    "goldMax": 7
+  },
+  "trapChest": {
+    "mimicChance": 0.6
+  }
+}

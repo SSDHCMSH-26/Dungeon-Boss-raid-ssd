@@ -1,4 +1,4 @@
-# CODE_MAP — `game/index.html` 구조 (v59)
+# CODE_MAP — `game/index.html` 구조 (v62)
 
 ## 파일 형태
 - 코드만 든 HTML(약 120KB). 그림은 v59부터 `game/art/` 폴더의 파일(약 1.4MB, 134개)이고, HTML 에는 `"art/t3a/cleric_idle.png"` 같은 **상대 경로**만 있음 → 이제 파일 전체를 읽어도 부담이 적음.
@@ -13,6 +13,10 @@
 `mode`(solo/local/multi) · `role`(boss/hero) · `act`(선택 중 스킬) · `picks`(찍은 칸) · `design`(old/t2/t3) · `traps`/`bombs`(보스가 숨겨 설치한 것) · `used`(턴당 사용 횟수) · `bag`(가방 열림) 등.
 
 ## 데이터 정의
+- **v62~ 수치 데이터는 `game/data/*.json`** (뜻: `game/data/README.md`). 시작 순서: 게임 코드는 `<script id="main" type="text/plain">` 에 들어 있고, 파일 맨 아래 로더 스크립트가 `heroes`/`skills`/`monsters` JSON 을 fetch 해서 전역 `DATA` 에 넣은 뒤 main 코드를 실행(`window.GAME_READY=1`). 로드 실패 시 화면 맨 위에 안내 문구. 새 JSON 파일을 추가하면 로더의 `FILES` 목록에도 추가.
+  - `CLS[k] = {...DATA.heroes[k], sk: DATA.skills.heroes[k]}` (키 순서 유지)
+  - `CH` 의 이름·설명·플래그(`n,s,m,ok,bash,bn,gen`)는 코드에, 스킬(`at,gx,ex`)은 `...DATA.skills.champions[id]`
+  - `MOB = DATA.monsters` — `mobSpawn`(체력), `mobAct`(이동·피해·AP·강탈 확률/금화), `chOpen`/`chAge`(미믹 확률·제압 턴), `supTick`(제압 피해), `ipH`(몬스터 정보 창 문구). `pct(v)` = 확률 → "60%" 문자열.
 - `CH` — 챔피언/스킬 정의(`at` 공격, `ex` 설치·특수, `gx` 발전기 스킬). `CLS` — 용사 4직업(`sk` 스킬: t=d 단일/범위 피해, h 치유, g 방패막기, l 성광, u 계시, r 방패돌진, b 순간이동, o 마력 방출). `ITEMS`, `RHP`(로봇 체력), `BAP`/`GAP`(AP), `TR`/`BOMBV`(피해), `CRMAX`/`CRLIFE`.
 
 ## 주요 함수 (검색 키워드)
