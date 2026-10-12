@@ -122,5 +122,16 @@ const E2 = createEngine({ clock: "()=>0" }), E3 = createEngine({ clock: "()=>0" 
 E2.call("replay", log); E3.call("replay", log);
 ok(E2.run("stateHash(S)") === E3.run("stateHash(S)"), "마법진 행동이 든 기록을 두 엔진에서 리플레이 → 같은 결과");
 
+// 10) 컴퓨터(AI): 보스는 화염 마법진을 피하고, 컴퓨터 마법사는 마법진·영창을 씀
+setup("gron"); act(MJ, 15, 7); R(`S.ph="boss";S.boss.ap=6;S.boss.moved=0;AB.dodgeCircle.chance=1;AB.gron.wall.chance=0;AB.gron.spikeTrap.chance=0;AB.gron.trapChest.chance=0;AB.gron.digPit.chance=0;AB.gron.hopPit.chance=0`);
+ok(R("cirHit(S.boss.x,S.boss.y)"), "보스가 화염 마법진 범위에 닿아 있음");
+R("aiBoss()"); ok(!R("cirHit(S.boss.x,S.boss.y)") && R("S.boss.moved") === 1, `컴퓨터 보스가 마법진 밖으로 이동 (${R("S.boss.x")},${R("S.boss.y")})`);
+{ const E4 = createEngine({ clock: "()=>0" }); let draw = 0, chant = 0, fired = 0, games = 0;
+  for (let sd = 1; sd <= 30; sd++) {
+    const r = E4.call("simMatch", { seed: sd, champ: sd % 2 ? "vince" : "gron", pick: ["knight", "cleric", "mage"] }); games++;
+    r.log.actions.forEach(a => { if (a.type == "heroAct" && typeof a.j == "number") { const t = E4.run(`CLS[S.heroes[${a.h}].k].sk[${a.j}].t`); if (t == "c") draw++; if (t == "w") chant++; } });
+  }
+  ok(draw > 0 && chant > 0, `컴퓨터 마법사 ${games}판: 마법진 ${draw}번 · 영창 ${chant}번 사용 (오류 없이 끝까지 진행)`);
+}
 console.log(fail ? fail + "개 실패" : "마법진 테스트 모두 통과");
 process.exit(fail ? 1 : 0);

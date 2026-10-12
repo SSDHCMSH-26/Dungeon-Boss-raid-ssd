@@ -126,6 +126,8 @@
 | `hero.healBelow` | 아군 체력이 이 비율 미만이면 치유 |
 | `hero.manaMinTargets` | 마력 방출 범위 안 적이 이 수 이상이면 사용 |
 | `hero.beltBreakChance` | 근처 벨트를 부술 확률 |
+| `hero.circle.chance` / `frostChance` / `shieldMinAllies` | 컴퓨터 마법사가 보스를 덮는 마법진을 그릴 확률 / 그중 빙결을 고를 확률 / 다친 아군이 이 수 이상 모이면 수호 마법진 |
+| `boss.dodgeCircle.chance` | 컴퓨터 보스가 화염·빙결 마법진을 피해 움직일 확률 (마법진이 있을 때만) |
 > 나중에 스토리 난이도별로 `ai.json` 을 여러 벌(쉬움·보통·어려움) 두는 자리.
 
 ## art.json — 그림·디자인
