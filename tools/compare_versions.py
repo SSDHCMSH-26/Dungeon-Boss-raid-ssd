@@ -126,15 +126,15 @@ for(const c of ['gron','vince']){
  r.push('부수기 '+act(K3,'x',12,19)+' '+act(K3,'x',11,19),S.log,st());
 }
 // 그론: 벽 쌓기 겹치기 Lv1→3, 가시 함정 최대, 구덩이 최대·낙하
-base('gron',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};const W=CH.gron.ex.find(e=>e.id=='wall'),T=CH.gron.ex.find(e=>e.id=='trap'),P=CH.gron.ex.find(e=>e.id=='pit');
+base('gron',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};S.used={};const W=CH.gron.ex.find(e=>e.id=='wall'),T=CH.gron.ex.find(e=>e.id=='trap'),P=CH.gron.ex.find(e=>e.id=='pit');
 const wp=[[13,15],[14,15],[15,15]];for(let i=0;i<4;i++){r.push('벽'+i+' '+bEx(W,wp),S.log,JSON.stringify(S.walls))}
-L.traps=[];for(let i=0;i<8;i++)r.push('함정'+i+' '+bEx(T,[[5+i,8]]));r.push(JSON.stringify(L.traps));
+L.traps=[];S.sec&&(S.sec.traps=[]);for(let i=0;i<8;i++)r.push('함정'+i+' '+bEx(T,[[5+i,8]]));r.push(JSON.stringify(S.sec?S.sec.traps:L.traps));
 S.pits=[];for(let i=0;i<8;i++){S.boss.x=3+i*3;S.boss.y=5;r.push('구덩이'+i+' '+bEx(P,[]))}r.push(JSON.stringify(S.pits));
 S.ph='hero';const H=S.heroes[0];H.x=S.pits[0].x;H.y=S.pits[0].y+3;H.ap=3;H.mc=0;r.push('낙하 '+act(H,'m',H.x,S.pits[0].y),S.log,st());
 // 빈센토: 벨트 길이 한도, 컨베이어 가동, 폭탄 한도
-base('vince',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};const BE=CH.vince.ex.find(e=>e.id=='belt'),RU=CH.vince.ex.find(e=>e.id=='run'),BO=CH.vince.ex.find(e=>e.id=='bomb');
-r.push('벨트 9칸 '+bEx(BE,[[2,20],[10,20]]),'벨트 8칸 '+bEx(BE,[[2,21],[9,21]]));L.used={};S.heroes[0].x=2;S.heroes[0].y=21;r.push('가동 '+bEx(RU,[]),S.log,st());
-L.bombs=[];for(let i=0;i<6;i++){L.used={};r.push('폭탄'+i+' '+bEx(BO,[[3+i,8],[3+i,9]]))}
+base('vince',['knight','cleric','archer']);S.ph='boss';L.role='boss';S.boss.ap=99;L.used={};S.used={};const BE=CH.vince.ex.find(e=>e.id=='belt'),RU=CH.vince.ex.find(e=>e.id=='run'),BO=CH.vince.ex.find(e=>e.id=='bomb');
+r.push('벨트 9칸 '+bEx(BE,[[2,20],[10,20]]),'벨트 8칸 '+bEx(BE,[[2,21],[9,21]]));L.used={};S.used={};S.heroes[0].x=2;S.heroes[0].y=21;r.push('가동 '+bEx(RU,[]),S.log,st());
+L.bombs=[];S.sec&&(S.sec.bombs=[]);for(let i=0;i<6;i++){L.used={};S.used={};r.push('폭탄'+i+' '+bEx(BO,[[3+i,8],[3+i,9]]))}
 S.ph='hero';S.heroes[1].par=1;r.push('마비 이동 '+mvOf(S.heroes[1])+' '+mvOf(S.heroes[0]));
 for(let i=0;i<8;i++){S=newS();L.mode='solo';L.role='hero';L.scr='game';L.wait=0;tickB();r.push('혼자하기 챔피언 '+S.champ+' '+S.map.split('1').length)}L.mode='local';
 {const d0=L.design,seq=[];for(const st of ['old','t2','t3','vince','zzz']){L.design=st;setDesign();seq.push(st+'→'+L.design)}setDesign('old');r.push('디자인 버튼 '+seq.join(' '))}

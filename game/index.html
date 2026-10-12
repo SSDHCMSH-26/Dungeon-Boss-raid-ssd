@@ -97,7 +97,7 @@ if(!err.length){DATA.maps={};await Promise.all((DATA.mapIndex.maps||[]).map(asyn
 if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
-const SRC=["src/ui/text.js", "src/core/data.js", "src/core/state.js", "src/core/map.js", "src/core/rules.js", "src/core/ai.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/app/loop.js", "src/net/net.js", "src/app/main.js"];
+const SRC=["src/ui/text.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/ai.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/app/loop.js", "src/net/net.js", "src/app/main.js"];
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok){show("게임 코드 파일을 불러오지 못했어요: "+f);return}}
 window.GAME_READY=1})();
 </script></body></html>

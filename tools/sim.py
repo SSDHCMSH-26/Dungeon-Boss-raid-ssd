@@ -2,7 +2,7 @@ import json,sys
 from playwright.sync_api import sync_playwright
 JS="""([champ,pick,n,maxr])=>{const out=[];sync=()=>{};ui=()=>{};draw=()=>{};
 for(let g=0;g<n;g++){try{
-S=newS();S.champ=champ;S.pick=pick?pick.slice():Object.keys(CLS).sort(()=>Math.random()-.5).slice(0,3);S.map=genMap(champ);start();L.mode='solo';L.role='none';L.scr='game';L.used={};L.traps=[];L.bombs=[];L.act=null;L.picks=[];
+S=newS();S.champ=champ;S.pick=pick?pick.slice():Object.keys(CLS).sort(()=>Math.random()-.5).slice(0,3);S.map=genMap(champ);start();L.mode='solo';L.role='none';L.scr='game';L.used={};S.used={};L.traps=[];S.sec&&(S.sec.traps=[]);L.bombs=[];S.sec&&(S.sec.bombs=[]);L.act=null;L.picks=[];
 let guard=0;while(!S.end&&S.round<=maxr&&guard++<2000){
  if(S.ph=='boss'){aiBoss();if(S.ph=='boss')endBoss()}
  else if(S.ph=='hero'){aiHero();if(S.ph=='hero')endHero()}

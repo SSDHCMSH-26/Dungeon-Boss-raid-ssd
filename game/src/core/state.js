@@ -2,7 +2,10 @@
 const N=30;
 let S;
 const ch=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=n=>Math.floor(Math.random()*n),cr=(v,b,r)=>cl(cl(v,b-r,b+r),0,N-1);
-const newS=()=>({ph:"setup",pick:[],champ:"",map:"",fac:[],rob:[],walls:[],fid:1,rid:1,belts:[],round:1,boss:{x:15,y:2,hp:0,max:0,moved:0,ap:0},gen:null,heroes:[],atks:[],rev:[],mv:[],log:"보스 진영은 챔피언을, 용사 진영은 영웅 3명을 고르세요.",end:""});
+/* 숨김 정보: S.sec = 보스만 아는 것(가시 함정·폭탄로봇), S.used = 이번 턴 스킬 사용 횟수.
+   예전 저장·방 데이터(이 칸이 없던 버전)는 fixState 로 채움 */
+function fixState(st,old){if(!st)return st;if(!st.sec)st.sec={traps:(old&&old.t)||[],bombs:(old&&old.b)||[],bid:(old&&old.bid)||0};if(!st.used)st.used=(old&&old.u)||{};return st}
+const newS=()=>({ph:"setup",pick:[],champ:"",map:"",fac:[],rob:[],walls:[],fid:1,rid:1,belts:[],round:1,boss:{x:15,y:2,hp:0,max:0,moved:0,ap:0},gen:null,heroes:[],atks:[],rev:[],mv:[],sec:{traps:[],bombs:[],bid:0},used:{},log:"보스 진영은 챔피언을, 용사 진영은 영웅 3명을 고르세요.",end:""});
 const inB=(x,y)=>Math.abs(x-S.boss.x)<=1&&Math.abs(y-S.boss.y)<=1;
 const hAt=(x,y)=>S.heroes.find(h=>!h.dead&&h.x==x&&h.y==y);
 const sw=(x,y)=>S.map[y*N+x]=="1",dw=(x,y)=>S.walls.some(w=>w.x==x&&w.y==y),fa=(x,y)=>S.fac.find(f=>x>=f.x&&x<=f.x+1&&y>=f.y&&y<=f.y+1),rb=(x,y)=>S.rob.find(r=>r.x==x&&r.y==y);
@@ -20,6 +23,6 @@ const gDead=()=>!!(CH[S.champ]&&CH[S.champ].gen&&(!S.gen||S.gen.hp<=0));
 const bMax=()=>gDead()?CST().apNoGen:CST().ap;
 const bMv=()=>CST().move+(gDead()?CST().moveNoGen:0)+(S.boss.mvb||0);
 const crAt=(x,y)=>(S.cry||[]).findIndex(c=>c.x==x&&c.y==y);
-const ecost=e=>e.c+(e.esc?(L.used[e.id]||0):0);
+const ecost=e=>e.c+(e.esc?(S.used[e.id]||0):0);
 const pitAt=(x,y)=>(S.pits||[]).findIndex(p=>x>=p.x&&x<=p.x+1&&y>=p.y&&y<=p.y+1);
 const mvOf=h=>Math.max(0,CLS[h.k].mv+(h.mvb||0)-(h.par>0?RULE.status.paralyzeMove:0));
