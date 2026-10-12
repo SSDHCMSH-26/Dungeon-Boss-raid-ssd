@@ -64,6 +64,18 @@
         if (s.v !== undefined) c.num(s.v, p + ".v", 0);
         if (s.cd !== undefined) c.int(s.cd, p + ".cd", 0);
       };
+      // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
+      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"] };
+      const FX_ID = { wall: ["hpPerLv", "turns", "turnsLater", "stackTurns", "maxLv"], trap: ["dmg", "max"], pit: ["fallDmg", "max"], belt: ["maxLen"], run: ["move", "enhancedMove"] };
+      const fx = (s, keys, p) => {
+        if (!keys || !c.obj(s.fx, p + ".fx")) return;
+        keys.forEach(k => c.num(s.fx[k], p + ".fx." + k, 0));
+        if (keys.includes("damageTaken")) c.prob(s.fx.damageTaken, p + ".fx.damageTaken");
+      };
+      if (c.obj(b.heroes, "heroes"))
+        for (const k in b.heroes) if (Array.isArray(b.heroes[k])) b.heroes[k].forEach((s, i) => isObj(s) && fx(s, FX_T[s.t], "heroes." + k + "[" + i + "]"));
+      if (c.obj(b.champions, "champions"))
+        for (const k in b.champions) if (isObj(b.champions[k])) (b.champions[k].ex || []).forEach((s, i) => isObj(s) && fx(s, FX_ID[s.id], "champions." + k + ".ex[" + i + "]"));
       if (c.obj(b.heroes, "heroes"))
         for (const k in b.heroes)
           if (c.need(Array.isArray(b.heroes[k]), "heroes." + k, "스킬 목록([ ])이어야 해요"))
@@ -130,7 +142,9 @@
       if (c.obj(b.hero, "hero")) {
         c.int(b.hero.ap, "hero.ap", 0); c.int(b.hero.movesPerTurn, "hero.movesPerTurn", 0);
         if (c.int(b.hero.clericApMax, "hero.clericApMax", 0)) c.need(b.hero.clericApMax >= b.hero.ap, "hero.clericApMax", "hero.ap 이상이어야 해요");
+        c.int(b.hero.breakDmg, "hero.breakDmg", 0); c.int(b.hero.breakRange, "hero.breakRange", 1);
       }
+      if (c.obj(b.status, "status")) c.int(b.status.paralyzeMove, "status.paralyzeMove", 0);
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

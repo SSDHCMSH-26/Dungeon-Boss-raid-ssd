@@ -33,4 +33,9 @@ module.exports = [
   ["금화 가중치 형식 틀림", r => { r.loot.treasureChest.gold[0] = 3; }, "treasureChest.gold[0]"],
   ["상자 수명 0", r => { r.rules.chest.life = 0; }, "chest.life"],
   ["상자 생성 확률 1 초과", r => { r.rules.chest.spawnChance = 2; }, "chest.spawnChance"],
+  ["방패막기 효과 수치 없음", r => { delete r.skills.heroes.knight[1].fx; }, "knight[1].fx"],
+  ["마력 방출 피해 글자", r => { r.skills.heroes.mage[2].fx.near = "50"; }, "mage[2].fx.near"],
+  ["받는 피해 비율 1 초과", r => { r.skills.heroes.knight[1].fx.damageTaken = 1.5; }, "fx.damageTaken"],
+  ["벽 쌓기 효과 수치 빠짐", r => { delete r.skills.champions.gron.ex[0].fx.maxLv; }, "gron.ex[0].fx.maxLv"],
+  ["용사 벽 부수기 사거리 0", r => { r.rules.hero.breakRange = 0; }, "hero.breakRange"],
 ];
