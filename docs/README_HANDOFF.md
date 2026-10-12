@@ -39,7 +39,7 @@
 - v62부터 `index.html` 을 파일로 직접 열면 데이터를 못 읽음 → Pages 주소나 `python3 -m http.server` 로 열기. 테스트도 웹서버로(`tools/compare_versions.py` 가 자동으로 띄움).
 - 수치만 바꿀 때는 `game/data/*.json` 만 고치고 `node tools/validate_data.js` 로 검사. 큰 변경 후에는 `tools/compare_versions.py` 로 이전 버전과 비교.
 - 수정은 **패치 방식**(원본 문자열을 찾아 교체)으로 하고 `assert` 로 한 곳만 바뀌는지 확인 → 문법 검사(`node --check`) → Playwright 로 규칙 테스트/스크린샷 → 게시.
-- 규칙을 바꾸면 컴퓨터끼리 대전(`tools/sim.py`)으로 밸런스를 돌려보고 결과를 보고.
+- **밸런스(승률) 비교용 대전은 사용자가 요청할 때만** 돌린다. 잘 작동하는지 확인하는 테스트(`tools/` 검사, 이전 버전과 같은 결과인지 비교)는 평소대로 한다.
 - 기존 디자인 3종(기존 디자인 / 테마 2 / 테마 3) 선택 기능은 유지.
 - 게시: Claude `Artifact` 도구로 **같은 URL** 에 게시. (이 문서 작성 시점 링크: https://claude.ai/artifact/M6mPmXnyaqVsT4E9RdeDFd — 계정 소유자만 갱신 가능)
 - 메모리: 요청 사항은 `areas/web-game-project.md` 에 [stated] 로 누적 기록됨.
