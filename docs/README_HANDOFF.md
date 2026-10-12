@@ -1,7 +1,7 @@
 # 픽셀 던전 레이드 — 인수인계 문서 (README)
 
 > 새 대화나 새 프로젝트에서 이어서 작업할 때 **이 파일부터** 읽게 하세요.
-> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v61** (`game/index.html` + `game/art/`)
+> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v62** (`game/index.html` + `game/art/`)
 > 폰/웹 주소(GitHub Pages): https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ — 설정 방법 `docs/DEPLOY_PAGES.md`
 
 ## 1. 한 줄 요약
@@ -12,6 +12,7 @@
 | 파일 | 내용 |
 |---|---|
 | `game/index.html` | **최신 게임 코드** (약 120KB) |
+| `game/data/` | 용사·스킬·몬스터 수치 JSON (v62~). 각 값의 뜻은 `game/data/README.md` |
 | `game/art/` | 게임 그림 파일 134개(약 1.4MB). `index.html` 과 **항상 함께** 있어야 그림이 나옴 |
 | `GAME_SPEC.md` | 확정된 규칙 전부 (챔피언·용사·스킬·상자·몬스터·벽 등) |
 | `CHANGELOG.md` | 버전별 변경 내역 |
@@ -29,7 +30,9 @@
 3. v59부터 그림이 `game/art/` 로 분리되어 코드 파일이 약 120KB 입니다. 그래도 필요한 함수만 찾아 읽게 하면 토큰이 절약됩니다 (CODE_MAP.md 의 함수 목록 참고).
 
 ## 4. 작업 방식 (지금까지 유지한 규칙)
-- `index.html` + `art/` 그림 폴더, 외부 의존성 없음 (폰트만 Google Fonts). 아티팩트로 게시할 때는 `art/` 파일들도 `files` 로 함께 올려야 함.
+- `index.html` + `art/` 그림 + `data/` 수치, 외부 의존성 없음 (폰트만 Google Fonts). 아티팩트로 게시할 때는 `art/`·`data/` 파일도 `files` 로 함께 올려야 함.
+- v62부터 `index.html` 을 파일로 직접 열면 데이터를 못 읽음 → Pages 주소나 `python3 -m http.server` 로 열기. 테스트도 웹서버로(`tools/compare_versions.py` 가 자동으로 띄움).
+- 수치만 바꿀 때는 `game/data/*.json` 만 고치고, 큰 변경 후에는 `tools/compare_versions.py` 로 이전 버전과 비교.
 - 수정은 **패치 방식**(원본 문자열을 찾아 교체)으로 하고 `assert` 로 한 곳만 바뀌는지 확인 → 문법 검사(`node --check`) → Playwright 로 규칙 테스트/스크린샷 → 게시.
 - 규칙을 바꾸면 컴퓨터끼리 대전(`tools/sim.py`)으로 밸런스를 돌려보고 결과를 보고.
 - 기존 디자인 3종(기존 디자인 / 테마 2 / 테마 3) 선택 기능은 유지.
