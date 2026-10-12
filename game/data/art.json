@@ -214,16 +214,12 @@
    "gen": "art/art1/gen.png",
    "bomb": "art/art1/bomb.png",
    "bombE": "art/art1/bombE.png",
-   "v0": "art/art1/v0.png",
-   "v1": "art/art1/v1.png",
-   "v2": "art/art1/v2.png",
    "portrait": "art/art1/portrait.jpg"
   },
   "ART2": {
    "v0": "art/art2/v0.png",
    "v1": "art/art2/v1.png",
    "v2": "art/art2/v2.png",
-   "vc": "art/art2/vc.png",
    "gen": "art/art2/gen.png",
    "genE": "art/art2/genE.png",
    "r1": "art/art2/r1.png",

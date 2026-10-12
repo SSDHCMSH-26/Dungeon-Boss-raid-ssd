@@ -63,7 +63,7 @@ game/
 | `node tools/check_core.js` | src 문법 + core 경계(화면·기기·시계·무작위·무작위 정렬) |
 | `node tools/headless.js selftest` | 화면 없이 실행, 같은 씨앗=같은 결과, 리플레이, view() 숨김 |
 | `python3 tools/test_engine_parity.py [N]` | 브라우저 = Node.js (지문·라운드·승패), 브라우저 기록 → Node 리플레이 |
-| `python3 tools/test_boss_art.py` | 느린 인터넷에서도 보스가 옛 임시 그림으로 안 바뀌는지 |
+| `python3 tools/test_boss_art.py` | 디자인 3종에서 그론·빈센토가 받은 그림만 쓰는지 (느린 인터넷 흉내) |
 | `python3 tools/compare_versions.py <이전 game>` | 이전 버전과 데이터·화면·규칙·AI 대전·실제 진행 루프 비교 |
 | `node tools/validate_data.js [--selftest]` | 데이터·맵 검사 |
 | `node tools/headless.js sim 400` | 화면 없이 대전 → 승률·평균 라운드 (밸런스) |
