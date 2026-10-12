@@ -1,4 +1,5 @@
-# GAME_SPEC — 확정 규칙 (v66 기준)
+# GAME_SPEC — 확정 규칙 (v67 기준)
+> v67: 규칙은 그대로. 코드 구조만 바뀜(`docs/ARCHITECTURE.md`). 무작위가 씨앗 고정 방식으로 바뀌어 같은 상황의 결과는 예전과 다를 수 있음.
 > v66: 화면 고정 문구는 `game/data/text/ko.json`. 규칙 변화 없음.
 > v65: 컴퓨터(AI) 확률·기준값은 `game/data/ai.json`, 그림 경로·디자인·테마 색은 `game/data/art.json`. 규칙 변화 없음.
 > v64: 맵(빈센토 공장 지도·그론 랜덤 미로)과 시작 위치는 `game/data/maps/*.json`. 규칙 변화 없음.

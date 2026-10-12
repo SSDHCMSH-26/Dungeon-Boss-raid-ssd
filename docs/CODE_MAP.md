@@ -1,15 +1,16 @@
-# CODE_MAP — `game/index.html` 구조 (v66)
+# CODE_MAP — 게임 코드 구조 (v67)
 
-## 파일 형태
-- 코드만 든 HTML(약 125KB). 그림은 `game/art/` 폴더의 파일(약 1.4MB, 134개), 그 경로 목록은 v65부터 `game/data/art.json`.
-- 그림 변수 → 폴더: `T3A`→`art/t3a/`(테마3 용사·효과), `ART`→`art/art1/`, `ART2`→`art/art2/`, `ART3`→`art/art3/`(+ `Object.assign(ART3,…)` 의 상자·아이템 → `art/art3b/`), `FACE`/`FACEG`→`art/face/`, `MOBA`→`art/mob/`(미믹·고블린), `FXD`→`art/fx/`, 번개 크리스탈→`art/crystal/`. `art/art3/t_spear.png`·`t_flame.png` 는 `art3b` 것으로 덮어써져 실제로는 안 쓰임(원본과 동일하게 보존).
-- 그림 추가/교체: 파일을 해당 폴더에 넣고 변수에 `"이름": "art/폴더/이름.png"` 한 줄 추가. 그림은 비동기로 열리므로 쓰는 쪽은 기존처럼 `i.complete&&i.naturalWidth` 확인 후 그리고, `onload` 에서 `draw()`.
-- 코드 부분은 약 100~150KB. 함수 이름으로 검색(Grep)해서 해당 줄만 읽는 방식 권장.
-- `<script>` 는 두 개 이상일 수 있으니 문법 검사는 "가장 긴 script" 를 추출해서 `node --check`.
+## 파일 형태 (v67~)
+- 게임 코드는 `game/src/` 아래 역할별 파일 (전체 구조·패턴: `docs/ARCHITECTURE.md`). `index.html` 은 로더만.
+  - **규칙 계산은 `src/core/`** — 고칠 때는 화면·L·Date.now·Math.random 을 쓰지 말고 PRES/NOW/RAND 를 쓰기 (`node tools/check_core.js` 로 확인)
+  - 화면에서 게임을 바꿀 때는 규칙 함수를 직접 부르지 말고 `apply({type:...})` (`src/core/actions.js` 목록)
+  - 새 규칙 무작위는 `rn()`/`RAND()`/`shuffle()`, AI 판단 무작위는 `arn()`/`ARAND()`
+- 각 파일은 전역 공유 스크립트(브라우저 `<script>` 순서 = index.html 의 `SRC`). Node 에서는 `tools/headless.js` 가 core 만 vm 에 불러 실행.
+- 함수 위치: 아래 "주요 함수" 이름으로 `grep -rn "function 이름" game/src` 로 찾기.
 
-## 핵심 상태 `S` (온라인 시 JSON 으로 동기화)
+## 핵심 상태 `S` (온라인 시 JSON 으로 동기화) — v67: `sec`(보스 비밀: traps·bombs·bid), `used`(턴 사용 횟수), `seed`·`rng`(규칙 무작위), `airng`(AI 무작위) 추가
 `ph`(setup/boss/hero/resolve) · `round` · `champ`(gron/vince) · `map`(문자열 N*N, "1"=벽) · `boss`{x,y,hp,max,ap,moved,bind,en…} · `gen`(빈센토전 발전기) · `heroes[]`{k,x,y,hp,max,ap,mc,guard,par,dead,stun,sup,cd{},nt,gold…} · `atks`(예고된 공격) · `rev`(공개된 함정) · `mv`(이번 턴 이동 기록) · `pits` · `chests[]`{id,x,y,k("t"/"x"),age} · `mobs[]`{id,k("mimic"/"gob"),x,y,hp,mx,hold,vi,gold,loot,items} · `walls[]`{x,y,t,lv,hp} · `mw`(맵 기본 벽의 손상 체력) · `belts`/`fac`/`rob`/`cry`(빈센토 요소) · `gold`{b,h}(보스 합산) · `bag`{b,h}{potion,scroll,gem} · `cd`(보스 쿨타임) · `hfx`/`cfx`/`rfx`(연출용) · `end`(종료 메시지) · `log`.
-## 로컬 상태 `L`
+## 로컬 상태 `L` (화면용만 — v67 부터 traps/bombs/used/bid 는 S 로 이동)
 `mode`(solo/local/multi) · `role`(boss/hero) · `act`(선택 중 스킬) · `picks`(찍은 칸) · `design`(old/t2/t3) · `traps`/`bombs`(보스가 숨겨 설치한 것) · `used`(턴당 사용 횟수) · `bag`(가방 열림) 등.
 
 ## 데이터 정의
