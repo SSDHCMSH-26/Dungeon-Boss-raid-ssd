@@ -13,7 +13,14 @@
     rules: { path: "data/rulesets/standard.json", format: "pdr-ruleset", version: 1 },
     items: { path: "data/items.json", format: "pdr-items", version: 1 },
     loot: { path: "data/loot.json", format: "pdr-loot", version: 1 },
+    mapIndex: { path: "data/maps/index.json", format: "pdr-map-index", version: 1 },
   };
+  // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
+  const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
+    generators: ["maze"], objects: ["chest", "trapChest", "pit"],
+    keys: ["format", "version", "id", "name", "author", "champion", "ruleset", "size", "tiles", "generator", "spawns", "objects"] };
+  const mapPath = id => "data/maps/" + id + ".json";
+  const ID_RE = /^[a-z0-9_-]{1,64}$/;
   const META = ["format", "version"];
 
   const isObj = v => v !== null && typeof v === "object" && !Array.isArray(v);
@@ -174,6 +181,11 @@
         c.need(isNum(b[k].effect[need]), k + ".effect." + need, "이 아이템 효과에 필요한 숫자예요");
       });
     },
+    mapIndex(b, c) {
+      if (c.need(Array.isArray(b.maps) && b.maps.length > 0, "maps", "맵 ID 목록이어야 해요"))
+        b.maps.forEach((id, i) => c.need(isStr(id) && ID_RE.test(id), "maps[" + i + "]", "맵 ID 는 영어 소문자·숫자·_·- 여야 해요"));
+      if (c.obj(b.default, "default")) for (const k in b.default) c.need(Array.isArray(b.maps) && b.maps.indexOf(b.default[k]) >= 0, "default." + k, "maps 목록에 없는 맵이에요");
+    },
     loot(b, c) {
       const t = b.treasureChest;
       if (!c.obj(t, "treasureChest")) return;
@@ -187,18 +199,129 @@
     },
   };
 
+  // format·version 확인 (모든 파일 공통)
+  function head(c, json, spec) {
+    if (!c.obj(json, "")) return false;
+    if (!c.need(json.format === spec.format, "format", '"' + spec.format + '" 이어야 해요 (지금: ' + JSON.stringify(json.format) + ")")) return false;
+    if (!c.need(isInt(json.version), "version", "정수여야 해요")) return false;
+    return c.need(json.version <= spec.version, "version",
+      "이 게임은 version " + spec.version + " 까지만 읽을 수 있어요 (파일: " + json.version + "). 게임을 새로 고침하거나 최신 버전으로 업데이트하세요");
+  }
+
   // 파일 하나 검사: format·version 확인 + 내용 검사
   function dataFile(name, json) {
     const spec = FILES[name], c = checker(spec ? spec.path : name);
     if (!c.need(!!spec, "", "알 수 없는 데이터 파일이에요")) return c.errs;
-    if (!c.obj(json, "")) return c.errs;
-    if (!c.need(json.format === spec.format, "format", '"' + spec.format + '" 이어야 해요 (지금: ' + JSON.stringify(json.format) + ")")) return c.errs;
-    if (!c.need(isInt(json.version), "version", "정수여야 해요")) return c.errs;
-    if (!c.need(json.version <= spec.version, "version",
-      "이 게임은 version " + spec.version + " 까지만 읽을 수 있어요 (파일: " + json.version + "). 게임을 새로 고침하거나 최신 버전으로 업데이트하세요")) return c.errs;
+    if (!head(c, json, spec)) return c.errs;
     if (BODY[name]) BODY[name](body(json), c);
     return c.errs;
   }
+
+  // ── 맵 검사 ── json: 맵 파일 내용, D: 이미 불러온 데이터(챔피언·규칙 묶음 확인용), file: 오류에 표시할 이름
+  // 반환: 한국어 오류 배열. 남이 만든 맵(공유 맵)도 반드시 이 검사를 통과해야 사용.
+  function map(json, D, file) {
+    const c = checker(file || "맵"), N = MAP.size;
+    if (!head(c, json, MAP)) return c.errs;
+    for (const k in json) c.need(MAP.keys.indexOf(k) >= 0, k, "모르는 항목이에요 (오타인지 확인하세요)");
+    c.need(isStr(json.id) && ID_RE.test(json.id), "id", "영어 소문자·숫자·_·- 로 1~64자여야 해요");
+    c.need(isStr(json.name) && json.name.length >= 1 && json.name.length <= 40, "name", "1~40자 글자여야 해요");
+    if (json.author !== undefined) c.need(isStr(json.author) && json.author.length <= 40, "author", "40자 이하 글자여야 해요");
+    const ch = D && D.champions && D.champions[json.champion];
+    c.need(!!ch && !!ch.ok, "champion", '쓸 수 있는 챔피언 ID 여야 해요 (지금: ' + JSON.stringify(json.champion) + ")");
+    c.need(D && D.rules && json.ruleset === D.rules.id, "ruleset", '있는 규칙 묶음 ID 여야 해요 (지금: ' + JSON.stringify(json.ruleset) + ")");
+    if (c.obj(json.size, "size")) c.need(json.size.w === N && json.size.h === N, "size", "지금은 " + N + "×" + N + " 맵만 쓸 수 있어요");
+    const hasT = json.tiles !== undefined, hasG = json.generator !== undefined;
+    if (!c.need(hasT !== hasG, "", "tiles(지도) 와 generator(자동 생성) 중 정확히 하나만 있어야 해요")) return c.errs;
+    let grid = null; // grid[y][x] = true 면 벽
+    if (hasT) {
+      const t = json.tiles;
+      if (c.need(Array.isArray(t) && t.length === N, "tiles", N + "줄이어야 해요" + (Array.isArray(t) ? " (지금: " + t.length + "줄)" : ""))) {
+        let ok = true;
+        for (let y = 0; y < N; y++) { // forEach 는 빈 칸(구멍)을 건너뛰므로 일반 반복문으로 모든 줄 확인
+          const row = t[y];
+          if (!c.need(isStr(row) && row.length === N, "tiles[" + y + "]", N + "글자여야 해요" + (isStr(row) ? " (지금: " + row.length + "글자)" : ""))) { ok = false; continue; }
+          for (let x = 0; x < N; x++) if (!Object.prototype.hasOwnProperty.call(MAP.tiles, row[x])) { c.need(false, "tiles[" + y + "]", (x + 1) + "번째 글자 '" + row[x] + "' 는 쓸 수 없어요 (. 바닥 / # 벽)"); ok = false; break; }
+        }
+        if (ok) { grid = []; for (let y = 0; y < N; y++) { const r = []; for (let x = 0; x < N; x++) r.push(t[y][x] === "#"); grid.push(r); } }
+      }
+    } else if (c.obj(json.generator, "generator")) {
+      c.need(MAP.generators.indexOf(json.generator.type) >= 0, "generator.type", "다음 중 하나여야 해요: " + MAP.generators.join(", "));
+    }
+    // 시작 위치
+    const wall = (x, y) => grid ? grid[y][x] : false;
+    const pt = (p, path) => c.obj(p, path) && (c.int(p.x, path + ".x", 0, N - 1) & c.int(p.y, path + ".y", 0, N - 1)) === 1;
+    const area = (p, r) => { const a = []; for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) a.push([p.x + dx, p.y + dy]); return a; };
+    const big = (p, path) => { // 보스·발전기: 가운데 기준 3×3
+      if (!pt(p, path)) return null;
+      if (!c.need(p.x >= 1 && p.y >= 1 && p.x <= N - 2 && p.y <= N - 2, path, "3×3 크기라 맨 가장자리에서 1칸 이상 안쪽이어야 해요")) return null;
+      const a = area(p, 1);
+      c.need(a.every(([x, y]) => !wall(x, y)), path, "3×3 자리에 벽이 있어요");
+      return a;
+    };
+    const used = new Map(), mark = (cells, who) => cells.forEach(([x, y]) => { const k = y * N + x; if (used.has(k)) c.need(false, "spawns", who + " 자리가 " + used.get(k) + " 와 겹쳐요 (" + x + "," + y + ")"); else used.set(k, who); });
+    let bossA = null;
+    if (c.obj(json.spawns, "spawns")) {
+      const sp = json.spawns;
+      bossA = big(sp.boss, "spawns.boss");
+      if (bossA) mark(bossA, "보스");
+      if (ch && ch.gen) { const g = big(sp.generator, "spawns.generator"); if (g) mark(g, "발전기"); }
+      else c.need(sp.generator === undefined, "spawns.generator", "발전기가 없는 챔피언이에요");
+      if (c.need(Array.isArray(sp.heroes) && sp.heroes.length === 3, "spawns.heroes", "용사 시작 위치 3개여야 해요"))
+        for (let i = 0; i < 3; i++) { const h = sp.heroes[i], p = "spawns.heroes[" + i + "]"; if (pt(h, p)) { c.need(!wall(h.x, h.y), p, "벽 위예요"); mark([[h.x, h.y]], "용사" + (i + 1)); } }
+    }
+    // 미리 놓는 물건 (디펜스 모드·편집기용)
+    if (json.objects !== undefined && c.need(Array.isArray(json.objects), "objects", "목록([ ])이어야 해요")) {
+      const R = D && D.rules, cnt = {};
+      if (!c.need(json.objects.length <= 200, "objects", "물건이 너무 많아요 (최대 200개)")) return c.errs;
+      Array.from(json.objects).forEach((o, i) => {
+        const p = "objects[" + i + "]";
+        if (!c.obj(o, p)) return;
+        if (!c.need(MAP.objects.indexOf(o.type) >= 0, p + ".type", "다음 중 하나여야 해요: " + MAP.objects.join(", "))) return;
+        cnt[o.type] = (cnt[o.type] || 0) + 1;
+        if (!pt(o, p)) return;
+        const cells = o.type === "pit" ? [[o.x, o.y], [o.x + 1, o.y], [o.x, o.y + 1], [o.x + 1, o.y + 1]] : [[o.x, o.y]];
+        if (!c.need(cells.every(([x, y]) => x < N && y < N), p, "맵 밖으로 나가요")) return;
+        c.need(cells.every(([x, y]) => !wall(x, y)), p, "벽 위에 놓을 수 없어요");
+        mark(cells, p + "(" + o.type + ")");
+      });
+      if (R && R.chest) c.need((cnt.chest || 0) + (cnt.trapChest || 0) <= R.chest.max, "objects", "상자는 최대 " + R.chest.max + "개예요");
+      const pitMax = D && D.skills && D.skills.champions && D.skills.champions.gron && (D.skills.champions.gron.ex || []).filter(e => e.id === "pit").map(e => e.fx && e.fx.max)[0];
+      if (pitMax !== undefined) c.need((cnt.pit || 0) <= pitMax, "objects", "구덩이는 최대 " + pitMax + "개예요");
+    }
+    // 길 확인: 용사마다 벽을 부수지 않고 보스 옆까지 걸어갈 수 있어야 함 (지도가 있는 맵만)
+    if (grid && bossA && !c.errs.length) {
+      const near = new Set();
+      bossA.forEach(([bx, by]) => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) near.add((by + dy) * N + bx + dx); });
+      const blocked = (x, y) => x < 0 || y < 0 || x >= N || y >= N || grid[y][x] || bossA.some(([a, b]) => a === x && b === y);
+      json.spawns.heroes.forEach((h, i) => {
+        const seen = new Set([h.y * N + h.x]), q = [[h.x, h.y]];
+        let ok = false;
+        while (q.length && !ok) {
+          const [x, y] = q.shift();
+          if (near.has(y * N + x)) { ok = true; break; }
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            const nx = x + dx, ny = y + dy, k = ny * N + nx;
+            if ((dx || dy) && !blocked(nx, ny) && !seen.has(k)) { seen.add(k); q.push([nx, ny]); }
+          }
+        }
+        c.need(ok, "spawns.heroes[" + i + "]", "이 용사가 보스까지 걸어갈 길이 없어요 (벽으로 막힘)");
+      });
+    }
+    return c.errs;
+  }
+
+  // 맵 파일 글자(공유 맵 업로드·불러오기용): 크기 제한 → JSON 해석 → map() 검사
+  function mapText(text, D, file) {
+    if (typeof text !== "string") return ["맵 파일을 읽을 수 없어요"];
+    const bytes = typeof TextEncoder !== "undefined" ? new TextEncoder().encode(text).length : text.length;
+    if (bytes > MAP.maxBytes) return [(file || "맵") + ": 파일이 너무 커요 (" + Math.round(bytes / 1024) + "KB, 최대 " + MAP.maxBytes / 1024 + "KB)"];
+    let j;
+    try { j = JSON.parse(text); } catch (e) { return [(file || "맵") + ": JSON 형식이 아니에요 (" + e.message + ")"]; }
+    return map(j, D, file);
+  }
+
+  // 맵 → 게임 내부 지도 글자("0" 바닥 / "1" 벽, 한 줄로). generator 맵은 null
+  const mapString = m => m.tiles ? m.tiles.join("").replace(/\./g, "0").replace(/#/g, "1") : null;
 
   // format·version 을 뺀 실제 내용 (옛 버전이면 여기서 새 형식으로 변환할 자리)
   function body(json) {
@@ -216,6 +339,10 @@
     }
     if (D.loot && D.items && D.loot.treasureChest && Array.isArray(D.loot.treasureChest.items))
       D.loot.treasureChest.items.forEach(g => c.need(Array.isArray(g) && g[0] in D.items, "loot.treasureChest.items", '"' + (g && g[0]) + '" 는 items.json 에 없는 아이템이에요'));
+    if (D.mapIndex && D.champions)
+      for (const k in D.champions) if (D.champions[k].ok) c.need(D.mapIndex.default && D.mapIndex.default[k], "maps/index.json", '챔피언 "' + k + '" 의 기본 맵이 없어요');
+    if (D.maps && D.mapIndex && D.mapIndex.default)
+      for (const k in D.mapIndex.default) { const m = D.maps[D.mapIndex.default[k]]; c.need(!m || m.champion === k, "maps/index.json", '기본 맵 "' + D.mapIndex.default[k] + '" 은 ' + k + " 맵이 아니에요"); }
     if (D.skills && D.champions) {
       for (const k in D.champions) if (D.champions[k].ok) c.need(D.skills.champions && D.skills.champions[k], "skills.champions", '챔피언 "' + k + '" 의 스킬이 없어요');
       for (const k in D.skills.champions || {}) c.need(k in D.champions, "skills.champions", '"' + k + '" 는 champions.json 에 없는 챔피언이에요');
@@ -223,7 +350,7 @@
     return c.errs;
   }
 
-  const API = { FILES, dataFile, body, links };
+  const API = { FILES, MAP, mapPath, dataFile, body, links, map, mapText, mapString };
   root.PDRValidate = API;
   if (typeof module !== "undefined" && module.exports) module.exports = API;
 })(typeof window !== "undefined" ? window : globalThis);
