@@ -12,7 +12,8 @@
  5. 화면 글자: 모든 유닛 정보 창(정보·스킬 탭)·행동 메뉴·빠른 버튼·확정 창, 상태별(발전기 파괴, 마비, 크리스탈 등)
     + 보스·용사 행동 기록(발전, 크리스탈, 빈센토 피해 감소, 공장 파괴 보상 등)이 같은지
  6. 스킬 시나리오: 모든 용사·보스 스킬을 직접 써 본 결과(기록·체력·위치·벽·구덩이·함정 한도 등)가 같은지
- 7. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
+ 7. 실제 진행 루프(혼자 하기 타이머·화면 정리·sync)로 양쪽 컴퓨터 대전 4판의 최종 상태가 같은지
+ 8. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
 """
 import functools, http.server, json, os, re, sys, tempfile, threading
 from playwright.sync_api import sync_playwright
@@ -140,6 +141,13 @@ for(let i=0;i<8;i++){S=newS();L.mode='solo';L.role='hero';L.scr='game';L.wait=0;
 {const d0=L.design,seq=[];for(const st of ['old','t2','t3','vince','zzz']){L.design=st;setDesign();seq.push(st+'→'+L.design)}setDesign('old');r.push('디자인 버튼 '+seq.join(' '))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""
 
+# 실제 진행 루프(보스 비밀·사용 횟수는 v67 부터 S 안에 있어 L/S 어디에 있든 같은 뜻으로 비교, 폭탄 번호는 판마다 1부터): 혼자 하기 타이머 루프(tick → AI → 정산 → 화면 정리 → sync)를 양쪽 다 컴퓨터로 끝까지 돌림
+LOOP = """async ()=>{const r=[];AI.delayMs=0;
+for(const c of ['gron','vince','gron','vince']){S=newS();L.bid=0;L.traps=[];L.bombs=[];L.used={};L.mode='solo';L.role='none';L.scr='game';L.wait=0;S.champ=c;S.map=genMap(c);S.pick=c=='gron'?['knight','cleric','mage']:['archer','cleric','knight'];start();
+let n=0;while(!S.end&&S.round<=25&&n++<6000)await new Promise(z=>setTimeout(z,2));
+const sec=S.sec||{traps:L.traps,bombs:L.bombs,bid:L.bid},o=Object.assign({},S);delete o.sec;delete o.used;r.push(c+' 라운드 '+S.round+' '+S.end,JSON.stringify(o),JSON.stringify({sec,used:S.used||L.used}),JSON.stringify({a:L.act,p:L.picks,m:L.menu,si:L.si,bag:L.bag}))}
+L.scr='menu';return r}"""
+
 RULES_MOBS = open(os.path.join(ROOT, 'tools', 'test_mobs_example.py'), encoding='utf-8').read()
 RULES_WALLS = open(os.path.join(ROOT, 'tools', 'test_walls_example.py'), encoding='utf-8').read()
 SIM = open(os.path.join(ROOT, 'tools', 'sim.py'), encoding='utf-8').read()
@@ -173,7 +181,7 @@ def run(url, tag, b, shots):
             f = os.path.join(shots, f'{tag}_{design}_{champ}.png'); pg.screenshot(path=f, full_page=True)
             res['shots'][design + '_' + champ] = f
     pg.close()
-    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS), ('ui_text', UITEXT), ('skills', SKILLS)]:
+    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS), ('ui_text', UITEXT), ('skills', SKILLS), ('loop', LOOP)]:
         p2 = page(b, url, errs); res[name] = p2.evaluate(js); p2.close()
     p3 = page(b, url, errs)
     res['sim'] = [p3.evaluate(SIM_JS, [c, None, GAMES, 40]) for c in ['gron', 'vince']]
@@ -198,7 +206,7 @@ def main():
     for k in A['shots']:
         ia, ib = Image.open(A['shots'][k]).convert('RGB'), Image.open(B['shots'][k]).convert('RGB')
         check(ia.size == ib.size and ImageChops.difference(ia, ib).getbbox() is None, f'화면 픽셀 동일: {k}')
-    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios', 'ui_text', 'skills']:
+    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios', 'ui_text', 'skills', 'loop']:
         err = any('ERR' in str(x)[:4] for x in B[k])
         check(A[k] == B[k] and not err, f'{k} 결과 동일 ({len(B[k])}항목)')
     sims = B['sim']

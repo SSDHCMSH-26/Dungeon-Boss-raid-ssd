@@ -79,3 +79,8 @@ if(Vg()&&fxR()&&S.fxA)fxBoulder();
 if(S.champ=="vince"&&fxR()&&S.fxA)fxVince();
 if(fxF()&&S.rfx)S.rfx.forEach(q=>{const age=Date.now()-S.rfxT;fxS(q.en?"strike":"ystrike",(q.x+.5)*Z,(q.y+1)*Z,Z*1.7,age<80?age/80:1-(age-80)/820)});
 for(const k2 in VP)if(!live.has(k2))delete VP[k2];if(anyQ())kick()}
+/* 규칙(core)의 화면 알림(PRES)을 실제 그리기에 연결하는 어댑터 */
+Object.assign(PRES,{path:vpath,fx:hfx,kick,
+trim:(k,n)=>{const v=VP[k];if(v&&n>0)v.q.splice(Math.max(0,v.q.length-n),n)},
+snap:(k,x,y)=>{const v=VP[k];if(v){v.x=x;v.y=y;v.q=[]}},
+fallDelay:k=>(VP[k]?VP[k].q.length:0)/SPD*1000+200});

@@ -22,7 +22,8 @@ function strip(js) {
   return o;
 }
 let total = 0;
-const files = fs.readdirSync(CORE).filter(f => f.endsWith(".js")).sort();
+// env.js 는 바깥 세상과 만나는 유일한 통로라 검사에서 뺌 (여기서만 시계·무작위를 연결)
+const files = fs.readdirSync(CORE).filter(f => f.endsWith(".js") && f !== "env.js").sort();
 for (const f of files) {
   const code = strip(fs.readFileSync(path.join(CORE, f), "utf8")), lines = code.split("\n");
   for (const [kind, names] of Object.entries(BANNED)) for (const n of names) {
