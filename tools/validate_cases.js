@@ -76,4 +76,10 @@ module.exports = [
   ["AI 치유 기준 음수", r => { r.ai.hero.healBelow = -0.1; }, "hero.healBelow"],
   ["AI 시도 횟수 소수", r => { r.ai.boss.attackTries = 2.5; }, "boss.attackTries"],
   ["AI 벨트 길이 뒤집힘", r => { r.ai.boss.vince.belt.lenMin = 9; }, "lenMin 이 lenMax"],
+  // ── 그림·디자인 ──
+  ["그림 경로가 바깥 주소", r => { r.art.images.ART.r1 = "https://evil.example/x.png"; }, "images.ART.r1"],
+  ["그림 경로에 상위 폴더", r => { r.art.images.FACE = "art/../index.png"; }, "images.FACE"],
+  ["없는 그림 파일", r => { r.art.images.MOBA.gob_idle = "art/mob/gob_nap.png"; }, "그림 파일이 없어요"],
+  ["코드가 쓰는 디자인 빠짐", r => { r.art.designs.order = ["old", "t3"]; }, '"t2" 디자인'],
+  ["테마 색 형식 틀림", r => { r.art.themes.gron.hi = "purple"; }, "themes.gron.hi"],
 ];

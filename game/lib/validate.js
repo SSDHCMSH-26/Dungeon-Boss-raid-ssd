@@ -15,6 +15,7 @@
     loot: { path: "data/loot.json", format: "pdr-loot", version: 1 },
     mapIndex: { path: "data/maps/index.json", format: "pdr-map-index", version: 1 },
     ai: { path: "data/ai.json", format: "pdr-ai", version: 1 },
+    art: { path: "data/art.json", format: "pdr-art", version: 1 },
   };
   // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
   const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
@@ -181,6 +182,30 @@
         const need = { potion: "heal", scroll: "range", gem: "ap" }[k];
         c.need(isNum(b[k].effect[need]), k + ".effect." + need, "이 아이템 효과에 필요한 숫자예요");
       });
+    },
+    art(b, c) {
+      // 그림 경로는 game/art/ 아래 png·jpg 만 (바깥 주소·상위 폴더 금지)
+      const IMG_RE = /^art\/[A-Za-z0-9_\/-]+\.(png|jpg)$/;
+      const img = (v, p) => c.need(isStr(v) && IMG_RE.test(v) && v.indexOf("..") < 0, p, "art/ 폴더 안의 .png/.jpg 경로여야 해요 (지금: " + JSON.stringify(v) + ")");
+      if (c.obj(b.images, "images")) for (const k in b.images) {
+        const v = b.images[k];
+        if (isObj(v)) for (const n in v) img(v[n], "images." + k + "." + n); else img(v, "images." + k);
+      }
+      ["T3A", "ART", "ART2", "ART3", "ART3_EXTRA", "MOBA", "FXD", "CRYSTAL"].forEach(k => isObj(b.images) && c.obj(b.images[k], "images." + k));
+      if (c.obj(b.designs, "designs")) {
+        const d = b.designs;
+        if (c.need(Array.isArray(d.order) && d.order.length > 0 && d.order.every(isStr), "designs.order", "디자인 ID 목록이어야 해요"))
+          ["old", "t2", "t3"].forEach(id => c.need(d.order.indexOf(id) >= 0, "designs.order", '"' + id + '" 디자인은 코드가 쓰므로 빼면 안 돼요'));
+        if (c.obj(d.legacy, "designs.legacy")) for (const k in d.legacy) c.need(Array.isArray(d.order) && d.order.indexOf(d.legacy[k]) >= 0, "designs.legacy." + k, "order 에 있는 디자인이어야 해요");
+      }
+      const COLOR = /^#[0-9a-fA-F]{6}$/;
+      if (c.obj(b.themes, "themes")) for (const k in b.themes) {
+        const t = b.themes[k], p = "themes." + k;
+        if (!c.obj(t, p)) continue;
+        c.str(t.k, p + ".k");
+        ["hi", "ln"].forEach(n => c.need(COLOR.test(t[n]), p + "." + n, "#rrggbb 색이어야 해요"));
+        [["f", 2], ["sp", 1], ["w", 4]].forEach(([n, min]) => c.need(Array.isArray(t[n]) && t[n].length >= min && t[n].every(x => COLOR.test(x)), p + "." + n, "#rrggbb 색 " + min + "개 이상 목록이어야 해요"));
+      }
     },
     ai(b, c) {
       // 이름이 chance 면 확률(0~1), healBelow 도 비율, 나머지 숫자는 0 이상 정수

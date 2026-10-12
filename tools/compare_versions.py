@@ -137,6 +137,7 @@ r.push('벨트 9칸 '+bEx(BE,[[2,20],[10,20]]),'벨트 8칸 '+bEx(BE,[[2,21],[9,
 L.bombs=[];for(let i=0;i<6;i++){L.used={};r.push('폭탄'+i+' '+bEx(BO,[[3+i,8],[3+i,9]]))}
 S.ph='hero';S.heroes[1].par=1;r.push('마비 이동 '+mvOf(S.heroes[1])+' '+mvOf(S.heroes[0]));
 for(let i=0;i<8;i++){S=newS();L.mode='solo';L.role='hero';L.scr='game';L.wait=0;tickB();r.push('혼자하기 챔피언 '+S.champ+' '+S.map.split('1').length)}L.mode='local';
+{const d0=L.design,seq=[];for(const st of ['old','t2','t3','vince','zzz']){L.design=st;setDesign();seq.push(st+'→'+L.design)}setDesign('old');r.push('디자인 버튼 '+seq.join(' '))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""
 
 RULES_MOBS = open(os.path.join(ROOT, 'tools', 'test_mobs_example.py'), encoding='utf-8').read()

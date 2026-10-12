@@ -28,6 +28,11 @@ function check(raw) {
     D.maps[id] = V.body(raw.maps[id]);
   }
   if (!errs.length) errs.push(...V.links(D));
+  // 도구 전용: art.json 의 그림 파일이 실제로 있는지
+  if (!errs.length && D.art && D.art.images) for (const k in D.art.images) {
+    const v = D.art.images[k], list = typeof v === "string" ? [v] : Object.values(v);
+    list.forEach(f => { if (!fs.existsSync(path.join(GAME, f))) errs.push("data/art.json › images." + k + ": 그림 파일이 없어요 (" + f + ")"); });
+  }
   return errs;
 }
 
