@@ -98,7 +98,7 @@ S.fac[0].hp=1;dealHits([{o:S.fac[0],n:'공장'}],30,CLS.mage,'파이어볼');r.p
 S.gen.hp=1;dealHits([{o:S.gen,n:'발전기'}],30,CLS.mage,'파이어볼');r.push(S.log);S.ph='boss';S.boss.ap=bMax();grab(c+' 발전기 파괴');r.push('bMax '+bMax()+' bMv '+bMv())}
 S.ph='hero';L.role='hero';S.heroes[0].par=1;S.heroes[1].mc=1;S.heroes[1].ap=5;S.heroes[2].sup=0;grab(c+' 용사 차례');
 S.bag={b:{potion:2,scroll:2,gem:2},h:{potion:2,scroll:2,gem:2}};L.si=0;S.heroes[0].hp-=40;L.bag=1;r.push(c+' 가방 '+qkH());useItem('potion');r.push(S.log,S.heroes[0].hp);useItem('potion');r.push($('lg').textContent);useItem('gem');r.push(S.log,S.heroes[0].ap);useItem('scroll');r.push(L.act);r.push('스크롤 먼 곳 '+useScroll(S.heroes[0].x,S.heroes[0].y-11),'스크롤 '+useScroll(S.heroes[0].x,S.heroes[0].y-5),S.log,S.heroes[0].y);S.ph='boss';S.boss.hp-=50;useItem('potion');r.push(S.log,S.boss.hp);useItem('gem');r.push(S.log,S.boss.ap);r.push('보스 스크롤 '+useScroll(S.boss.x,S.boss.y+8),S.log);S.ph='hero';L.bag=0;for(let i=0;i<3;i++){L.si=i;for(const a of ['m','x',0,1,2]){L.act=a;L.picks=[];r.push(c+' cf '+i+' '+a+' '+cfH())}}L.act=null;
-S.ph='boss';L.role='boss';for(const a of ['m','a0','a1','e0','e1','e2','e3']){L.act=a;L.picks=[];try{r.push(c+' cfB '+a+' '+cfH())}catch(e){r.push('x')}}L.act=null;
+S.ph='boss';L.role='boss';for(const a of ['m','a0','a1','e0','e1','e2','e3','e4','e5']){L.act=a;L.picks=[];try{r.push(c+' cfB '+a+' '+cfH())}catch(e){r.push('x')}}L.act=null;
 S.ph='resolve';S.atks=[];resolve();r.push(c+' 다음 턴 '+S.log+' '+JSON.stringify(S.heroes.map(h=>[h.ap,h.mc])))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""
 
