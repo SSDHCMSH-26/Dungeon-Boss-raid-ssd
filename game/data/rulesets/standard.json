@@ -1,0 +1,22 @@
+{
+  "format": "pdr-ruleset",
+  "version": 1,
+  "id": "standard",
+  "name": "기본 규칙",
+  "hero": {
+    "ap": 3,
+    "clericApMax": 12,
+    "movesPerTurn": 2
+  },
+  "mapWallHp": 20,
+  "crystal": {
+    "max": 5,
+    "life": 7,
+    "blueChance": 0.25,
+    "start": 3,
+    "perTurnMin": 1,
+    "perTurnMax": 2,
+    "blueAp": 2,
+    "yellowMove": 2
+  }
+}

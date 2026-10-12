@@ -9,6 +9,8 @@
     heroes: { path: "data/heroes.json", format: "pdr-heroes", version: 1 },
     skills: { path: "data/skills.json", format: "pdr-skills", version: 1 },
     monsters: { path: "data/monsters.json", format: "pdr-monsters", version: 1 },
+    champions: { path: "data/champions.json", format: "pdr-champions", version: 1 },
+    rules: { path: "data/rulesets/standard.json", format: "pdr-ruleset", version: 1 },
   };
   const META = ["format", "version"];
 
@@ -89,6 +91,39 @@
       }
       if (c.obj(b.trapChest, "trapChest")) c.prob(b.trapChest.mimicChance, "trapChest.mimicChance");
     },
+    champions(b, c) {
+      for (const k in b) {
+        const ch = b[k];
+        if (!c.obj(ch, k)) continue;
+        c.str(ch.n, k + ".n");
+        if (!ch.ok) continue; // 아직 준비 중인 챔피언은 이름·설명만
+        if (!c.obj(ch.stats, k + ".stats")) continue;
+        const st = ch.stats, p = k + ".stats.";
+        c.int(st.hp, p + "hp", 1); c.int(st.ap, p + "ap", 0); c.int(st.move, p + "move", 0);
+        if (ch.gen) {
+          c.int(st.apNoGen, p + "apNoGen", 0); c.int(st.moveNoGen, p + "moveNoGen", 0);
+          c.prob(st.damageTakenWithGen, p + "damageTakenWithGen"); c.int(st.factoryKillAp, p + "factoryKillAp", 0);
+          if (c.obj(st.generator, p + "generator")) {
+            c.int(st.generator.hp, p + "generator.hp", 1); c.int(st.generator.ap, p + "generator.ap", 0); c.int(st.generator.charge, p + "generator.charge", 0);
+          }
+        }
+      }
+    },
+    rules(b, c) {
+      c.str(b.id, "id");
+      if (c.obj(b.hero, "hero")) {
+        c.int(b.hero.ap, "hero.ap", 0); c.int(b.hero.movesPerTurn, "hero.movesPerTurn", 0);
+        if (c.int(b.hero.clericApMax, "hero.clericApMax", 0)) c.need(b.hero.clericApMax >= b.hero.ap, "hero.clericApMax", "hero.ap 이상이어야 해요");
+      }
+      c.int(b.mapWallHp, "mapWallHp", 1);
+      if (c.obj(b.crystal, "crystal")) {
+        const r = b.crystal;
+        c.int(r.max, "crystal.max", 0); c.int(r.life, "crystal.life", 1); c.prob(r.blueChance, "crystal.blueChance");
+        c.int(r.start, "crystal.start", 0); c.int(r.blueAp, "crystal.blueAp", 0); c.int(r.yellowMove, "crystal.yellowMove", 0);
+        if (c.int(r.perTurnMin, "crystal.perTurnMin", 0) & c.int(r.perTurnMax, "crystal.perTurnMax", 0))
+          c.need(r.perTurnMin <= r.perTurnMax, "crystal", "perTurnMin 이 perTurnMax 보다 클 수 없어요");
+      }
+    },
   };
 
   // 파일 하나 검사: format·version 확인 + 내용 검사
@@ -117,6 +152,10 @@
     if (D.skills && D.heroes) {
       for (const k in D.heroes) c.need(D.skills.heroes && Array.isArray(D.skills.heroes[k]), "skills.heroes", '용사 "' + k + '" 의 스킬이 없어요');
       for (const k in D.skills.heroes || {}) c.need(k in D.heroes, "skills.heroes", '"' + k + '" 는 heroes.json 에 없는 용사예요');
+    }
+    if (D.skills && D.champions) {
+      for (const k in D.champions) if (D.champions[k].ok) c.need(D.skills.champions && D.skills.champions[k], "skills.champions", '챔피언 "' + k + '" 의 스킬이 없어요');
+      for (const k in D.skills.champions || {}) c.need(k in D.champions, "skills.champions", '"' + k + '" 는 champions.json 에 없는 챔피언이에요');
     }
     return c.errs;
   }

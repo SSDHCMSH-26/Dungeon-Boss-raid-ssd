@@ -15,4 +15,13 @@ module.exports = [
   ["확률이 1 초과", r => { r.monsters.trapChest.mimicChance = 1.5; }, "mimicChance"],
   ["강탈 확률 합이 1 초과", r => { r.monsters.gob.goldChance = 0.9; }, "goldChance + itemChance"],
   ["금화 범위 뒤집힘", r => { r.monsters.gob.goldMin = 9; }, "goldMin 이 goldMax"],
+  ["보스 체력 없음", r => { delete r.champions.gron.stats.hp; }, "gron.stats.hp"],
+  ["발전기 정보 없음", r => { delete r.champions.vince.stats.generator; }, "vince.stats.generator"],
+  ["피해 감소율이 1 초과", r => { r.champions.vince.stats.damageTakenWithGen = 2; }, "damageTakenWithGen"],
+  ["스킬 없는 챔피언 (ID 연결)", r => { r.champions.terna.ok = 1; r.champions.terna.stats = { hp: 1, ap: 1, move: 1 }; }, '챔피언 "terna" 의 스킬이 없어요'],
+  ["없는 챔피언의 스킬 (ID 연결)", r => { r.skills.champions.ghost = { at: [], ex: [] }; }, '"ghost" 는 champions.json 에 없는'],
+  ["규칙 묶음 format 틀림", r => { r.rules.format = "pdr-rules"; }, "pdr-ruleset"],
+  ["용사 AP 음수", r => { r.rules.hero.ap = -1; }, "hero.ap"],
+  ["성직자 이월 최대가 기본 AP 보다 작음", r => { r.rules.hero.clericApMax = 2; }, "hero.ap 이상"],
+  ["크리스탈 생성 범위 뒤집힘", r => { r.rules.crystal.perTurnMin = 5; }, "perTurnMin 이 perTurnMax"],
 ];

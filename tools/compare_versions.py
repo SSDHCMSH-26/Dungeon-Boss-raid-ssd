@@ -9,7 +9,9 @@
  2. 메뉴·용사 선택 화면, 디자인 3종 × 챔피언 2명 게임 화면 픽셀이 같은지
  3. 규칙 테스트(상자·몬스터, 벽) 결과가 같은지
  4. 미믹·고블린 전용 시나리오(상자 개봉 문구·정보 창·제압·추격·강탈·처치) 결과가 같은지
- 5. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
+ 5. 화면 글자: 모든 유닛 정보 창(정보·스킬 탭)·행동 메뉴·빠른 버튼·확정 창, 상태별(발전기 파괴, 마비, 크리스탈 등)
+    + 보스·용사 행동 기록(발전, 크리스탈, 빈센토 피해 감소, 공장 파괴 보상 등)이 같은지
+ 6. 컴퓨터끼리 대전(AI 대전) N판 결과가 한 판도 빠짐없이 같은지
 """
 import functools, http.server, json, os, re, sys, tempfile, threading
 from playwright.sync_api import sync_playwright
@@ -45,7 +47,11 @@ t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};const T=1760000
 performance.now=()=>0;try{localStorage.clear()}catch(e){}})();"""
 READY = "()=>{try{return typeof ui=='function'&&typeof CLS=='object'}catch(e){return false}}"
 
-DATA = """()=>JSON.stringify({CLS,CH,ITEMS,TR,TMAX,BAP,GAP,BOMBV,RHP,CRMAX,CRLIFE})"""
+# 데이터 비교: 전역 표(있는 것만) + 챔피언별로 게임을 시작했을 때 실제로 쓰이는 값(보스·발전기·용사 시작 상태, AP·이동)
+DATA = """()=>{const g=n=>{try{const v=window.eval(n);return typeof v=='function'?'(함수)':v}catch(e){return '(없음)'}};
+const o={};['CLS','CH','ITEMS','TR','TMAX','BOMBV','RHP','CRMAX','CRLIFE'].forEach(n=>o[n]=g(n));
+const sy=sync;sync=()=>{};o.start={};for(const c of ['gron','vince']){S=newS();S.champ=c;S.pick=['knight','cleric','mage'];S.map=genMap(c);start();
+o.start[c]={boss:S.boss,gen:S.gen,heroes:S.heroes,bMax:bMax(),bMv:bMv(),log:S.log}}sync=sy;return JSON.stringify(o)}"""
 
 SETUP = """async who=>{sync=()=>{};S=newS();L.mode='local';L.role=who;L.scr='game';
 document.getElementById('m').style.display='none';document.getElementById('g').style.display='block';
@@ -71,6 +77,26 @@ if(S.mobs[0]){dealHits([{o:S.mobs[0],n:'몹'}],99,CLS.archer,'x');lg.push(S.log,
 r.push(lg)}
 // 방치된 함정 상자 → 몬스터 출현
 run('gron',['knight','cleric','archer']);for(let i=0;i<8;i++)S.chests.push({x:10+i,y:20,k:i%2?'x':'t',id:900+i,age:11});const o=[];chAge(o);r.push(o,JSON.stringify(S.mobs));
+}catch(e){r.push('ERR '+e.stack)}return r}"""
+
+# 화면 글자 시나리오: 정보 창·메뉴·기록 문장을 상태별로 모아서 비교
+UITEXT = """()=>{const r=[];try{sync=()=>{};
+const grab=tag=>{const o={tag};L.act=null;L.menu=1;o.am=amH();o.qk=qkH();
+const us=[{t:'B'},{t:'G'}].concat(S.heroes.map((h,i)=>({t:'h',i})),(S.cry||[]).map((c,i)=>({t:'c',i})),S.rob.map(q=>({t:'r',i:q.id})),S.fac.map(f=>({t:'f',i:f.id})),(S.mobs||[]).map(m=>({t:'m',i:m.id})));
+o.ip=us.map(u=>{L.insp=u;L.itab='info';const a=ipH();L.itab='skill';const b=ipH();L.itab='info';return a+b});L.insp=null;r.push(o)};
+for(const c of ['gron','vince']){S=newS();S.champ=c;S.pick=['knight','cleric','mage'];S.map='0'.repeat(N*N);start();S.map='0'.repeat(N*N);L.mode='local';L.role='boss';L.scr='game';
+S.cry=[{x:3,y:3,t:5,k:'b'},{x:4,y:3,t:5,k:'y'}];S.mobs=[];S.chests=[];
+S.ph='boss';grab(c+' 보스 차례');
+if(c=='vince'){S.fac=[{id:1,x:5,y:8,hp:40,mx:40,lv:1,cd:3,en:0}];S.rob=[{id:1,fid:1,x:8,y:8,hp:8,mx:8,lv:1}];L.bsel='g';grab(c+' 발전기 탭');L.bsel='v';
+r.push('발전:'+genCharge()+' '+S.log);S.boss.mvb=2;grab(c+' 노랑 크리스탈');S.boss.mvb=0;
+const h=S.heroes[0];h.x=3;h.y=3;r.push('크리스탈:'+crEat('h',h,3,3)+crEat('h',h,4,3)+' ap '+h.ap+' mvb '+h.mvb);
+dealHits([{o:S.boss,n:'빈센토'}],30,CLS.mage,'파이어볼');r.push(S.log,S.boss.hp);
+S.fac[0].hp=1;dealHits([{o:S.fac[0],n:'공장'}],30,CLS.mage,'파이어볼');r.push(S.log);S.ph='resolve';S.atks=[];resolve();r.push(S.log,S.boss.ap,S.gen.ap);
+S.gen.hp=1;dealHits([{o:S.gen,n:'발전기'}],30,CLS.mage,'파이어볼');r.push(S.log);S.ph='boss';S.boss.ap=bMax();grab(c+' 발전기 파괴');r.push('bMax '+bMax()+' bMv '+bMv())}
+S.ph='hero';L.role='hero';S.heroes[0].par=1;S.heroes[1].mc=1;S.heroes[1].ap=5;S.heroes[2].sup=0;grab(c+' 용사 차례');
+for(let i=0;i<3;i++){L.si=i;for(const a of ['m','x',0,1,2]){L.act=a;L.picks=[];r.push(c+' cf '+i+' '+a+' '+cfH())}}L.act=null;
+S.ph='boss';L.role='boss';for(const a of ['m','a0','a1','e0','e1','e2','e3']){L.act=a;L.picks=[];try{r.push(c+' cfB '+a+' '+cfH())}catch(e){r.push('x')}}L.act=null;
+S.ph='resolve';S.atks=[];resolve();r.push(c+' 다음 턴 '+S.log+' '+JSON.stringify(S.heroes.map(h=>[h.ap,h.mc])))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""
 
 RULES_MOBS = open(os.path.join(ROOT, 'tools', 'test_mobs_example.py'), encoding='utf-8').read()
@@ -106,7 +132,7 @@ def run(url, tag, b, shots):
             f = os.path.join(shots, f'{tag}_{design}_{champ}.png'); pg.screenshot(path=f, full_page=True)
             res['shots'][design + '_' + champ] = f
     pg.close()
-    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS)]:
+    for name, js in [('rules_mobs', js_of(RULES_MOBS)), ('rules_walls', js_of(RULES_WALLS)), ('mob_scenarios', MOBS), ('ui_text', UITEXT)]:
         p2 = page(b, url, errs); res[name] = p2.evaluate(js); p2.close()
     p3 = page(b, url, errs)
     res['sim'] = [p3.evaluate(SIM_JS, [c, None, GAMES, 40]) for c in ['gron', 'vince']]
@@ -131,7 +157,7 @@ def main():
     for k in A['shots']:
         ia, ib = Image.open(A['shots'][k]).convert('RGB'), Image.open(B['shots'][k]).convert('RGB')
         check(ia.size == ib.size and ImageChops.difference(ia, ib).getbbox() is None, f'화면 픽셀 동일: {k}')
-    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios']:
+    for k in ['rules_mobs', 'rules_walls', 'mob_scenarios', 'ui_text']:
         err = any('ERR' in str(x)[:4] for x in B[k])
         check(A[k] == B[k] and not err, f'{k} 결과 동일 ({len(B[k])}항목)')
     sims = B['sim']
