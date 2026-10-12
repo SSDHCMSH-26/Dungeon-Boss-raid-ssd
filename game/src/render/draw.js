@@ -4,7 +4,8 @@ if(at.sh=="cross"){for(let d=0;d<=at.k;d++)(at.dg?[[1,0],[-1,0],[0,1],[0,-1],[1,
 else{for(let y=py-at.k;y<=py+at.k;y++)for(let x=px-at.k;x<=px+at.k;x++){if(x<0||y<0||x>=N||y>=N||(x+y)%2)continue;const t=age-((x*7+y*13)%9)*55;if(t<0||t>480)continue;fxS("strike",(x+.5)*Z,(y+1)*Z,Z*1.5,t<80?t/80:1-(t-80)/400)}const t2=age-350;if(t2>0&&t2<900)fxS("burst",(px+.5)*Z,(py+1)*Z,Z*(at.k*2+2)*.9,1-t2/900)}})})}
 function sp(k,x,y,w){cx.drawImage(SC[k],x,y,w,w)}
 const gKey=v=>S.end&&S.end.includes("보스 진영 승리")?"g4":fxR()?(Math.floor(Date.now()/250)%2?"g3":"g2"):S.atks.length?"g2":v.q.length?"g1":"g0";
-function bossArt(vb,hp){if(Vg())return spI(gKey(vb),vb.x*Z+Z/2,(vb.y+2)*Z-Z*.1-hp(vb,.1),3*Z,3.2*Z);if(V()){const en=S.boss.en>0,yb=(vb.y+2)*Z-Z*.15-hp(vb,.1);if(en&&!V2()){const xi=xImg("v2");if(xi)return spJ(xi,vb.x*Z+Z/2,yb,3*Z,3.3*Z)}return spI(en&&V2()?"v2":bossKey(vb),vb.x*Z+Z/2,yb,(V2()?3:2.4)*Z,(V2()?3.3:3)*Z)}return 0}
+// 보스 그림: 지금 동작 그림(이동·공격 등)이 아직 준비 안 됐으면 같은 디자인의 기본 그림(g0/v0)으로 — 옛 임시 그림(sp)은 그림 파일이 하나도 없을 때만
+function bossArt(vb,hp){if(Vg()){const x=vb.x*Z+Z/2,y=(vb.y+2)*Z-Z*.1-hp(vb,.1);return spI(gKey(vb),x,y,3*Z,3.2*Z)||spI("g0",x,y,3*Z,3.2*Z)}if(V()){const en=S.boss.en>0,yb=(vb.y+2)*Z-Z*.15-hp(vb,.1);if(en&&!V2()){const xi=xImg("v2");if(xi)return spJ(xi,vb.x*Z+Z/2,yb,3*Z,3.3*Z)}const w=(V2()?3:2.4)*Z,h=(V2()?3.3:3)*Z;return spI(en&&V2()?"v2":bossKey(vb),vb.x*Z+Z/2,yb,w,h)||spI("v0",vb.x*Z+Z/2,yb,w,h)}return 0}
 function fxBoulder(){const age=Date.now()-S.fxT,fr=Math.min(5,1+Math.floor(age/280));S.fxA.forEach(a=>{const at=CH.gron.at[a.i];if(!at)return;a.p.forEach(([px,py])=>{const cxp=(px+.5)*Z,cyp=(py+.5)*Z;
 if(at.sh=="cross"){const pr=Math.min(1,age/1100),k=at.k;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const d=pr*k;spI("f"+(2+Math.floor(age/200)%2),cxp+dx*d*Z,cyp+dy*d*Z+Z*.5,Z*2,Z*2)})}
 else spI("f"+fr,cxp,cyp+Z*1.2,Z*4.2,Z*4.2)})})}
