@@ -1,0 +1,28 @@
+{
+  "format": "pdr-items",
+  "version": 1,
+  "potion": {
+    "n": "체력 포션",
+    "ic": "it_pot",
+    "d": "HP +30",
+    "effect": {
+      "heal": 30
+    }
+  },
+  "scroll": {
+    "n": "순간이동 스크롤",
+    "ic": "it_scr",
+    "d": "10칸 이내 순간이동",
+    "effect": {
+      "range": 10
+    }
+  },
+  "gem": {
+    "n": "AP 보석",
+    "ic": "it_gem",
+    "d": "AP +2",
+    "effect": {
+      "ap": 2
+    }
+  }
+}

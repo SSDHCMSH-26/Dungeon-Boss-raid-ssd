@@ -1,4 +1,6 @@
 {
+  "format": "pdr-heroes",
+  "version": 1,
   "knight": {
     "n": "기사",
     "hp": 80,
