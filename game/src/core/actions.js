@@ -40,7 +40,7 @@ function apply(a) {
 }
 // 리플레이: 씨앗과 행동 목록으로 처음부터 다시 둠 → 최종 상태
 function replay(log) {
-  S = newS(); S.seed = S.rng = log.seed; REC.of = null;
+  S = newS(); S.seed = S.rng = log.seed; S.airng = (log.seed ^ 0x9E3779B9) >>> 0; REC.of = null;
   for (const a of log.actions) apply(a);
   return S;
 }

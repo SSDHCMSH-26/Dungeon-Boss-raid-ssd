@@ -7,13 +7,16 @@
    - NOW(): 연출용 시각(애니메이션 타이밍 기록). 규칙 판단에는 쓰지 않음. 서버·테스트는 바꿔 끼울 수 있음.
    - RAND(): 규칙이 쓰는 무작위(0 이상 1 미만). 규칙은 Math.random 을 직접 쓰지 않고 반드시 이것만 씀.
      씨앗을 정한 의사난수(mulberry32)이고 진행 값이 게임 상태 S.rng 안에 있음 → 같은 씨앗·같은 행동이면 어디서나 같은 결과.
+   - ARAND(): 컴퓨터(AI) 전용 무작위(진행 값 S.airng). AI 는 "플레이어"라서 판단용 주사위를 규칙과 따로 씀
+     → 판의 결과는 기록된 행동만으로 정해짐(리플레이할 때 AI 를 다시 돌릴 필요 없음).
    - SEED(): 새 판의 씨앗. 브라우저에선 무작위로 정하고, 서버는 자기가 정한 값을 넣으면 됨. */
 const PRES = { path() {}, fx() {}, trim() {}, snap() {}, kick() {}, fallDelay() { return 200; } };
 let NOW = () => Date.now();
 let SEED = () => (Math.random() * 4294967296) >>> 0;
-function RAND() {
-  let t = (S.rng = (S.rng + 0x6D2B79F5) | 0);
+function mulberry(k) {
+  let t = (S[k] = (S[k] + 0x6D2B79F5) | 0);
   t = Math.imul(t ^ (t >>> 15), t | 1);
   t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+const RAND = () => mulberry("rng"), ARAND = () => mulberry("airng");

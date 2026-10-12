@@ -1,11 +1,14 @@
 /* [규칙] 게임 상태 S, 새 게임 상태, 칸·거리·막힘 판정 같은 기본 도구 */
 const N=30;
 let S;
-const ch=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=n=>Math.floor(RAND()*n),cr=(v,b,r)=>cl(cl(v,b-r,b+r),0,N-1);
+const ch=(a,b,c,d)=>Math.max(Math.abs(a-c),Math.abs(b-d)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rn=n=>Math.floor(RAND()*n),arn=n=>Math.floor(ARAND()*n),
+/* 섞기(Fisher–Yates): 주사위를 정해진 횟수·순서로만 굴림 → 어느 JS 엔진에서나 같은 결과.
+   (sort 에 무작위 비교를 쓰는 섞기는 엔진마다 비교 순서가 달라 결과가 달라짐 — 쓰지 말 것) */
+shuffle=(a,r)=>{r=r||rn;for(let i=a.length-1;i>0;i--){const j=r(i+1),t=a[i];a[i]=a[j];a[j]=t}return a},cr=(v,b,r)=>cl(cl(v,b-r,b+r),0,N-1);
 /* 숨김 정보: S.sec = 보스만 아는 것(가시 함정·폭탄로봇), S.used = 이번 턴 스킬 사용 횟수.
    예전 저장·방 데이터(이 칸이 없던 버전)는 fixState 로 채움 */
-function fixState(st,old){if(!st)return st;if(!st.sec)st.sec={traps:(old&&old.t)||[],bombs:(old&&old.b)||[],bid:(old&&old.bid)||0};if(!st.used)st.used=(old&&old.u)||{};if(st.rng===undefined)st.rng=st.seed=SEED();return st}
-const newS=()=>{const sd=SEED();return {ph:"setup",pick:[],champ:"",map:"",fac:[],rob:[],walls:[],fid:1,rid:1,belts:[],round:1,boss:{x:15,y:2,hp:0,max:0,moved:0,ap:0},gen:null,heroes:[],atks:[],rev:[],mv:[],sec:{traps:[],bombs:[],bid:0},used:{},seed:sd,rng:sd,log:"보스 진영은 챔피언을, 용사 진영은 영웅 3명을 고르세요.",end:""}};
+function fixState(st,old){if(!st)return st;if(!st.sec)st.sec={traps:(old&&old.t)||[],bombs:(old&&old.b)||[],bid:(old&&old.bid)||0};if(!st.used)st.used=(old&&old.u)||{};if(st.rng===undefined)st.rng=st.seed=SEED();if(st.airng===undefined)st.airng=(st.seed^0x9E3779B9)>>>0;return st}
+const newS=()=>{const sd=SEED();return {ph:"setup",pick:[],champ:"",map:"",fac:[],rob:[],walls:[],fid:1,rid:1,belts:[],round:1,boss:{x:15,y:2,hp:0,max:0,moved:0,ap:0},gen:null,heroes:[],atks:[],rev:[],mv:[],sec:{traps:[],bombs:[],bid:0},used:{},seed:sd,rng:sd,airng:(sd^0x9E3779B9)>>>0,log:"보스 진영은 챔피언을, 용사 진영은 영웅 3명을 고르세요.",end:""}};
 const inB=(x,y)=>Math.abs(x-S.boss.x)<=1&&Math.abs(y-S.boss.y)<=1;
 const hAt=(x,y)=>S.heroes.find(h=>!h.dead&&h.x==x&&h.y==y);
 const sw=(x,y)=>S.map[y*N+x]=="1",dw=(x,y)=>S.walls.some(w=>w.x==x&&w.y==y),fa=(x,y)=>S.fac.find(f=>x>=f.x&&x<=f.x+1&&y>=f.y&&y<=f.y+1),rb=(x,y)=>S.rob.find(r=>r.x==x&&r.y==y);

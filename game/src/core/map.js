@@ -6,7 +6,7 @@ const vis=new Set(),sx=rnd(CW),sy=rnd(CR),st=[[sx,sy]];vis.add(sy*CW+sx);
 while(st.length){const [c,r]=st[st.length-1],nb=[[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>[c+a,r+b,a,b]).filter(([a,b])=>a>=0&&b>=0&&a<CW&&b<CR&&!vis.has(b*CW+a));
 if(!nb.length){st.pop();continue}const [a,b,da,dB]=nb[rnd(nb.length)];vis.add(b*CW+a);if(da==1)oH(c,r);else if(da==-1)oH(a,b);else if(dB==1)oV(c,r);else oV(a,b);st.push([a,b])}
 for(let n=0;n<3;n++){if(RAND()<.5)oH(rnd(CW-1),rnd(CR));else oV(rnd(CW),rnd(CR-1))}
-const ent=(y)=>{const cs=[0,1,2,3,4,5,6].sort(()=>RAND()-.5).slice(0,2);cs.forEach(c=>{for(let k=0;k<3;k++)m[y*N+x0(c)+k]=0})};ent(4);ent(24);
+const ent=(y)=>{const cs=shuffle([0,1,2,3,4,5,6]).slice(0,2);cs.forEach(c=>{for(let k=0;k<3;k++)m[y*N+x0(c)+k]=0})};ent(4);ent(24);
 return m.join("")}
 const mapOf=id=>DATA.maps[DATA.mapIndex.default[id]];
 function genMap(id){const m=mapOf(id);if(!m)return "0".repeat(N*N);if(m.generator&&m.generator.type=="maze")return mazeMap();return PDRValidate.mapString(m)}

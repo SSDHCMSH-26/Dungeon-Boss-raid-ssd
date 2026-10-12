@@ -9,6 +9,8 @@ const BANNED = {
   "기기 상태": ["L", "sel", "mine", "Z", "db", "uid"],
   "시계·무작위": ["Math.random", "Date.now", "performance"],
 };
+// 엔진마다 결과가 달라지는 코드 모양 (이름이 아니라 패턴)
+const PATTERNS = { "무작위 비교 정렬(sort 에 RAND) — shuffle() 을 쓸 것": /sort\([^)]*RAND\(\)/g };
 // 주석·문자열을 지운 코드에서 이름(식별자)을 찾음
 function strip(js) {
   let o = "", i = 0;
@@ -21,7 +23,11 @@ function strip(js) {
   }
   return o;
 }
+// 0) game/src 아래 모든 파일 문법 검사 (한 파일이라도 틀리면 게임이 안 뜸)
+const vm = require("vm"), SRC = path.join(__dirname, "..", "game", "src");
+const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith(".js") ? [path.join(d, e.name)] : []);
 let total = 0;
+for (const f of walk(SRC)) { try { new vm.Script(fs.readFileSync(f, "utf8"), { filename: f }); } catch (e) { total++; console.log("FAIL 문법 오류 " + path.relative(SRC, f) + ": " + e.message); } }
 // env.js 는 바깥 세상과 만나는 유일한 통로라 검사에서 뺌 (여기서만 시계·무작위를 연결)
 const files = fs.readdirSync(CORE).filter(f => f.endsWith(".js") && f !== "env.js").sort();
 for (const f of files) {
@@ -32,6 +38,7 @@ for (const f of files) {
     lines.forEach(l => { const m = l.match(re); if (m) hits += m.length; });
     if (hits) { total += hits; console.log(`FAIL core/${f}: ${kind} "${n}" ${hits}곳`); }
   }
+  for (const [kind, re] of Object.entries(PATTERNS)) { const m = code.match(re); if (m) { total += m.length; console.log(`FAIL core/${f}: ${kind} ${m.length}곳`); } }
 }
-console.log(total ? `경계 위반 ${total}곳 (core 는 화면·기기·시계·무작위를 직접 쓰면 안 됨)` : `OK core ${files.length}개 파일: 화면·기기·시계·무작위 직접 사용 없음`);
+console.log(total ? `문제 ${total}곳 (문법 오류 또는 core 가 화면·기기·시계·무작위를 직접 사용)` : `OK src 전체 문법 정상 · core ${files.length}개 파일: 화면·기기·시계·무작위 직접 사용 없음`);
 process.exit(total ? 1 : 0);
