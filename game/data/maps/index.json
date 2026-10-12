@@ -1,0 +1,12 @@
+{
+  "format": "pdr-map-index",
+  "version": 1,
+  "maps": [
+    "gron_maze",
+    "vince_factory"
+  ],
+  "default": {
+    "gron": "gron_maze",
+    "vince": "vince_factory"
+  }
+}

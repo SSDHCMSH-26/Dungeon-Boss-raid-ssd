@@ -1,4 +1,4 @@
-# CODE_MAP — `game/index.html` 구조 (v63)
+# CODE_MAP — `game/index.html` 구조 (v64)
 
 ## 파일 형태
 - 코드만 든 HTML(약 120KB). 그림은 v59부터 `game/art/` 폴더의 파일(약 1.4MB, 134개)이고, HTML 에는 `"art/t3a/cleric_idle.png"` 같은 **상대 경로**만 있음 → 이제 파일 전체를 읽어도 부담이 적음.
@@ -17,6 +17,7 @@
   - `DATA` 이름표: heroes, skills, monsters, champions, rules(=rulesets/standard.json), items, loot
   - 코드 쪽 별칭: `RULE`(규칙 묶음), `CST()`(지금 챔피언 stats), `GAP()`(발전기 AP), `HSK(t)`/`EXS(id)`(스킬 찾기), `GRD`/`WAL`/`PIT`/`BRUN`(자주 쓰는 스킬 fx), `ROB`/`FAC`/`BMB`(로봇·공장·폭탄), `ITEMS`(이름·아이콘·설명)·`ITEF`(아이템 effect)·`bag0()`(빈 가방), `CHR`(상자 규칙), `LOOT`/`LOOTW`/`LOOTI`(드롭표), `CRY`(크리스탈). 예전 상수 `TR`, `TMAX`, `BOMBV`, `RHP`, `CRMAX`, `CRLIFE` 는 데이터에서 만든 값으로 남아 있음.
   - 보스 체력·AP 는 `newS()` 에선 0, `pickChamp`/`start` 에서 champions.json stats 로 설정.
+  - **맵**: 로더가 `DATA.mapIndex.maps` 의 각 맵을 `PDRValidate.mapText()` 로 검사 후 `DATA.maps[id]` 에 저장. `mapOf(챔피언)` = 기본 맵. `genMap(id)`: tiles 맵은 `PDRValidate.mapString()`("0"/"1" 900글자), generator maze 는 `mazeMap()`. `start()` 가 `spawns`(보스·발전기·용사)와 `objects`(상자·함정 상자·구덩이)를 적용. 게임 내부 `S.map` 형식은 그대로("1"=벽).
   - `CLS[k] = {...DATA.heroes[k], sk: DATA.skills.heroes[k]}` (키 순서 유지)
   - `CH` 의 이름·설명·플래그(`n,s,m,ok,bash,bn,gen`)는 코드에, 스킬(`at,gx,ex`)은 `...DATA.skills.champions[id]`
   - `MOB = DATA.monsters` — `mobSpawn`(체력), `mobAct`(이동·피해·AP·강탈 확률/금화), `chOpen`/`chAge`(미믹 확률·제압 턴), `supTick`(제압 피해), `ipH`(몬스터 정보 창 문구). `pct(v)` = 확률 → "60%" 문자열.

@@ -1,7 +1,7 @@
 # 픽셀 던전 레이드 — 인수인계 문서 (README)
 
 > 새 대화나 새 프로젝트에서 이어서 작업할 때 **이 파일부터** 읽게 하세요.
-> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v63** (`game/index.html` + `game/art/`)
+> 마지막 정리 시점: 2026-10-11 · 최신 빌드 **v64** (`game/index.html` + `game/art/`)
 > 폰/웹 주소(GitHub Pages): https://ssdhcmsh-26.github.io/Dungeon-Boss-raid-ssd/ — 설정 방법 `docs/DEPLOY_PAGES.md`
 
 ## 1. 한 줄 요약
@@ -13,7 +13,8 @@
 |---|---|
 | `game/index.html` | **최신 게임 코드** (약 120KB) |
 | `game/data/` | 게임 수치 JSON — 용사·보스·스킬·몬스터·아이템·드롭표·규칙 묶음 (v63~). 각 값의 뜻은 `game/data/README.md` |
-| `game/lib/validate.js` | 데이터 검증기 (게임·도구·나중 서버 공용) |
+| `game/data/maps/` | 맵 파일(형식 설명: `game/data/maps/README.md`) — 맵 편집기·공유 맵용 |
+| `game/lib/validate.js` | 데이터·맵 검증기 (게임·도구·나중 서버 공용) |
 | `docs/DATA_DESIGN.md` | 데이터 분리 전체 계획·맵 저장 형식 설계 (PR A~D) |
 | `game/art/` | 게임 그림 파일 134개(약 1.4MB). `index.html` 과 **항상 함께** 있어야 그림이 나옴 |
 | `GAME_SPEC.md` | 확정된 규칙 전부 (챔피언·용사·스킬·상자·몬스터·벽 등) |

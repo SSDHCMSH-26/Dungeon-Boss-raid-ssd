@@ -52,7 +52,7 @@ READY = "()=>{try{return typeof ui=='function'&&typeof CLS=='object'}catch(e){re
 DATA = """()=>{const g=n=>{try{const v=window.eval(n);return typeof v=='function'?'(함수)':v}catch(e){return '(없음)'}};
 const o={};['CLS','CH','ITEMS','TR','TMAX','BOMBV','RHP','CRMAX','CRLIFE'].forEach(n=>o[n]=g(n));
 const sy=sync;sync=()=>{};o.start={};for(const c of ['gron','vince']){S=newS();S.champ=c;S.pick=['knight','cleric','mage'];S.map=genMap(c);start();
-o.start[c]={boss:S.boss,gen:S.gen,heroes:S.heroes,bMax:bMax(),bMv:bMv(),log:S.log}}sync=sy;return JSON.stringify(o,(k,v)=>k==='fx'?undefined:v)}"""
+o.start[c]={boss:S.boss,gen:S.gen,heroes:S.heroes,bMax:bMax(),bMv:bMv(),log:S.log,map:S.map,chests:S.chests,pits:S.pits,maps:[0,1,2].map(()=>genMap(c))}}sync=sy;return JSON.stringify(o,(k,v)=>k==='fx'?undefined:v)}"""
 
 SETUP = """async who=>{sync=()=>{};S=newS();L.mode='local';L.role=who;L.scr='game';
 document.getElementById('m').style.display='none';document.getElementById('g').style.display='block';

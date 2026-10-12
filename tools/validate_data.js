@@ -9,12 +9,24 @@ const V = require(path.join(GAME, "lib", "validate.js"));
 function loadAll() {
   const raw = {};
   for (const k in V.FILES) raw[k] = JSON.parse(fs.readFileSync(path.join(GAME, V.FILES[k].path), "utf8"));
+  // 맵: 목록(maps/index.json)에 적힌 맵 파일들
+  raw.maps = {};
+  for (const id of raw.mapIndex.maps || []) raw.maps[id] = JSON.parse(fs.readFileSync(path.join(GAME, V.mapPath(id)), "utf8"));
   return raw;
 }
 
+// 게임 로더와 같은 순서: 파일 검사 → 맵 검사 → ID 연결 검사
 function check(raw) {
   const errs = [], D = {};
-  for (const k in raw) { errs.push(...V.dataFile(k, raw[k])); D[k] = V.body(raw[k]); }
+  for (const k in V.FILES) { errs.push(...V.dataFile(k, raw[k])); D[k] = V.body(raw[k]); }
+  if (errs.length) return errs;
+  D.maps = {};
+  for (const id in raw.maps) {
+    const f = V.mapPath(id), e = V.map(raw.maps[id], D, f);
+    if (!e.length && raw.maps[id].id !== id) e.push(f + " › id: 파일 이름과 같은 \"" + id + "\" 이어야 해요");
+    errs.push(...e);
+    D.maps[id] = V.body(raw.maps[id]);
+  }
   if (!errs.length) errs.push(...V.links(D));
   return errs;
 }
@@ -34,10 +46,39 @@ if (process.argv.includes("--selftest")) {
     console.log((hit ? "OK  " : "FAIL") + " " + name + " → " + (e[0] || "(오류 없음)"));
     if (!hit) fail++;
   }
-  console.log(fail ? fail + "개 실패" : "검증기 자체 테스트 모두 통과 (" + (CASES.length + 1) + "개)");
+  // 무작위로 망가뜨린 맵 수천 개: 검증기가 멈추거나(예외) 통과시키면 안 됨 (공유 맵은 아무 내용이나 올 수 있음)
+  let seed = 7;
+  const rnd = n => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+  const JUNK = [null, undefined, 0, -1, 1e9, 3.5, "", "x", "#", [], [1], {}, { x: 1 }, true, NaN];
+  const mutate = o => {
+    const paths = [];
+    (function walk(v, p) { paths.push(p); if (v && typeof v === "object") for (const k of Object.keys(v)) walk(v[k], p.concat(k)); })(o, []);
+    for (let n = 1 + rnd(3); n > 0; n--) {
+      const p = paths[1 + rnd(paths.length - 1)];
+      if (!p) continue;
+      let t = o; for (const k of p.slice(0, -1)) { if (!t || typeof t !== "object") { t = null; break; } t = t[k]; }
+      if (!t || typeof t !== "object") continue;
+      const last = p[p.length - 1];
+      const v = JUNK[rnd(JUNK.length)];
+      if (rnd(4) === 0) delete t[last]; else t[last] = v === undefined ? undefined : clone(v);
+    }
+    return o;
+  };
+  const base = loadAll(), D = {};
+  for (const k in V.FILES) D[k] = V.body(base[k]);
+  let crash = 0, passed = 0;
+  for (let i = 0; i < 3000; i++) {
+    const id = i % 2 ? "vince_factory" : "gron_maze", m = mutate(clone(base.maps[id]));
+    try { const e = V.map(m, D, id); if (!e.length && JSON.stringify(m) !== JSON.stringify(base.maps[id])) passed++; }
+    catch (e) { if (crash++ < 3) console.log("FAIL 검증기 멈춤: " + e.stack.split("\n").slice(0, 3).join(" / ") + " ← " + JSON.stringify(m).slice(0, 120)); }
+  }
+  console.log((crash ? "FAIL" : "OK  ") + " 무작위로 망가뜨린 맵 3000개: 멈춤 " + crash + "번 (망가뜨렸는데도 통과 " + passed + "개 — 값이 우연히 유효한 경우)");
+  if (crash) fail++;
+  console.log(fail ? fail + "개 실패" : "검증기 자체 테스트 모두 통과 (" + (CASES.length + 2) + "개)");
   process.exit(fail ? 1 : 0);
 } else {
   const e = check(loadAll());
   if (e.length) { console.log("데이터 오류 " + e.length + "개:"); e.forEach(x => console.log(" - " + x)); process.exit(1); }
-  console.log("데이터 검사 통과: " + Object.keys(V.FILES).map(k => V.FILES[k].path).join(", "));
+  const raw = loadAll();
+  console.log("데이터 검사 통과: " + Object.keys(V.FILES).map(k => V.FILES[k].path).concat(Object.keys(raw.maps).map(V.mapPath)).join(", "));
 }
