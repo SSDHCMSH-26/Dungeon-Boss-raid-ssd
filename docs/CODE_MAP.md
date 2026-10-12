@@ -1,4 +1,4 @@
-# CODE_MAP — `game/index.html` 구조 (v62)
+# CODE_MAP — `game/index.html` 구조 (v63)
 
 ## 파일 형태
 - 코드만 든 HTML(약 120KB). 그림은 v59부터 `game/art/` 폴더의 파일(약 1.4MB, 134개)이고, HTML 에는 `"art/t3a/cleric_idle.png"` 같은 **상대 경로**만 있음 → 이제 파일 전체를 읽어도 부담이 적음.
@@ -13,7 +13,10 @@
 `mode`(solo/local/multi) · `role`(boss/hero) · `act`(선택 중 스킬) · `picks`(찍은 칸) · `design`(old/t2/t3) · `traps`/`bombs`(보스가 숨겨 설치한 것) · `used`(턴당 사용 횟수) · `bag`(가방 열림) 등.
 
 ## 데이터 정의
-- **v62~ 수치 데이터는 `game/data/*.json`** (뜻: `game/data/README.md`). 시작 순서: 게임 코드는 `<script id="main" type="text/plain">` 에 들어 있고, 파일 맨 아래 로더 스크립트가 `heroes`/`skills`/`monsters` JSON 을 fetch 해서 전역 `DATA` 에 넣은 뒤 main 코드를 실행(`window.GAME_READY=1`). 로드 실패 시 화면 맨 위에 안내 문구. 새 JSON 파일을 추가하면 로더의 `FILES` 목록에도 추가.
+- **수치 데이터는 `game/data/*.json`** (뜻: `game/data/README.md`). 시작 순서: 게임 코드는 `<script id="main" type="text/plain">` 에 들어 있고, 맨 아래 `<script src="lib/validate.js">` + 로더가 `PDRValidate.FILES` 의 파일을 모두 fetch → `dataFile()` 로 format·version·내용 검사 → `body()` 로 format/version 을 뺀 내용을 `DATA[이름표]` 에 저장 → `links()` 로 파일 간 ID 연결 검사 → 통과하면 main 실행(`window.GAME_READY=1`). 실패 시 화면 맨 위에 오류 목록. **새 데이터 파일은 `validate.js` 의 `FILES` 와 `BODY`(검사 규칙)에 추가.**
+  - `DATA` 이름표: heroes, skills, monsters, champions, rules(=rulesets/standard.json), items, loot
+  - 코드 쪽 별칭: `RULE`(규칙 묶음), `CST()`(지금 챔피언 stats), `GAP()`(발전기 AP), `HSK(t)`/`EXS(id)`(스킬 찾기), `GRD`/`WAL`/`PIT`/`BRUN`(자주 쓰는 스킬 fx), `ROB`/`FAC`/`BMB`(로봇·공장·폭탄), `ITEMS`(이름·아이콘·설명)·`ITEF`(아이템 effect)·`bag0()`(빈 가방), `CHR`(상자 규칙), `LOOT`/`LOOTW`/`LOOTI`(드롭표), `CRY`(크리스탈). 예전 상수 `TR`, `TMAX`, `BOMBV`, `RHP`, `CRMAX`, `CRLIFE` 는 데이터에서 만든 값으로 남아 있음.
+  - 보스 체력·AP 는 `newS()` 에선 0, `pickChamp`/`start` 에서 champions.json stats 로 설정.
   - `CLS[k] = {...DATA.heroes[k], sk: DATA.skills.heroes[k]}` (키 순서 유지)
   - `CH` 의 이름·설명·플래그(`n,s,m,ok,bash,bn,gen`)는 코드에, 스킬(`at,gx,ex`)은 `...DATA.skills.champions[id]`
   - `MOB = DATA.monsters` — `mobSpawn`(체력), `mobAct`(이동·피해·AP·강탈 확률/금화), `chOpen`/`chAge`(미믹 확률·제압 턴), `supTick`(제압 피해), `ipH`(몬스터 정보 창 문구). `pct(v)` = 확률 → "60%" 문자열.
