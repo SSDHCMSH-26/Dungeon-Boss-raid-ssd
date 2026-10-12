@@ -1,7 +1,7 @@
-# CODE_MAP — `game/index.html` 구조 (v64)
+# CODE_MAP — `game/index.html` 구조 (v65)
 
 ## 파일 형태
-- 코드만 든 HTML(약 120KB). 그림은 v59부터 `game/art/` 폴더의 파일(약 1.4MB, 134개)이고, HTML 에는 `"art/t3a/cleric_idle.png"` 같은 **상대 경로**만 있음 → 이제 파일 전체를 읽어도 부담이 적음.
+- 코드만 든 HTML(약 125KB). 그림은 `game/art/` 폴더의 파일(약 1.4MB, 134개), 그 경로 목록은 v65부터 `game/data/art.json`.
 - 그림 변수 → 폴더: `T3A`→`art/t3a/`(테마3 용사·효과), `ART`→`art/art1/`, `ART2`→`art/art2/`, `ART3`→`art/art3/`(+ `Object.assign(ART3,…)` 의 상자·아이템 → `art/art3b/`), `FACE`/`FACEG`→`art/face/`, `MOBA`→`art/mob/`(미믹·고블린), `FXD`→`art/fx/`, 번개 크리스탈→`art/crystal/`. `art/art3/t_spear.png`·`t_flame.png` 는 `art3b` 것으로 덮어써져 실제로는 안 쓰임(원본과 동일하게 보존).
 - 그림 추가/교체: 파일을 해당 폴더에 넣고 변수에 `"이름": "art/폴더/이름.png"` 한 줄 추가. 그림은 비동기로 열리므로 쓰는 쪽은 기존처럼 `i.complete&&i.naturalWidth` 확인 후 그리고, `onload` 에서 `draw()`.
 - 코드 부분은 약 100~150KB. 함수 이름으로 검색(Grep)해서 해당 줄만 읽는 방식 권장.
@@ -17,6 +17,8 @@
   - `DATA` 이름표: heroes, skills, monsters, champions, rules(=rulesets/standard.json), items, loot
   - 코드 쪽 별칭: `RULE`(규칙 묶음), `CST()`(지금 챔피언 stats), `GAP()`(발전기 AP), `HSK(t)`/`EXS(id)`(스킬 찾기), `GRD`/`WAL`/`PIT`/`BRUN`(자주 쓰는 스킬 fx), `ROB`/`FAC`/`BMB`(로봇·공장·폭탄), `ITEMS`(이름·아이콘·설명)·`ITEF`(아이템 effect)·`bag0()`(빈 가방), `CHR`(상자 규칙), `LOOT`/`LOOTW`/`LOOTI`(드롭표), `CRY`(크리스탈). 예전 상수 `TR`, `TMAX`, `BOMBV`, `RHP`, `CRMAX`, `CRLIFE` 는 데이터에서 만든 값으로 남아 있음.
   - 보스 체력·AP 는 `newS()` 에선 0, `pickChamp`/`start` 에서 champions.json stats 로 설정.
+  - **AI**: `AI`=ai.json, `AB`/`AH`(보스/용사 설정), `cex(c,id)` 챔피언 설치 스킬을 id 로 찾기. 판단 흐름은 `aiBoss`/`aiHero` 코드.
+  - **그림·디자인**: `ART_`=art.json, `IMG`(images), `DSN`(designs). `T3A`/`ART`/`ART2`/`ART3`/`MOBA`/`FXD`/`FACE`/`FACEG`/`TH` 는 art.json 에서 만든 값. `setDesign` 은 `DSN.order` 순환.
   - **맵**: 로더가 `DATA.mapIndex.maps` 의 각 맵을 `PDRValidate.mapText()` 로 검사 후 `DATA.maps[id]` 에 저장. `mapOf(챔피언)` = 기본 맵. `genMap(id)`: tiles 맵은 `PDRValidate.mapString()`("0"/"1" 900글자), generator maze 는 `mazeMap()`. `start()` 가 `spawns`(보스·발전기·용사)와 `objects`(상자·함정 상자·구덩이)를 적용. 게임 내부 `S.map` 형식은 그대로("1"=벽).
   - `CLS[k] = {...DATA.heroes[k], sk: DATA.skills.heroes[k]}` (키 순서 유지)
   - `CH` 의 이름·설명·플래그(`n,s,m,ok,bash,bn,gen`)는 코드에, 스킬(`at,gx,ex`)은 `...DATA.skills.champions[id]`
