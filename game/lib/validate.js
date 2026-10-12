@@ -11,6 +11,8 @@
     monsters: { path: "data/monsters.json", format: "pdr-monsters", version: 1 },
     champions: { path: "data/champions.json", format: "pdr-champions", version: 1 },
     rules: { path: "data/rulesets/standard.json", format: "pdr-ruleset", version: 1 },
+    items: { path: "data/items.json", format: "pdr-items", version: 1 },
+    loot: { path: "data/loot.json", format: "pdr-loot", version: 1 },
   };
   const META = ["format", "version"];
 
@@ -137,6 +139,37 @@
         if (c.int(r.perTurnMin, "crystal.perTurnMin", 0) & c.int(r.perTurnMax, "crystal.perTurnMax", 0))
           c.need(r.perTurnMin <= r.perTurnMax, "crystal", "perTurnMin 이 perTurnMax 보다 클 수 없어요");
       }
+      if (c.obj(b.chest, "chest")) {
+        const h = b.chest;
+        ["max", "startMin", "startMax", "heroOpenRange", "bossOpenRange", "spacing", "heroClearance", "bossClearance", "trapChestSpacing"].forEach(k => c.int(h[k], "chest." + k, 0));
+        c.int(h.life, "chest.life", 1); c.prob(h.startChance, "chest.startChance"); c.prob(h.spawnChance, "chest.spawnChance");
+        if (isInt(h.startMin) && isInt(h.startMax)) c.need(h.startMin <= h.startMax, "chest", "startMin 이 startMax 보다 클 수 없어요");
+      }
+    },
+    items(b, c) {
+      c.need(Object.keys(b).length >= 1, "", "아이템이 1개 이상 있어야 해요");
+      for (const k in b) {
+        const it = b[k];
+        if (!c.obj(it, k)) continue;
+        c.str(it.n, k + ".n"); c.str(it.ic, k + ".ic"); c.str(it.d, k + ".d");
+        if (c.obj(it.effect, k + ".effect")) for (const e in it.effect) c.num(it.effect[e], k + ".effect." + e, 0);
+      }
+      ["potion", "scroll", "gem"].forEach(k => {
+        if (!isObj(b[k]) || !isObj(b[k].effect)) return;
+        const need = { potion: "heal", scroll: "range", gem: "ap" }[k];
+        c.need(isNum(b[k].effect[need]), k + ".effect." + need, "이 아이템 효과에 필요한 숫자예요");
+      });
+    },
+    loot(b, c) {
+      const t = b.treasureChest;
+      if (!c.obj(t, "treasureChest")) return;
+      if (c.need(Array.isArray(t.gold) && t.gold.length > 0, "treasureChest.gold", "[금화 양, 가중치] 목록이어야 해요"))
+        t.gold.forEach((g, i) => { const p = "treasureChest.gold[" + i + "]"; if (c.need(Array.isArray(g) && g.length == 2, p, "[금화 양, 가중치] 여야 해요")) { c.int(g[0], p + "[0]", 0); c.num(g[1], p + "[1]", 0); } });
+      if (c.need(Array.isArray(t.items), "treasureChest.items", "[아이템 ID, 확률] 목록이어야 해요")) {
+        let sum = 0;
+        t.items.forEach((g, i) => { const p = "treasureChest.items[" + i + "]"; if (c.need(Array.isArray(g) && g.length == 2, p, "[아이템 ID, 확률] 이어야 해요") && c.str(g[0], p + "[0]") && c.prob(g[1], p + "[1]")) sum += g[1]; });
+        c.need(sum <= 1 + 1e-9, "treasureChest.items", "확률 합이 1 이하여야 해요 (지금: " + Math.round(sum * 1000) / 1000 + ")");
+      }
     },
   };
 
@@ -167,6 +200,8 @@
       for (const k in D.heroes) c.need(D.skills.heroes && Array.isArray(D.skills.heroes[k]), "skills.heroes", '용사 "' + k + '" 의 스킬이 없어요');
       for (const k in D.skills.heroes || {}) c.need(k in D.heroes, "skills.heroes", '"' + k + '" 는 heroes.json 에 없는 용사예요');
     }
+    if (D.loot && D.items && D.loot.treasureChest && Array.isArray(D.loot.treasureChest.items))
+      D.loot.treasureChest.items.forEach(g => c.need(Array.isArray(g) && g[0] in D.items, "loot.treasureChest.items", '"' + (g && g[0]) + '" 는 items.json 에 없는 아이템이에요'));
     if (D.skills && D.champions) {
       for (const k in D.champions) if (D.champions[k].ok) c.need(D.skills.champions && D.skills.champions[k], "skills.champions", '챔피언 "' + k + '" 의 스킬이 없어요');
       for (const k in D.skills.champions || {}) c.need(k in D.champions, "skills.champions", '"' + k + '" 는 champions.json 에 없는 챔피언이에요');

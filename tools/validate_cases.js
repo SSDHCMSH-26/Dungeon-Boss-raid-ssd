@@ -27,4 +27,10 @@ module.exports = [
   ["로봇 체력이 목록이 아님", r => { r.monsters.robot.hp = 8; }, "robot.hp"],
   ["공장 최대 레벨이 로봇 레벨 수보다 큼", r => { r.monsters.factory.maxLv = 4; }, "factory.maxLv"],
   ["폭탄 피해 음수", r => { r.monsters.bomb.dmg = -5; }, "bomb.dmg"],
+  ["아이템 효과 수치 없음", r => { delete r.items.potion.effect.heal; }, "potion.effect.heal"],
+  ["드롭표 확률 합이 1 초과", r => { r.loot.treasureChest.items[0][1] = 0.9; }, "확률 합이 1 이하"],
+  ["드롭표에 없는 아이템 (ID 연결)", r => { r.loot.treasureChest.items[0][0] = "elixir"; }, '"elixir" 는 items.json 에 없는'],
+  ["금화 가중치 형식 틀림", r => { r.loot.treasureChest.gold[0] = 3; }, "treasureChest.gold[0]"],
+  ["상자 수명 0", r => { r.rules.chest.life = 0; }, "chest.life"],
+  ["상자 생성 확률 1 초과", r => { r.rules.chest.spawnChance = 2; }, "chest.spawnChance"],
 ];

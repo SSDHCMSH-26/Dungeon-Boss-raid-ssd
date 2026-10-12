@@ -75,6 +75,8 @@ const u=S.heroes[t%3];const c={x:u.x+1,y:u.y,k:'x',id:500+t};S.chests.push(c);co
 for(let i=0;i<6;i++){S.ph='resolve';S.atks=[];resolve();lg.push(S.log,JSON.stringify(S.mobs),JSON.stringify(S.heroes.map(h=>[h.x,h.y,h.hp,h.sup,h.gold,h.dead])),JSON.stringify(S.bag.h))}
 if(S.mobs[0]){dealHits([{o:S.mobs[0],n:'몹'}],99,CLS.archer,'x');lg.push(S.log,JSON.stringify(S.heroes.map(h=>h.gold)),JSON.stringify(S.bag.h))}
 r.push(lg)}
+// 보물상자 2000개 열기: 금화·아이템 결과 순서까지 기록
+run('gron',['knight','cleric','archer']);{const u=S.heroes[0],seq=[];for(let i=0;i<2000;i++){const c={x:20,y:20,k:'t',id:3000+i};S.chests=[c];seq.push(chOpen(c,i%3?'h':'b',u))}r.push(seq.join('|').length,JSON.stringify(S.bag),S.gold,u.gold,seq.slice(0,40))}
 // 방치된 함정 상자 → 몬스터 출현
 run('gron',['knight','cleric','archer']);for(let i=0;i<8;i++)S.chests.push({x:10+i,y:20,k:i%2?'x':'t',id:900+i,age:11});const o=[];chAge(o);r.push(o,JSON.stringify(S.mobs));
 }catch(e){r.push('ERR '+e.stack)}return r}"""
@@ -94,7 +96,7 @@ dealHits([{o:S.boss,n:'빈센토'}],30,CLS.mage,'파이어볼');r.push(S.log,S.b
 S.fac[0].hp=1;dealHits([{o:S.fac[0],n:'공장'}],30,CLS.mage,'파이어볼');r.push(S.log);S.ph='resolve';S.atks=[];resolve();r.push(S.log,S.boss.ap,S.gen.ap);
 S.gen.hp=1;dealHits([{o:S.gen,n:'발전기'}],30,CLS.mage,'파이어볼');r.push(S.log);S.ph='boss';S.boss.ap=bMax();grab(c+' 발전기 파괴');r.push('bMax '+bMax()+' bMv '+bMv())}
 S.ph='hero';L.role='hero';S.heroes[0].par=1;S.heroes[1].mc=1;S.heroes[1].ap=5;S.heroes[2].sup=0;grab(c+' 용사 차례');
-for(let i=0;i<3;i++){L.si=i;for(const a of ['m','x',0,1,2]){L.act=a;L.picks=[];r.push(c+' cf '+i+' '+a+' '+cfH())}}L.act=null;
+S.bag={b:{potion:2,scroll:2,gem:2},h:{potion:2,scroll:2,gem:2}};L.si=0;S.heroes[0].hp-=40;L.bag=1;r.push(c+' 가방 '+qkH());useItem('potion');r.push(S.log,S.heroes[0].hp);useItem('potion');r.push($('lg').textContent);useItem('gem');r.push(S.log,S.heroes[0].ap);useItem('scroll');r.push(L.act);r.push('스크롤 먼 곳 '+useScroll(S.heroes[0].x,S.heroes[0].y-11),'스크롤 '+useScroll(S.heroes[0].x,S.heroes[0].y-5),S.log,S.heroes[0].y);S.ph='boss';S.boss.hp-=50;useItem('potion');r.push(S.log,S.boss.hp);useItem('gem');r.push(S.log,S.boss.ap);r.push('보스 스크롤 '+useScroll(S.boss.x,S.boss.y+8),S.log);S.ph='hero';L.bag=0;for(let i=0;i<3;i++){L.si=i;for(const a of ['m','x',0,1,2]){L.act=a;L.picks=[];r.push(c+' cf '+i+' '+a+' '+cfH())}}L.act=null;
 S.ph='boss';L.role='boss';for(const a of ['m','a0','a1','e0','e1','e2','e3']){L.act=a;L.picks=[];try{r.push(c+' cfB '+a+' '+cfH())}catch(e){r.push('x')}}L.act=null;
 S.ph='resolve';S.atks=[];resolve();r.push(c+' 다음 턴 '+S.log+' '+JSON.stringify(S.heroes.map(h=>[h.ap,h.mc])))}
 }catch(e){r.push('ERR '+e.stack)}return r}"""

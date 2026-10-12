@@ -18,5 +18,19 @@
     "perTurnMax": 2,
     "blueAp": 2,
     "yellowMove": 2
+  },
+  "chest": {
+    "max": 6,
+    "startChance": 0.5,
+    "startMin": 1,
+    "startMax": 2,
+    "spawnChance": 0.2,
+    "life": 12,
+    "heroOpenRange": 1,
+    "bossOpenRange": 2,
+    "spacing": 3,
+    "heroClearance": 3,
+    "bossClearance": 4,
+    "trapChestSpacing": 1
   }
 }
