@@ -1,4 +1,6 @@
 {
+  "format": "pdr-monsters",
+  "version": 1,
   "mimic": {
     "hp": 20,
     "move": 2,

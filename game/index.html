@@ -648,11 +648,15 @@ $("pn").innerHTML=p;save()}
 window.addEventListener("error",e=>{try{console.error(e.error||e.message);const l=$("lg");if(l)l.textContent="⚠️ 오류가 났지만 게임은 유지돼요. 계속 진행해 보세요."}catch(x){}});
 ui();
 </script>
+<script src="lib/validate.js"></script>
 <script>
-/* 수치 데이터(data/*.json)를 먼저 읽은 뒤 위의 게임 코드(#main)를 실행 */
+/* 수치 데이터(data/*.json)를 먼저 읽고 검사(lib/validate.js)한 뒤 위의 게임 코드(#main)를 실행 */
 const DATA={};
-(async()=>{const FILES=["heroes","skills","monsters"];
-try{await Promise.all(FILES.map(async f=>{const r=await fetch("data/"+f+".json",{cache:"no-cache"});if(!r.ok)throw new Error(f+".json ("+r.status+")");DATA[f]=await r.json()}))}
-catch(e){document.body.insertAdjacentHTML("afterbegin",'<div style="background:#5a1d1d;color:#fff;padding:12px;font:14px sans-serif">⚠️ 게임 데이터를 불러오지 못했어요: '+e.message+'<br>index.html 을 파일로 직접 열면 안 돼요. 웹 주소(GitHub Pages)나 로컬 웹서버(python3 -m http.server)로 열어 주세요.</div>');return}
+(async()=>{const V=window.PDRValidate,err=[];
+const show=(t,l)=>document.body.insertAdjacentHTML("afterbegin",'<div style="background:#5a1d1d;color:#fff;padding:12px;font:14px sans-serif">⚠️ '+t+(l&&l.length?'<ul style="margin:6px 0 0 18px;padding:0">'+l.slice(0,20).map(x=>"<li>"+String(x).replace(/</g,"&lt;")+"</li>").join("")+"</ul>":"")+'</div>');
+try{if(!V)throw new Error("lib/validate.js");await Promise.all(Object.keys(V.FILES).map(async f=>{const r=await fetch(V.FILES[f].path,{cache:"no-cache"});if(!r.ok)throw new Error(V.FILES[f].path+" ("+r.status+")");const j=await r.json();err.push(...V.dataFile(f,j));DATA[f]=V.body(j)}))}
+catch(e){show("게임 데이터를 불러오지 못했어요: "+e.message+"<br>index.html 을 파일로 직접 열면 안 돼요. 웹 주소(GitHub Pages)나 로컬 웹서버(python3 -m http.server)로 열어 주세요.");return}
+if(!err.length)err.push(...V.links(DATA));
+if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 const s=document.createElement("script");s.textContent=document.getElementById("main").textContent;document.body.appendChild(s);window.GAME_READY=1})();
 </script></body></html>

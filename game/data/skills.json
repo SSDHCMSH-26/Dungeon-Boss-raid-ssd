@@ -1,4 +1,6 @@
 {
+ "format": "pdr-skills",
+ "version": 1,
  "heroes": {
   "knight": [
    {
