@@ -20,7 +20,7 @@ function bfsD(sx,sy){const D=new Array(N*N).fill(999),q=[[sx,sy]];D[sy*N+sx]=0;w
 /* 컴퓨터 마법사의 마법진: 있으면 영창(목표가 범위 안이면 위력, 범위 바로 밖이면 확산, 아니면 영창 안 함 → 이번 턴 끝 발동),
    없으면 다친 아군이 모여 있으면 수호, 아니면 확률로 보스를 덮는 화염/빙결을 그림 */
 function aiCircle(h){const k=CLS[h.k],i=S.heroes.indexOf(h),B=S.boss,c=h.cir,J=q=>k.sk.indexOf(q);if(!k.sk.some(q=>q.t=="c"))return 0;
-if(c){if(c.nw||c.ch||c.mv||c.tpo||c.lv>=CIRC.maxLv)return 0;const f=k.sk[c.j].fx,R=cirR(h),inn=r=>f.kind=="shield"?S.heroes.some(a=>!a.dead&&inSq(c.x,c.y,r,a.x,a.y)):Math.abs(B.x-c.x)<=1+r&&Math.abs(B.y-c.y)<=1+r;
+if(c){if(c.ch||h.mc>0||c.lv>=CIRC.maxLv)return 0;const f=k.sk[c.j].fx,R=cirR(h),inn=r=>f.kind=="shield"?S.heroes.some(a=>!a.dead&&inSq(c.x,c.y,r,a.x,a.y)):Math.abs(B.x-c.x)<=1+r&&Math.abs(B.y-c.y)<=1+r;
 const pw=cirW(h,"power"),sp=cirW(h,"spread");if(inn(R)&&pw&&h.ap>=pw.c)return apply({type:"heroAct",h:i,j:J(pw),x:h.x,y:h.y});if(!inn(R)&&sp&&h.ap>=sp.c&&inn(R+sp.fx.add))return apply({type:"heroAct",h:i,j:J(sp),x:h.x,y:h.y});return 0}
 const cs=k.sk.filter(q=>q.t=="c"&&h.ap>=q.c);if(!cs.length)return 0;
 const sh=cs.find(q=>q.fx.kind=="shield"),hu=S.heroes.filter(a=>!a.dead&&a.hp<a.max*AH.healBelow);

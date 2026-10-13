@@ -66,5 +66,8 @@
       }
     ]
   },
-  "objects": []
+  "objects": [],
+  "settings": {
+    "chestSpawn": false
+  }
 }

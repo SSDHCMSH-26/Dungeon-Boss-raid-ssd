@@ -30,6 +30,9 @@ const slowOf=o=>o&&o.sl&&o.sl.r>=S.round?o.sl.n:0,frozen=o=>!!(o&&o.fz>=S.round)
 /* 마법진 범위(정사각형) 안인지 */
 const inSq=(ox,oy,r,x,y)=>Math.abs(x-ox)<=r&&Math.abs(y-oy)<=r;
 const crAt=(x,y)=>(S.cry||[]).findIndex(c=>c.x==x&&c.y==y);
-const ecost=e=>e.c+(e.esc?(S.used[e.id]||0):0);
+const ecost=e=>e.c+(e.esc?Math.floor((S.used[e.id]||0)/(e.escEvery||1)):0);
+/* 부채꼴 3칸(기사 베기): 나를 기준으로 고른 방향과 그 양옆 방향의 인접 칸 */
+const D8=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+function arcCells(h,x,y){const dx=Math.sign(x-h.x),dy=Math.sign(y-h.y),i=D8.findIndex(d=>d[0]==dx&&d[1]==dy);if(i<0)return [];return [-1,0,1].map(k=>{const d=D8[(i+k+8)%8];return [h.x+d[0],h.y+d[1]]}).filter(([a,b])=>a>=0&&b>=0&&a<N&&b<N)}
 const pitAt=(x,y)=>(S.pits||[]).findIndex(p=>x>=p.x&&x<=p.x+1&&y>=p.y&&y<=p.y+1);
 const mvOf=h=>Math.max(0,CLS[h.k].mv+(h.mvb||0)-(h.par>0?RULE.status.paralyzeMove:0));

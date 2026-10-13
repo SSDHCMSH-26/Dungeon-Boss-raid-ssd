@@ -3,7 +3,7 @@ const CLS={};
 for(const k in DATA.heroes)CLS[k]={...DATA.heroes[k],sk:DATA.skills.heroes[k]};
 const CH={};
 for(const id in DATA.champions){const {stats,...m}=DATA.champions[id];CH[id]=Object.assign(m,DATA.skills.champions[id]||{})}
-const RULE=DATA.rules,CST=()=>DATA.champions[S.champ].stats;
+const RULE=DATA.rules,CST=()=>DATA.champions[S.champ].stats,hAP=h=>CLS[h.k].ap||RULE.hero.ap;
 const HSK=t=>{for(const k in CLS)for(const q of CLS[k].sk)if(q.t==t)return q},EXS=id=>{for(const c in CH)for(const e of CH[c].ex||[])if(e.id==id)return e};
 const GRD=HSK("g").fx,WAL=EXS("wall").fx,PIT=EXS("pit").fx,BRUN=EXS("run").fx;
 const ROB=DATA.monsters.robot,FAC=DATA.monsters.factory,BMB=DATA.monsters.bomb;

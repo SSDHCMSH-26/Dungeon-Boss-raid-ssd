@@ -21,7 +21,7 @@
   // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
   const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
     generators: ["maze"], objects: ["chest", "trapChest", "pit"],
-    keys: ["format", "version", "id", "name", "author", "champion", "ruleset", "size", "tiles", "generator", "spawns", "objects"] };
+    keys: ["format", "version", "id", "name", "author", "champion", "ruleset", "size", "tiles", "generator", "spawns", "objects", "settings"], settings: { chestSpawn: "boolean" } };
   const mapPath = id => "data/maps/" + id + ".json";
   const ID_RE = /^[a-z0-9_-]{1,64}$/;
   const META = ["format", "version"];
@@ -62,6 +62,7 @@
         c.int(h.hp, k + ".hp", 1);
         c.int(h.mv, k + ".mv", 0);
         if (h.pas !== undefined) c.str(h.pas, k + ".pas");
+        if (h.ap !== undefined) c.int(h.ap, k + ".ap", 1); // 기본 AP (없으면 규칙 묶음 hero.ap)
       }
       c.need(Object.keys(b).length >= 3, "", "용사가 3명 이상 있어야 해요");
     },
@@ -73,6 +74,7 @@
         if (s.r !== undefined) c.int(s.r, p + ".r", 0);
         if (s.v !== undefined) c.num(s.v, p + ".v", 0);
         if (s.cd !== undefined) c.int(s.cd, p + ".cd", 0);
+        if (s.escEvery !== undefined) c.int(s.escEvery, p + ".escEvery", 1);
       };
       // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
       const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"] };
@@ -283,6 +285,8 @@
     const c = checker(file || "맵"), N = MAP.size;
     if (!head(c, json, MAP)) return c.errs;
     for (const k in json) c.need(MAP.keys.indexOf(k) >= 0, k, "모르는 항목이에요 (오타인지 확인하세요)");
+    // 맵별 설정(선택): chestSpawn=false 면 이 맵에서는 보물상자가 저절로 생기지 않음
+    if (json.settings !== undefined && c.obj(json.settings, "settings")) for (const k in json.settings) { const ty = MAP.settings[k]; if (c.need(!!ty, "settings." + k, "모르는 설정이에요 (쓸 수 있는 것: " + Object.keys(MAP.settings).join(", ") + ")")) c.need(typeof json.settings[k] === ty, "settings." + k, ty === "boolean" ? "true 또는 false 여야 해요" : ty + " 여야 해요"); }
     c.need(isStr(json.id) && ID_RE.test(json.id), "id", "영어 소문자·숫자·_·- 로 1~64자여야 해요");
     c.need(isStr(json.name) && json.name.length >= 1 && json.name.length <= 40, "name", "1~40자 글자여야 해요");
     if (json.author !== undefined) c.need(isStr(json.author) && json.author.length <= 40, "author", "40자 이하 글자여야 해요");
