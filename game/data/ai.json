@@ -55,12 +55,20 @@
         "chance": 0.4
       },
       "enhancedAttackTries": 2
+    },
+    "dodgeCircle": {
+      "chance": 0.8
     }
   },
   "hero": {
     "actionsPerTurn": 4,
     "healBelow": 0.6,
     "manaMinTargets": 1,
-    "beltBreakChance": 0.6
+    "beltBreakChance": 0.6,
+    "circle": {
+      "chance": 0.5,
+      "frostChance": 0.35,
+      "shieldMinAllies": 2
+    }
   }
 }
