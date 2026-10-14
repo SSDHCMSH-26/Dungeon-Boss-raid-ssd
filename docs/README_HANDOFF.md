@@ -37,6 +37,7 @@
 ## 4. 작업 방식 (지금까지 유지한 규칙)
 - `index.html` + `art/` 그림 + `data/` 수치, 외부 의존성 없음 (폰트만 Google Fonts). 아티팩트로 게시할 때는 `art/`·`data/` 파일도 `files` 로 함께 올려야 함.
 - v62부터 `index.html` 을 파일로 직접 열면 데이터를 못 읽음 → Pages 주소나 `python3 -m http.server` 로 열기. 테스트도 웹서버로(`tools/compare_versions.py` 가 자동으로 띄움).
+- **수치표(구글 시트)**: https://docs.google.com/spreadsheets/d/1nfH8sz39G5GcpEO8hVVvkcqCZP32NOfWP_cPiZuz5gc/edit — 사용자가 노란 "값" 칸을 고친 뒤 "시트 반영해줘" 라고 하면 `tools/sheet_sync.py apply` 로 JSON 에 반영(키 칸 = 파일:경로).
 - 수치만 바꿀 때는 `game/data/*.json` 만 고치고 `node tools/validate_data.js` 로 검사. 큰 변경 후에는 `tools/compare_versions.py` 로 이전 버전과 비교.
 - 수정은 **패치 방식**(원본 문자열을 찾아 교체)으로 하고 `assert` 로 한 곳만 바뀌는지 확인 → 문법 검사(`node --check`) → Playwright 로 규칙 테스트/스크린샷 → 게시.
 - **밸런스(승률) 비교용 대전은 사용자가 요청할 때만** 돌린다. 잘 작동하는지 확인하는 테스트(`tools/` 검사, 이전 버전과 같은 결과인지 비교)는 평소대로 한다.
