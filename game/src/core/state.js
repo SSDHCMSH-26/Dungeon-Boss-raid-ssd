@@ -35,4 +35,4 @@ const ecost=e=>e.c+(e.esc?Math.floor((S.used[e.id]||0)/(e.escEvery||1)):0);
 const D8=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
 function arcCells(h,x,y){const dx=Math.sign(x-h.x),dy=Math.sign(y-h.y),i=D8.findIndex(d=>d[0]==dx&&d[1]==dy);if(i<0)return [];return [-1,0,1].map(k=>{const d=D8[(i+k+8)%8];return [h.x+d[0],h.y+d[1]]}).filter(([a,b])=>a>=0&&b>=0&&a<N&&b<N)}
 const pitAt=(x,y)=>(S.pits||[]).findIndex(p=>x>=p.x&&x<=p.x+1&&y>=p.y&&y<=p.y+1);
-const mvOf=h=>Math.max(0,CLS[h.k].mv+(h.mvb||0)-(h.par>0?RULE.status.paralyzeMove:0));
+const mvOf=h=>Math.max(0,CLS[h.k].mv+(h.mvb||0)-(h.par>0?RULE.status.paralyzeMove:0)-(h.cir&&h.cir.ch?CIRC.chantMove:0));

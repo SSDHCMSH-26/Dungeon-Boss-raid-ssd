@@ -29,7 +29,7 @@ while(n-->0){const b=beltAt(h.x,h.y);if(!b)break;const nx=h.x+DX[b.d],ny=h.y+DY[
 if(cs.length){S.mv.push({i,c:cs});PRES.path("h"+i,cs);S.log+=" 🛤️ 컨베이어에 실려 이동! "+crPath("h",h,cs)}}
 /* 마법진(마법사): h.cir = {j 스킬 번호, x, y 중심, lv 레벨, pw 위력 영창 수, sp 확산 영창 수, ch 이번 턴 영창함}
    그 턴에 영창(턴당 1번, 레벨 +1, 그린 턴에도 가능)하면 다음 턴으로 이월, 안 하면 그 용사 턴이 끝날 때(보스 턴 전, 정산 시작) 발동.
-   영창한 턴엔 걷기 불가(걸은 뒤에 영창하는 건 가능).
+   걸은 턴(h.mc>0)엔 영창 불가(→ 그 턴 끝에 발동). 영창한 턴엔 그 턴만 이동 거리 -CIRC.chantMove.
    순간이동 스킬은 언제나 내 마법진 안의 칸으로만. 벽 칸 중심으로는 못 그림(범위·확산은 벽·공장·발전기·유닛 위도 됨).
    한 번에 체력 피해 CIRC.breakDmg 이상이면 영창이 끊겨 사라짐 */
 const cirW=(h,kd)=>CLS[h.k].sk.find(q=>q.t=="w"&&q.fx.kind==kd);
@@ -65,7 +65,7 @@ function dealHits(hs,v,k,nm){const B=S.boss;const dv=e=>e.o===B&&S.champ=="vince
 function act0(h,j,x,y){const k=CLS[h.k],B=S.boss;
 if(j=="x"&&S.champ=="gron"){if(h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange||x<1||y<1||x>=N-1||y>=N-1||!(sw(x,y)||dw(x,y)))return 0;const gone=wDmg(x,y,RULE.hero.breakDmg);h.ap--;h.aT=NOW();h.aK="atk";S.log="🔨 "+k.n+"의 벽 부수기! 벽 -"+RULE.hero.breakDmg+(gone?" 🧱벽 파괴!":"");return 1}
 if(j=="x"){const b=beltAt(x,y);if(!b||h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange)return 0;S.belts=S.belts.filter(z=>z!==b);h.ap--;S.log="🔨 "+k.n+"이(가) 컨베이어를 파괴!";return 1}
-if(j=="m"){const c=qp(h,x,y,mvOf(h));if(h.ap<1||h.mc>=RULE.hero.movesPerTurn||!c||(h.cir&&h.cir.ch))return 0;h.x=x;h.y=y;h.ap--;h.mc++;S.mv.push({i:S.heroes.indexOf(h),c});PRES.path("h"+S.heroes.indexOf(h),c);{const m=crPath("h",h,c);ride(h);if(m)S.log=m}return 1}
+if(j=="m"){const c=qp(h,x,y,mvOf(h));if(h.ap<1||h.mc>=RULE.hero.movesPerTurn||!c)return 0;h.x=x;h.y=y;h.ap--;h.mc++;S.mv.push({i:S.heroes.indexOf(h),c});PRES.path("h"+S.heroes.indexOf(h),c);{const m=crPath("h",h,c);ride(h);if(m)S.log=m}return 1}
 const s=k.sk[j];if(s.t=="g"||s.t=="o"||s.t=="w"){x=h.x;y=h.y}if(h.ap<s.c||ch(x,y,h.x,h.y)>s.r)return 0;
 if(s.cd&&h.cd&&h.cd[j]>0)return 0;if(s.lim&&h.lu&&(h.lu[j]||0)>=s.lim)return 0;
 const sv=()=>s.fx&&s.fx.dmgMax!==undefined?s.fx.dmgMin+Math.floor(RAND()*(s.fx.dmgMax-s.fx.dmgMin+1)):s.v;
@@ -93,7 +93,7 @@ else if(s.t=="b"){if(bad(x,y)||!h.cir||!inSq(h.cir.x,h.cir.y,cirR(h),x,y))return
 else if(s.t=="o"){const R=new Map();for(let Y=0;Y<N;Y++)for(let X=0;X<N;X++){const d=ch(X,Y,h.x,h.y),v=d<=s.fx.radius?s.fx.near:s.fx.far;hits(X,Y,0).forEach(e=>{if(e.o.mw&&v<s.fx.near)return;const q=R.get(e.o);if(!q||q.v<v)R.set(e.o,{e,v})})}const g50=[],g10=[];R.forEach(q=>(q.v>=s.fx.near?g50:g10).push(q.e));PRES.fx("mana",h.x,h.y,0);if(g50.length)dealHits(g50,s.fx.near,k,"마력 방출");if(g10.length&&!S.end){const lg=S.log;dealHits(g10,s.fx.far,k,"마력 방출");if(g50.length)S.log=lg+" · "+S.log}if(!g50.length&&!g10.length)S.log=k.n+" 마력 방출! 맞은 적이 없다";else S.log="🔮 "+S.log}
 else if(s.t=="h"||s.t=="g"){const t=hAt(x,y);if(!t)return 0;if(s.t=="h"){t.hp=Math.min(t.max,t.hp+s.v);S.log=k.n+"의 치유! +"+s.v;PRES.fx("heal",t.x,t.y)}else{t.guard=1;S.log=k.n+" 방패막기! 반경 "+GRD.radius+"칸 아군 받는 피해 -"+pct(1-GRD.damageTaken)+" (턴 종료까지)"}}
 else if(s.t=="c"){if(h.cir||x<0||y<0||x>=N||y>=N||sw(x,y)||dw(x,y))return 0;h.cir={j:+j,x,y,lv:1,pw:0,sp:0,ch:0};S.log="🔯 "+k.n+" "+s.n+"! 이번 턴 끝에 발동 (영창하면 이월·강화)"}
-else if(s.t=="w"){const c=h.cir;if(!c||c.ch||c.lv>=CIRC.maxLv)return 0;c.ch=1;c.lv++;if(s.fx.kind=="power")c.pw++;else c.sp++;S.log="🔯 "+k.n+" "+s.n+"! "+CLS[h.k].sk[c.j].n+" Lv"+c.lv+(s.fx.kind=="power"?" (수치 +"+s.fx.add*c.pw+")":" (범위 사방 +"+c.sp*s.fx.add+"칸)")+" · 다음 턴으로 이월"}
+else if(s.t=="w"){const c=h.cir;if(!c||c.ch||h.mc>0||c.lv>=CIRC.maxLv)return 0;c.ch=1;c.lv++;if(s.fx.kind=="power")c.pw++;else c.sp++;S.log="🔯 "+k.n+" "+s.n+"! "+CLS[h.k].sk[c.j].n+" Lv"+c.lv+(s.fx.kind=="power"?" (수치 +"+s.fx.add*c.pw+")":" (범위 사방 +"+c.sp*s.fx.add+"칸)")+" · 다음 턴으로 이월"}
 else if(s.t=="d"&&s.fx&&s.fx.arc){const cs=arcCells(h,x,y);if(!cs.length)return 0;const hs=[];cs.forEach(([cx_,cy_])=>{PRES.fx("burst",cx_,cy_,0);hits(cx_,cy_,0).forEach(e=>{if(!hs.some(z=>z.o===e.o))hs.push(e)})});if(hs.length)dealHits(hs,sv(),k,s.n);else S.log=k.n+" "+s.n+" 빗나감!"}
 else{const hs=hits(x,y,s.a||0);if(h.k=="mage"&&s.t=="d")PRES.fx(s.a?"fire":"burst",x,y,0);if(hs.length)dealHits(hs,sv(),k,s.n);else S.log=k.n+" "+s.n+" 빗나감!"}
 h.ap-=s.c;h.aT=NOW();h.aK=(s.t=="d"||s.t=="l"||s.t=="r"||s.t=="o")?"atk":"cast";if(s.cd){h.cd=h.cd||{};h.cd[j]=s.cd+1}if(s.lim){h.lu=h.lu||{};h.lu[j]=(h.lu[j]||0)+1}return 1}

@@ -98,5 +98,15 @@ ok(R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`) === 0, "스태프 후리기: �
 { const seen = new Set(); for (let i = 0; i < 60; i++) { R(`S.rob[0].hp=99;S.heroes[2].lu={}`); R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`); seen.add(99 - R("S.rob[0].hp")); }
   ok([...seen].every(v => v >= 5 && v <= 10) && seen.size >= 4, `스태프 후리기: 피해가 무작위로 나옴 (${[...seen].sort((a, b) => a - b).join(",")})`); }
 
+// (v75) 영창한 턴엔 그 턴만 이동 -1 (걷기는 가능) · 먼저 걸으면 영창 잠김
+setup("gron", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=10;S.heroes[2].ap=9`);
+{ const MJ = R("CLS.mage.sk.findIndex(q=>q.t=='c')"), PJ = R("CLS.mage.sk.findIndex(q=>q.t=='w')");
+  R(`apply({type:"heroAct",h:2,j:${MJ},x:10,y:14})`);
+  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:10})`) === 1 && R("mvOf(S.heroes[2])") === 2, "영창하면 그 턴 이동 3 → 2");
+  ok(R(`apply({type:"heroAct",h:2,j:"m",x:10,y:13})`) === 0 && R(`apply({type:"heroAct",h:2,j:"m",x:10,y:12})`) === 1, "영창한 뒤에도 걷기 가능 (2칸까지)");
+  R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero"`);
+  ok(R("mvOf(S.heroes[2])") === 3, "다음 턴엔 이동 거리 원래대로 3");
+  ok(R(`apply({type:"heroAct",h:2,j:"m",x:11,y:12})`) === 1 && R(`apply({type:"heroAct",h:2,j:${PJ},x:11,y:12})`) === 0, "먼저 걸으면 영창 잠김"); }
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);
