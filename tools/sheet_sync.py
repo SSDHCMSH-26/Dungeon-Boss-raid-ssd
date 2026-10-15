@@ -61,6 +61,8 @@ L = {
     # AI
     "delayMs": ("행동 전 기다림", "밀리초"), "approachDist": ("이보다 멀면 다가감", "칸"), "attackTries": ("턴마다 공격 시도", "번"),
     "chance": ("확률", "0~1"), "minAp": ("필요 AP", ""), "minPits": ("필요 구덩이 수", ""), "tries": ("시도 횟수", ""),
+    "reserveAp": ("공격 후 남겨 둘 AP", "함정용으로 아껴 두는 AP"), "escapeWeight": ("빠져나갈 길 점수", "공격 예고 범위에 갇힌 용사의 탈출 길목 (클수록 우선)"),
+    "approachWeight": ("다가오는 길 점수", "범위 밖 용사가 보스에게 오는 길목"), "towardBossBonus": ("보스 쪽 길 배수", "보스에 가장 가까워지는 길에 곱함"),
     "upgradeChance": ("업그레이드 확률", "0~1"), "upgradeMinFactories": ("업그레이드 최소 공장 수", ""),
     "lenMin": ("벨트 길이 최소", "칸"), "lenMax": ("벨트 길이 최대", "칸"), "enhancedAttackTries": ("강화 중 추가 공격", "번"),
     "actionsPerTurn": ("용사 한 명 턴당 행동 수", ""), "healBelow": ("체력 이 비율 미만이면 치유", "0~1"),

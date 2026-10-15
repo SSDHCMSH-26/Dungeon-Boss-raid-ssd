@@ -124,7 +124,7 @@
 | `delayMs` | 컴퓨터가 행동하기 전 기다리는 시간(밀리초) |
 | `boss.approachDist` | 가장 가까운 용사가 이보다 멀면 보스가 다가감(발전기 없는 보스) |
 | `boss.attackTries` | 턴마다 공격 예고 시도 횟수 |
-| `boss.gron.*` | 함정 상자·구덩이 파기·구덩이 이동·벽 쌓기·가시 함정: `chance` 확률, `minAp` 필요 AP, `minPits`/`range`/`tries` |
+| `boss.gron.*` | 함정 상자·구덩이 파기·구덩이 이동·벽 쌓기·가시 함정: `chance` 확률, `minAp` 필요 AP, `minPits`/`range`/`tries`. 가시 함정 위치: `reserveAp` 공격 후 남겨 둘 AP, `escapeWeight`(예고 범위에 갇힌 용사의 탈출 길목)·`approachWeight`(다가오는 길목) 점수, `towardBossBonus` 보스 쪽 길 배수 |
 | `boss.vince.*` | 공장(확률·필요 AP·업그레이드 확률/최소 공장 수·범위·시도), 폭탄, 벨트(길이 lenMin~lenMax), 자기 강화(selfCharge), 발전(generatorCharge), 강화 중 추가 공격 횟수 |
 | `hero.actionsPerTurn` | 용사 한 명이 한 턴에 행동을 고르는 최대 횟수 |
 | `hero.healBelow` | 아군 체력이 이 비율 미만이면 치유 |

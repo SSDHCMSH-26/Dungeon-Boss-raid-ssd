@@ -19,7 +19,7 @@
   - 코드 쪽 별칭: `RULE`(규칙 묶음), `CST()`(지금 챔피언 stats), `GAP()`(발전기 AP), `HSK(t)`/`EXS(id)`(스킬 찾기), `GRD`/`WAL`/`PIT`/`BRUN`(자주 쓰는 스킬 fx), `ROB`/`FAC`/`BMB`(로봇·공장·폭탄), `ITEMS`(이름·아이콘·설명)·`ITEF`(아이템 effect)·`bag0()`(빈 가방), `CHR`(상자 규칙), `LOOT`/`LOOTW`/`LOOTI`(드롭표), `CRY`(크리스탈). 예전 상수 `TR`, `TMAX`, `BOMBV`, `RHP`, `CRMAX`, `CRLIFE` 는 데이터에서 만든 값으로 남아 있음.
   - 보스 체력·AP 는 `newS()` 에선 0, `pickChamp`/`start` 에서 champions.json stats 로 설정.
   - **글자**: `T(이름표)` → `DATA.text.text[이름표]` (없으면 `[이름표]`). HTML 고정 글자는 `data-t` 속성으로 시작 때 채움, `document.title` 도. 새 고정 문구를 화면에 넣을 때는 ko.json 에 이름표를 추가하고 `T(...)` 로 쓰기 (`node tools/validate_data.js` 가 빠진·안 쓰는 이름표를 알려 줌).
-  - **AI**: `AI`=ai.json, `AB`/`AH`(보스/용사 설정), `cex(c,id)` 챔피언 설치 스킬을 id 로 찾기. 판단 흐름은 `aiBoss`/`aiHero` 코드.
+  - **AI**: `AI`=ai.json, `AB`/`AH`(보스/용사 설정), `cex(c,id)` 챔피언 설치 스킬을 id 로 찾기. 판단 흐름은 `aiBoss`/`aiHero` 코드. `aiTrap(c)` 그론 가시 함정 길목 계산(공격 예고 뒤 호출).
   - **그림·디자인**: `ART_`=art.json, `IMG`(images), `DSN`(designs). `T3A`/`ART`/`ART2`/`ART3`/`MOBA`/`FXD`/`FACE`/`FACEG`/`TH` 는 art.json 에서 만든 값. `setDesign` 은 `DSN.order` 순환.
   - **맵**: 로더가 `DATA.mapIndex.maps` 의 각 맵을 `PDRValidate.mapText()` 로 검사 후 `DATA.maps[id]` 에 저장. `mapOf(챔피언)` = 기본 맵. `genMap(id)`: tiles 맵은 `PDRValidate.mapString()`("0"/"1" 900글자), generator maze 는 `mazeMap()`. `start()` 가 `spawns`(보스·발전기·용사)와 `objects`(상자·함정 상자·구덩이)를 적용. 게임 내부 `S.map` 형식은 그대로("1"=벽).
   - `CLS[k] = {...DATA.heroes[k], sk: DATA.skills.heroes[k]}` (키 순서 유지)

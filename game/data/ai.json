@@ -26,7 +26,11 @@
       },
       "spikeTrap": {
         "chance": 0.6,
-        "tries": 2
+        "tries": 2,
+        "reserveAp": 1,
+        "escapeWeight": 2,
+        "approachWeight": 1,
+        "towardBossBonus": 2
       }
     },
     "vince": {
