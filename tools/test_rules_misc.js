@@ -102,7 +102,7 @@ ok(R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`) === 0, "스태프 후리기: �
 setup("gron", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=10;S.heroes[2].ap=9`);
 { const MJ = R("CLS.mage.sk.findIndex(q=>q.t=='c')"), PJ = R("CLS.mage.sk.findIndex(q=>q.t=='w')");
   R(`apply({type:"heroAct",h:2,j:${MJ},x:10,y:14})`);
-  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:10})`) === 1 && R("mvOf(S.heroes[2])") === 2, "영창하면 그 턴 이동 3 → 2");
+  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:14})`) === 1 && R("mvOf(S.heroes[2])") === 2, "영창하면 그 턴 이동 3 → 2");
   ok(R(`apply({type:"heroAct",h:2,j:"m",x:10,y:13})`) === 0 && R(`apply({type:"heroAct",h:2,j:"m",x:10,y:12})`) === 1, "영창한 뒤에도 걷기 가능 (2칸까지)");
   R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero"`);
   ok(R("mvOf(S.heroes[2])") === 3, "다음 턴엔 이동 거리 원래대로 3");
