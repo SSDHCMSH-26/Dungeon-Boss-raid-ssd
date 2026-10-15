@@ -34,7 +34,7 @@ L = {
     "slow": ("레벨별 이동 감소", "Lv1, Lv2, Lv3"), "stunLv": ("행동불능 되는 레벨", ""), "add": ("영창 1번당 증가량", "위력: 수치 +, 확산: 반경 +"),
     "hpPerLv": ("레벨당 체력", ""), "turns": ("첫 벽 유지", "턴"), "turnsLater": ("같은 턴 두 번째부터 유지", "턴"),
     "stackTurns": ("겹쳐 쌓을 때 추가 유지", "턴"), "maxLv": ("최대 레벨", ""), "max": ("최대 개수", ""), "fallDmg": ("낙하 피해", ""),
-    "maxLen": ("한 줄 최대 길이", "칸"), "move": ("이동", "칸"), "enhancedMove": ("강화 시 이동", "칸"),
+    "dmgMin": ("최소 피해", "무작위"), "dmgMax": ("최대 피해", "무작위"), "maxLen": ("한 줄 최대 길이", "칸"), "move": ("이동", "칸"), "enhancedMove": ("강화 시 이동", "칸"),
     # 보스 능력치
     "apNoGen": ("발전기 파괴 후 AP", ""), "moveNoGen": ("발전기 파괴 후 추가 이동", "칸"),
     "damageTakenWithGen": ("발전기 가동 중 받는 피해 비율", "0.75 = 25% 줄임"), "factoryKillAp": ("공장 파괴 시 다음 턴 AP 회수", ""),
@@ -61,6 +61,8 @@ L = {
     # AI
     "delayMs": ("행동 전 기다림", "밀리초"), "approachDist": ("이보다 멀면 다가감", "칸"), "attackTries": ("턴마다 공격 시도", "번"),
     "chance": ("확률", "0~1"), "minAp": ("필요 AP", ""), "minPits": ("필요 구덩이 수", ""), "tries": ("시도 횟수", ""),
+    "reserveAp": ("공격 후 남겨 둘 AP", "함정용으로 아껴 두는 AP"), "escapeWeight": ("빠져나갈 길 점수", "공격 예고 범위에 갇힌 용사의 탈출 길목 (클수록 우선)"),
+    "approachWeight": ("다가오는 길 점수", "범위 밖 용사가 보스에게 오는 길목"), "towardBossBonus": ("보스 쪽 길 배수", "보스에 가장 가까워지는 길에 곱함"),
     "upgradeChance": ("업그레이드 확률", "0~1"), "upgradeMinFactories": ("업그레이드 최소 공장 수", ""),
     "lenMin": ("벨트 길이 최소", "칸"), "lenMax": ("벨트 길이 최대", "칸"), "enhancedAttackTries": ("강화 중 추가 공격", "번"),
     "actionsPerTurn": ("용사 한 명 턴당 행동 수", ""), "healBelow": ("체력 이 비율 미만이면 치유", "0~1"),

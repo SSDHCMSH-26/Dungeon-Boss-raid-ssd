@@ -2,7 +2,7 @@
    사용법: node tools/test_circle.js
    그리기·영창(그린 턴 포함)·이월·발동(영창 안 한 턴 끝), 위력/확산 영창, 끊김(한 번에 체력 피해 20 이상, 보호막 별개), 보호막,
    빙결(이동 감소·행동불능), 불바닥, 구덩이 발각, 놓는 곳(벽 칸 중심 불가, 건물 위 가능), 그론 벽 금지,
-   영창한 턴은 걷기 잠김·걸은 턴은 영창 잠김, 순간이동은 마법진 안으로만, AI, 리플레이 */
+   영창한 턴은 걷기 잠김(v74: 걸은 뒤 영창은 가능), 순간이동은 마법진 안으로만, AI, 리플레이 */
 const { createEngine } = require("./headless.js");
 let fail = 0;
 const ok = (c, m) => { console.log((c ? "OK   " : "FAIL ") + m); if (!c) fail++; };
@@ -38,19 +38,20 @@ ok(R(`S.heroes[2].cd[${TJ}]`) === 3, "순간이동 쿨타임 2턴 (정산 때마
 let h0 = bhp(); round();
 ok(bhp() === h0 && R("S.heroes[2].cir.lv") === 2, "영창한 턴 끝: 발동 안 하고 이월");
 ok(act("m", 15, 10) === 1, "다음 턴: 걷기 가능 (영창 안 함)");
-ok(act(WJ, 0, 0) === 0, "걸은 턴에는 영창 불가 (영창 탭 잠김)");
-h0 = bhp(); round();
-ok(h0 - bhp() === 50 && !R("S.heroes[2].cir"), `걸은 턴 끝에 이월 없이 발동: Lv2+위력 = 45+5 = 50 (보스 ${h0}→${bhp()})`);
+ok(act(WJ, 0, 0) === 1 && R("S.heroes[2].cir.lv") === 3, "걸은 턴에도 영창 가능 (v74) → Lv3");
+ok(act("m", 15, 11) === 0, "걸은 뒤 영창하면 그 뒤로는 걷기 불가");
+h0 = bhp(); round(); round();
+ok(h0 - bhp() === 55 + 5 && !R("S.heroes[2].cir"), `최대 레벨이면 다음 턴 끝에 발동: Lv3 55 + 위력 5 = 60 (보스 ${h0}→${bhp()})`);
 setup("gron"); act(MJ, 15, 7); h0 = bhp(); round();
-ok(h0 - bhp() === 25 && !R("S.heroes[2].cir"), `그리고 영창 안 하면 그 턴 끝(보스 턴 전)에 바로 발동: Lv1 25 (${h0 - bhp()})`);
-setup("gron"); ok(act("m", 15, 10) === 1 && act(MJ, 15, 7) === 1 && act(PJ, 0, 0) === 0, "걸은 뒤 그린 턴에도 영창 불가");
+ok(h0 - bhp() === 10 && !R("S.heroes[2].cir"), `그리고 영창 안 하면 그 턴 끝(보스 턴 전)에 바로 발동: Lv1 10 (${h0 - bhp()})`);
+setup("gron"); ok(act("m", 15, 10) === 1 && act(MJ, 15, 7) === 1 && act(PJ, 0, 0) === 1, "걸은 뒤 그린 턴에도 영창 가능 (v74)");
 
-// 2) 위력 + 확산 → Lv3 · 65+5 = 70, 범위 사방 +1 (5×5) · 불바닥
+// 2) 위력 + 확산 → Lv3 · 55+5 = 60, 범위 사방 +1 (5×5) · 불바닥
 setup("gron"); act(MJ, 15, 8); act(PJ, 0, 0); round();
 ok(act(WJ, 0, 0) === 1 && R("S.heroes[2].cir.lv") === 3 && R("cirR(S.heroes[2])") === 2, "확산 영창 → Lv3, 범위 반지름 1→2");
 round(); ok(act(PJ, 0, 0) === 0, "Lv3(최대)에서는 더 영창 불가");
 h0 = bhp(); round();
-ok(h0 - bhp() === 70, `Lv3 + 위력 1번 = 65+5 = 70 (${h0 - bhp()})`);
+ok(h0 - bhp() === 60, `Lv3 + 위력 1번 = 55+5 = 60 (${h0 - bhp()})`);
 ok(R("(S.burn||[]).length") === 1, "Lv3 화염: 불바닥 생김");
 h0 = bhp(); round();
 ok(h0 - bhp() === 10 && R("(S.burn||[]).length") === 0, `다음 정산 때 불바닥 피해 10 후 사라짐 (${h0 - bhp()})`);
@@ -67,12 +68,12 @@ setup("gron"); act(MJ, 15, 7); R(`S.heroes[2].x=20;S.heroes[2].y=20`);
 ok(/영창 끊김/.test(R(`hurt(S.heroes[2],12)+" "+hurt(S.heroes[2],12)`)) === false && R("!!S.heroes[2].cir"), "12 + 12 따로 두 번 → 안 끊김 (한 번에 20 이상만)");
 ok(/영창 끊김/.test(R(`""+hurt(S.heroes[2],20)`)) && !R("S.heroes[2].cir"), "한 번에 20 → 끊김");
 
-// 4) 수호 마법진: 범위 안 아군 보호막 10, 피해를 먼저 막음
+// 4) 수호 마법진: 범위 안 아군 보호막 5, 피해를 먼저 막음
 setup("gron"); R(`S.heroes[0].x=14;S.heroes[0].y=14;S.heroes[1].x=16;S.heroes[1].y=15`);
 act(SJ, 15, 14); round();
-ok(R("S.heroes[0].sh") === 10 && R("S.heroes[1].sh") === 10 && R("S.heroes[2].sh||0") === 0, "수호 Lv1: 범위 안 기사·성직자 보호막 10 (밖의 마법사는 없음)");
+ok(R("S.heroes[0].sh") === 5 && R("S.heroes[1].sh") === 5 && R("S.heroes[2].sh||0") === 0, "수호 Lv1: 범위 안 기사·성직자 보호막 5 (밖의 마법사는 없음)");
 let hp0 = R("S.heroes[0].hp"); R("hurt(S.heroes[0],15)");
-ok(hp0 - R("S.heroes[0].hp") === 5 && R("S.heroes[0].sh") === 0, "피해 15 → 보호막 10 이 먼저 막고 체력 -5");
+ok(hp0 - R("S.heroes[0].hp") === 10 && R("S.heroes[0].sh") === 0, "피해 15 → 보호막 5 가 먼저 막고 체력 -10");
 
 // 5) 빙결 결계: Lv1 이동 -1 (다음 보스 턴), Lv3 행동불능
 setup("gron"); let mv0 = R("bMv()"); act(FJ, 15, 8); round();

@@ -1,5 +1,6 @@
 /* 규칙 테스트 묶음 (v72): 기사 베기 부채꼴, 용사 체력·AP, 발전기 AP, 구덩이 파기 쿨타임, 가시 함정 AP 증가,
-   함정 상자 설치 조건(주변 3×3 유닛 없음), 맵별 상자 생성 설정(빈센토 맵 끔), 컨베이어(벗어나면 멈춤·겹치지 않음)
+   함정 상자 설치 조건(주변 3×3 유닛 없음), 맵별 상자 생성 설정(빈센토 맵 끔), 컨베이어(벗어나면 멈춤·겹치지 않음),
+   (v73) 구덩이 이동 조건, 컴퓨터 그론 가시 함정 위치, (v74) 베기 턴당 1번·스태프 후리기
    사용법: node tools/test_rules_misc.js */
 const { createEngine } = require("./headless.js");
 let fail = 0;
@@ -68,6 +69,34 @@ setup("vince"); R(`S.heroes[0].x=5;S.heroes[0].y=15;S.fac=[{id:1,x:8,y:15,hp:40,
 ok(R("S.heroes[0].x") === 7, "용사: 앞에 공장이 있으면 그 앞에서 멈춤");
 setup("vince"); R(`S.heroes[0].x=5;S.heroes[0].y=15;S.heroes[1].x=6;S.heroes[1].y=15;S.belts=[];for(let i=0;i<3;i++)S.belts.push({x:5+i,y:15,d:0,en:0,t:1})`); run();
 ok(R("S.heroes[0].x!=S.heroes[1].x||S.heroes[0].y!=S.heroes[1].y") && R("S.heroes[1].x") === 8, `용사 둘이 줄지어 있어도 겹치지 않음 (${R("S.heroes[0].x")}, ${R("S.heroes[1].x")})`);
+
+// 구덩이 이동: 구덩이 위에 서 있을 때만 · 다른 구덩이로만
+setup("gron"); R(`S.ph="boss";S.boss.ap=20;S.cd={};S.pits=[{x:5,y:5},{x:20,y:20}];S.boss.x=10;S.boss.y=10`);
+ok(R(`apply({type:"bossBuild",id:"hop",p:[[20,20]]})`) === 0, "구덩이 이동: 구덩이 밖에 서 있으면 불가");
+R(`S.boss.x=6;S.boss.y=5`);
+ok(R(`apply({type:"bossBuild",id:"hop",p:[[5,6]]})`) === 0, "구덩이 이동: 같은 구덩이 안으로는 불가");
+ok(R(`apply({type:"bossBuild",id:"hop",p:[[20,20]]})`) === 1 && R("S.boss.x") === 20, "구덩이 이동: 구덩이 위에서 다른 구덩이로 이동 (거리 30칸 이내)");
+
+// 컴퓨터 그론 가시 함정: 공격 예고 범위·벽을 뺀, 용사가 빠져나갈 길목에 설치
+setup("gron"); R(`S.ph="boss";S.boss.ap=20;S.used={};S.boss.x=15;S.boss.y=12;S.heroes[1].dead=1;S.heroes[2].dead=1;
+const m=S.map.split("");for(let y=17;y<=23;y++)for(let x=7;x<=13;x++)if((x==7||x==13||y==17||y==23)&&!(x==13&&y==20))m[y*N+x]="1";S.map=m.join("");
+S.atks=[{i:0,p:[[10,20]]}];AB.gron.spikeTrap.chance=1;aiTrap(CH.gron);AB.gron.spikeTrap.chance=DATA.ai.boss.gron.spikeTrap.chance;1`);
+ok(R("S.sec.traps.some(t=>t[0]==13&&t[1]==20)"), `가시 함정 AI: 벽에 둘러싸인 곳의 유일한 출구(13,20)에 설치 (${R("JSON.stringify(S.sec.traps)")})`);
+ok(R("S.sec.traps.length>0&&S.sec.traps.every(t=>!dangerSet().has(t[1]*N+t[0])&&!sw(t[0],t[1]))"), "가시 함정 AI: 공격 예고 범위·벽에는 설치 안 함");
+
+// (v74) 기사 베기: 턴당 1번 · 마법사 스태프 후리기: AP 0 · 사거리 1 · 한 칸 · 피해 5~10 · 턴당 1번
+setup("vince"); R(`S.rob=[{id:1,x:11,y:20,hp:50,mx:50,lv:1}]`);
+ok(R(`apply({type:"heroAct",h:0,j:0,x:11,y:20})`) === 1 && R(`apply({type:"heroAct",h:0,j:0,x:11,y:20})`) === 0, "베기: 한 턴에 1번만");
+R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero"`);
+ok(R(`apply({type:"heroAct",h:0,j:0,x:11,y:20})`) === 1, "베기: 다음 턴엔 다시 가능");
+setup("vince", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=10;S.rob=[{id:1,x:11,y:10,hp:99,mx:99,lv:1},{id:2,x:12,y:11,hp:99,mx:99,lv:1},{id:3,x:13,y:10,hp:99,mx:99,lv:1}]`);
+ok(R("CLS.mage.sk[0].n") === "스태프 후리기" && !R("CLS.mage.sk.some(q=>q.n=='파이어볼')"), "마법사 기본 스킬: 파이어볼 → 스태프 후리기");
+ok(R(`apply({type:"heroAct",h:2,j:0,x:13,y:10})`) === 0, "스태프 후리기: 사거리 1 (2칸 떨어진 적 불가)");
+ok(R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`) === 1 && R("S.heroes[2].ap") === 4, "스태프 후리기: AP 소모 없음");
+{ const d = 99 - R("S.rob[0].hp"); ok(d >= 5 && d <= 10 && R("S.rob[1].hp") === 99, `스태프 후리기: 한 칸만 피해 5~10 (${d})`); }
+ok(R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`) === 0, "스태프 후리기: 한 턴에 1번만");
+{ const seen = new Set(); for (let i = 0; i < 60; i++) { R(`S.rob[0].hp=99;S.heroes[2].lu={}`); R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`); seen.add(99 - R("S.rob[0].hp")); }
+  ok([...seen].every(v => v >= 5 && v <= 10) && seen.size >= 4, `스태프 후리기: 피해가 무작위로 나옴 (${[...seen].sort((a, b) => a - b).join(",")})`); }
 
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);

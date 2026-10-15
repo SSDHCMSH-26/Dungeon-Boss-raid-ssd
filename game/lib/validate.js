@@ -75,6 +75,9 @@
         if (s.v !== undefined) c.num(s.v, p + ".v", 0);
         if (s.cd !== undefined) c.int(s.cd, p + ".cd", 0);
         if (s.escEvery !== undefined) c.int(s.escEvery, p + ".escEvery", 1);
+        if (s.lim !== undefined) c.int(s.lim, p + ".lim", 1);
+        // 무작위 피해(fx.dmgMin~fx.dmgMax): v 대신 씀
+        if (s.fx && (s.fx.dmgMin !== undefined || s.fx.dmgMax !== undefined)) { c.int(s.fx.dmgMin, p + ".fx.dmgMin", 0); c.int(s.fx.dmgMax, p + ".fx.dmgMax", 0); c.need(s.fx.dmgMin <= s.fx.dmgMax, p + ".fx", "dmgMin 이 dmgMax 보다 클 수 없어요"); }
       };
       // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
       const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"] };
