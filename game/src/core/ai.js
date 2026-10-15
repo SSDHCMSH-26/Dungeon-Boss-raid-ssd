@@ -2,10 +2,10 @@
 const AI=DATA.ai,AB=AI.boss,AH=AI.hero,cex=(c,id)=>c.ex.find(e=>e.id==id);
 function aiSetup(){apply({type:"setPick",ids:shuffle(Object.keys(CLS),arn).slice(0,3)});return apply({type:"start"})}
 /* 마법진 피하기: 보스(3×3)가 피해를 주는 마법진(화염·빙결)에 닿는 자리인지. 마법진이 있을 때만 AI 주사위를 굴림(없으면 예전과 똑같이 진행) */
-const cirHit=(x,y)=>S.heroes.some(h=>h.cir&&!h.dead&&CLS[h.k].sk[h.cir.j].fx.kind!="shield"&&Math.abs(x-h.cir.x)<=1+cirR(h)&&Math.abs(y-h.cir.y)<=1+cirR(h));
+const cirHit=(x,y)=>S.heroes.some(h=>!h.dead&&cirsOf(h).some(c=>CLS[h.k].sk[c.j].fx.kind!="shield"&&Math.abs(x-c.x)<=1+cirR(h,c)&&Math.abs(y-c.y)<=1+cirR(h,c)));
 function aiDodge(t){const B=S.boss;if(!cirHit(B.x,B.y))return;let best=null,bd=1e9;const m=bMv();for(let dy=-m;dy<=m;dy++)for(let dx=-m;dx<=m;dx++){if(!(dx||dy)||(dx&&dy&&Math.abs(dx)!=Math.abs(dy)))continue;const x=B.x+dx,y=B.y+dy;if(!bOk(x,y)||cirHit(x,y))continue;const d=ch(x,y,t.x,t.y);if(d<bd){bd=d;best=[x,y]}}if(best)apply({type:"bossMove",x:best[0],y:best[1]})}
 function aiBoss(){const B=S.boss,c=CH[S.champ],al=S.heroes.filter(h=>!h.dead).sort((a,b)=>ch(a.x,a.y,B.x,B.y)-ch(b.x,b.y,B.x,B.y)),t=al[0];
-const cz=S.heroes.some(h=>h.cir&&!h.dead)&&ARAND()<AB.dodgeCircle.chance;if(cz)aiDodge(t);
+const cz=S.heroes.some(h=>!h.dead&&cirsOf(h).length)&&ARAND()<AB.dodgeCircle.chance;if(cz)aiDodge(t);
 if((!c.gen||gDead())&&ch(t.x,t.y,B.x,B.y)>AB.approachDist){let mx=cl(t.x-B.x,-bMv(),bMv()),my=cl(t.y-B.y,-bMv(),bMv());if(mx&&my){const m=Math.min(Math.abs(mx),Math.abs(my));mx=Math.sign(mx)*m;my=Math.sign(my)*m}if(!(cz&&cirHit(B.x+mx,B.y+my))&&!apply({type:"bossMove",x:B.x+mx,y:B.y+my})&&mx&&my&&!(cz&&cirHit(B.x+mx,B.y)))apply({type:"bossMove",x:B.x+mx,y:B.y})}
 if(S.champ=="gron"){const AG=AB.gron;if(B.ap>=AG.trapChest.minAp&&!(S.cd&&S.cd.tchest>0)&&ARAND()<AG.trapChest.chance){const e=cex(c,"tchest");apply({type:"bossBuild",id:e.id,p:[[cr(t.x+arn(7)-3,B.x,e.r),cr(t.y-2-arn(3),B.y,e.r)]]})}if(B.ap>=AG.digPit.minAp&&pitAt(B.x,B.y)<0&&ARAND()<AG.digPit.chance)apply({type:"bossBuild",id:cex(c,"pit").id,p:[]});if(B.ap>=AG.hopPit.minAp&&pitAt(B.x,B.y)>=0&&(S.pits||[]).length>=AG.hopPit.minPits&&ARAND()<AG.hopPit.chance){const ps=(S.pits||[]).filter(z=>z!==S.pits[pitAt(B.x,B.y)]&&ch(z.x,z.y,B.x,B.y)<=AG.hopPit.range&&!hAt(z.x,z.y)).sort((a,b)=>ch(a.x,a.y,t.x,t.y)-ch(b.x,b.y,t.x,t.y));if(ps.length&&ch(ps[0].x,ps[0].y,t.x,t.y)<ch(B.x,B.y,t.x,t.y))apply({type:"bossBuild",id:cex(c,"hop").id,p:[[ps[0].x,ps[0].y]]})}if(ARAND()<AG.wall.chance){const e=cex(c,"wall"),p=[];for(let n=0;n<AG.wall.tries&&p.length<e.pk;n++){const q=[cr(t.x+arn(5)-2,B.x,e.r),cr(t.y-1-arn(2),B.y,e.r)];if(!bad(q[0],q[1])&&!p.some(z=>z[0]==q[0]&&z[1]==q[1]))p.push(q)}if(p.length==e.pk)apply({type:"bossBuild",id:e.id,p:p})}}
 else{const AV=AB.vince,F=AV.factory,f=S.fac.filter(z=>ch(z.x,z.y,B.x,B.y)<=F.range&&z.lv<FAC.maxLv);
@@ -28,10 +28,11 @@ for(let n=0,k=0;n<AT.tries&&k<cs.length;n++)if(ARAND()<AT.chance){const i=cs[k++
 function bfsD(sx,sy){const D=new Array(N*N).fill(999),q=[[sx,sy]];D[sy*N+sx]=0;while(q.length){const [x,y]=q.shift();for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=N||ny>=N)continue;const i=ny*N+nx;if(D[i]==999&&!blk(nx,ny)){D[i]=D[y*N+x]+1;q.push([nx,ny])}}}return D}
 /* 컴퓨터 마법사의 마법진: 있으면 영창(목표가 범위 안이면 위력, 범위 바로 밖이면 확산, 아니면 영창 안 함 → 이번 턴 끝 발동),
    없으면 다친 아군이 모여 있으면 수호, 아니면 확률로 보스를 덮는 화염/빙결을 그림 */
-function aiCircle(h){const k=CLS[h.k],i=S.heroes.indexOf(h),B=S.boss,c=h.cir,J=q=>k.sk.indexOf(q);if(!k.sk.some(q=>q.t=="c"))return 0;
-if(c){if(c.ch||c.lv>=CIRC.maxLv)return 0;const f=k.sk[c.j].fx,R=cirR(h),inn=r=>f.kind=="shield"?S.heroes.some(a=>!a.dead&&inSq(c.x,c.y,r,a.x,a.y)):Math.abs(B.x-c.x)<=1+r&&Math.abs(B.y-c.y)<=1+r;
-const pw=cirW(h,"power"),sp=cirW(h,"spread");if(inn(R)&&pw&&h.ap>=pw.c)return apply({type:"heroAct",h:i,j:J(pw),x:h.x,y:h.y});if(!inn(R)&&sp&&h.ap>=sp.c&&inn(R+sp.fx.add))return apply({type:"heroAct",h:i,j:J(sp),x:h.x,y:h.y});return 0}
-const cs=k.sk.filter(q=>q.t=="c"&&h.ap>=q.c);if(!cs.length)return 0;
+function aiCircle(h){const k=CLS[h.k],i=S.heroes.indexOf(h),B=S.boss,J=q=>k.sk.indexOf(q);if(!k.sk.some(q=>q.t=="c"))return 0;
+if(!h.wch&&!(h.mc>0)){const pw=cirW(h,"power"),sp=cirW(h,"spread");for(const c of cirsOf(h)){if(c.ch||c.lv>=CIRC.maxLv)continue;const f=k.sk[c.j].fx,R=cirR(h,c),inn=r=>f.kind=="shield"?S.heroes.some(a=>!a.dead&&inSq(c.x,c.y,r,a.x,a.y)):Math.abs(B.x-c.x)<=1+r&&Math.abs(B.y-c.y)<=1+r;
+if(inn(R)&&pw&&h.ap>=pw.c)return apply({type:"heroAct",h:i,j:J(pw),x:c.x,y:c.y});if(!inn(R)&&sp&&h.ap>=sp.c&&inn(R+sp.fx.add))return apply({type:"heroAct",h:i,j:J(sp),x:c.x,y:c.y})}}
+if(cirsOf(h).some(c=>!c.ch))return 0;
+const cs=k.sk.filter(q=>q.t=="c"&&h.ap>=q.c&&!(h.cd&&h.cd[J(q)]>0));if(!cs.length)return 0;
 const sh=cs.find(q=>q.fx.kind=="shield"),hu=S.heroes.filter(a=>!a.dead&&a.hp<a.max*AH.healBelow);
 if(sh&&hu.length>=AH.circle.shieldMinAllies){const x=cr(hu[0].x,h.x,sh.r),y=cr(hu[0].y,h.y,sh.r);if(hu.filter(a=>inSq(x,y,sh.fx.radius,a.x,a.y)).length>=AH.circle.shieldMinAllies&&apply({type:"heroAct",h:i,j:J(sh),x,y}))return 1}
 if(ARAND()>=AH.circle.chance)return 0;const mt=cs.find(q=>q.fx.kind=="meteor"),fr=cs.find(q=>q.fx.kind=="frost"),q=fr&&(!mt||ARAND()<AH.circle.frostChance)?fr:mt;if(!q)return 0;

@@ -169,7 +169,7 @@
         c.int(b.hero.breakDmg, "hero.breakDmg", 0); c.int(b.hero.breakRange, "hero.breakRange", 1);
       }
       if (c.obj(b.status, "status")) c.int(b.status.paralyzeMove, "status.paralyzeMove", 0);
-      if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); c.int(b.circle.breakDmg, "circle.breakDmg", 1); }
+      if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); c.int(b.circle.breakDmg, "circle.breakDmg", 1); if (b.circle.chantMove !== undefined) c.int(b.circle.chantMove, "circle.chantMove", 0); }
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

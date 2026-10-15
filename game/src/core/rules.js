@@ -27,27 +27,32 @@ function qp(h,x,y,r){const dx=x-h.x,dy=y-h.y,d=Math.max(Math.abs(dx),Math.abs(dy
 function ride(h){const i=S.heroes.indexOf(h),b0=beltAt(h.x,h.y);if(!b0)return;let n=b0.en?BRUN.enhancedMove:BRUN.move;const cs=[];
 while(n-->0){const b=beltAt(h.x,h.y);if(!b)break;const nx=h.x+DX[b.d],ny=h.y+DY[b.d];if(bad(nx,ny))break;h.x=nx;h.y=ny;cs.push([nx,ny])}
 if(cs.length){S.mv.push({i,c:cs});PRES.path("h"+i,cs);S.log+=" 🛤️ 컨베이어에 실려 이동! "+crPath("h",h,cs)}}
-/* 마법진(마법사): h.cir = {j 스킬 번호, x, y 중심, lv 레벨, pw 위력 영창 수, sp 확산 영창 수, ch 이번 턴 영창함}
+/* 마법진(마법사): h.cirs = [{j 스킬 번호, x, y 중심, lv 레벨, pw 위력 영창 수, sp 확산 영창 수, ch 이번 턴 영창 받음(이월)}, ...] — 개수 제한 없음(스킬 쿨타임으로 조절).
+   영창은 용사당 턴당 1번(h.wch), 영창할 마법진을 칸으로 고름. 영창 안 받은 마법진은 그 턴 끝에 발동.
    그 턴에 영창(턴당 1번, 레벨 +1, 그린 턴에도 가능)하면 다음 턴으로 이월, 안 하면 그 용사 턴이 끝날 때(보스 턴 전, 정산 시작) 발동.
-   영창한 턴엔 걷기 불가(걸은 뒤에 영창하는 건 가능).
+   걸은 턴(h.mc>0)엔 영창 불가(→ 그 턴 끝에 발동). 영창한 턴엔 그 턴만 이동 거리 -CIRC.chantMove.
    순간이동 스킬은 언제나 내 마법진 안의 칸으로만. 벽 칸 중심으로는 못 그림(범위·확산은 벽·공장·발전기·유닛 위도 됨).
    한 번에 체력 피해 CIRC.breakDmg 이상이면 영창이 끊겨 사라짐 */
 const cirW=(h,kd)=>CLS[h.k].sk.find(q=>q.t=="w"&&q.fx.kind==kd);
-function cirR(h){const c=h.cir,w=cirW(h,"spread");return CLS[h.k].sk[c.j].fx.radius+c.sp*(w?w.fx.add:0)}
-function cirV(h){const c=h.cir,f=CLS[h.k].sk[c.j].fx,w=cirW(h,"power");return f.val[Math.min(c.lv,f.val.length)-1]+c.pw*(w?w.fx.add:0)}
-function cirAt(x,y){return S.heroes.some(h=>h.cir&&!h.dead&&inSq(h.cir.x,h.cir.y,cirR(h),x,y))}
+const cirsOf=h=>h.cirs||[],cirClear=h=>{if(h.cirs&&h.cirs.length){h.cirs=[];return 1}return 0};
+function cirR(h,c){const w=cirW(h,"spread");return CLS[h.k].sk[c.j].fx.radius+c.sp*(w?w.fx.add:0)}
+function cirV(h,c){const f=CLS[h.k].sk[c.j].fx,w=cirW(h,"power");return f.val[Math.min(c.lv,f.val.length)-1]+c.pw*(w?w.fx.add:0)}
+const inMyCir=(h,x,y)=>cirsOf(h).some(c=>inSq(c.x,c.y,cirR(h,c),x,y));
+function cirAt(x,y){return S.heroes.some(h=>!h.dead&&inMyCir(h,x,y))}
+/* 영창할 수 있는 마법진 중 (x,y) 를 덮는 것(가까운 중심 우선) */
+function cirPick(h,x,y){return cirsOf(h).filter(c=>!c.ch&&c.lv<CIRC.maxLv&&inSq(c.x,c.y,cirR(h,c),x,y)).sort((a,b)=>ch(a.x,a.y,x,y)-ch(b.x,b.y,x,y))[0]||null}
 /* 정산에서 합쳐 맞는 피해(td)의 각 한 방(vs)을 따져 영창 끊김 판정 (방패막기 경감·보호막을 먼저 적용) */
-function cirChk(h,vs){if(!h.cir)return 0;const g=S.heroes.some(k=>!k.dead&&k.guard&&ch(k.x,k.y,h.x,h.y)<=GRD.radius);let sh=h.sh||0;for(const v of vs){const e=g?Math.ceil(v*GRD.damageTaken):v,a=Math.min(sh,e);sh-=a;if(e-a>=CIRC.breakDmg){h.cir=null;return 1}}return 0}
+function cirChk(h,vs){if(!cirsOf(h).length)return 0;const g=S.heroes.some(k=>!k.dead&&k.guard&&ch(k.x,k.y,h.x,h.y)<=GRD.radius);let sh=h.sh||0;for(const v of vs){const e=g?Math.ceil(v*GRD.damageTaken):v,a=Math.min(sh,e);sh-=a;if(e-a>=CIRC.breakDmg){h.cirs=[];return 1}}return 0}
 /* 정산 시작: 마법진 발동·이월 */
-function cirFire(o){S.heroes.forEach(h=>{const c=h.cir;if(!c)return;if(h.dead){h.cir=null;return}if(c.ch){c.ch=0;return}if(S.end)return;
-const K=CLS[h.k],s=K.sk[c.j],f=s.fx,R=cirR(h),v=cirV(h),nm=s.n+" Lv"+c.lv;h.cir=null;let m="";
+function cirFire(o){S.heroes.forEach(h=>{if(!cirsOf(h).length)return;if(h.dead){h.cirs=[];return}const keep=[];h.cirs.forEach(c=>{if(c.ch){c.ch=0;keep.push(c);return}if(S.end){keep.push(c);return}
+const K=CLS[h.k],s=K.sk[c.j],f=s.fx,R=cirR(h,c),v=cirV(h,c),nm=s.n+" Lv"+c.lv;let m="";
 if(f.kind=="shield"){const al=S.heroes.filter(a=>!a.dead&&inSq(c.x,c.y,R,a.x,a.y));al.forEach(a=>a.sh=Math.max(a.sh||0,v));PRES.fx("shield",c.x,c.y,0);m="✨ "+K.n+" "+nm+" 발동! "+(al.length?al.map(a=>CLS[a.k].n).join("·")+" 보호막 "+v:"범위 안에 아군이 없다")}
 else{const hs=hits(c.x,c.y,R),en=hs.filter(e=>e.o===S.boss||e.o===S.gen||S.rob.includes(e.o)||(S.mobs||[]).includes(e.o));PRES.fx(f.kind=="meteor"?"fire":"purify",c.x,c.y,0);
 if(f.kind=="frost"){const sl=f.slow[c.lv-1]||0,st=c.lv>=f.stunLv;en.forEach(e=>{const r=e.o===S.boss||e.o===S.gen?S.round+1:S.round;if(st)e.o.fz=r;else if(sl)e.o.sl={n:sl,r}})}
 if(v>0&&hs.length){dealHits(hs,v,K,nm);m=(f.kind=="meteor"?"🔥 ":"❄️ ")+S.log}else m=(f.kind=="meteor"?"🔥 ":"❄️ ")+K.n+" "+nm+" 발동!"+(hs.length?"":" 맞은 적이 없다");
 if(f.kind=="frost"&&en.length){const sl=f.slow[c.lv-1]||0;m+=c.lv>=f.stunLv?" · "+en.map(e=>e.n).join("·")+" 1턴 행동불능":sl?" · "+en.map(e=>e.n).join("·")+" 이동 -"+sl:""}
 if(f.kind=="meteor"&&c.lv>=f.burnLv){S.burn=(S.burn||[]).concat({x:c.x,y:c.y,r:R,v:f.burn,until:S.round+1});m+=" · 🔥불바닥 1턴"}}
-let np=0;(S.pits||[]).forEach(p=>{if(!p.rv&&[[0,0],[1,0],[0,1],[1,1]].some(([a,b])=>inSq(c.x,c.y,R,p.x+a,p.y+b))){p.rv=1;np++}});if(np)m+=" · 🕳️숨은 구덩이 "+np+"개 발각!";o.push(m)})}
+let np=0;(S.pits||[]).forEach(p=>{if(!p.rv&&[[0,0],[1,0],[0,1],[1,1]].some(([a,b])=>inSq(c.x,c.y,R,p.x+a,p.y+b))){p.rv=1;np++}});if(np)m+=" · 🕳️숨은 구덩이 "+np+"개 발각!";o.push(m)});h.cirs=keep})}
 /* 정산 시작: 불바닥(화염 마법진 Lv3) — 다음 정산 때 그 자리에 있는 적에게 피해 */
 function burnTick(o){if(!S.burn||!S.burn.length)return;const due=S.burn.filter(b=>b.until==S.round);S.burn=S.burn.filter(b=>b.until>S.round);due.forEach(b=>{if(S.end)return;const hs=hits(b.x,b.y,b.r).filter(e=>e.n!="벽");if(hs.length){dealHits(hs,b.v,{n:"🔥불바닥"},"화염");o.push(S.log)}})}
 function act(h,j,x,y){const n=S.mv.length,r=act0(h,j,x,y);if(r){try{pitCheck(h,n)}catch(e){}try{chestPath(h,n)}catch(e){}}return r}
@@ -56,7 +61,7 @@ const cell=path[k],P=S.pits[pitAt(cell[0],cell[1])];let cnt=0;ents.forEach(r=>{c
 PRES.trim("h"+i,path.length-1-k);const tt=PRES.fallDelay("h"+i);
 const cs=S.pits.filter(z=>z!==P).sort((a,b)=>Math.hypot(b.x-P.x,b.y-P.y)-Math.hypot(a.x-P.x,a.y-P.y));let Q=null,ex=null;h.x=cell[0];h.y=cell[1];
 for(const q of cs){const c=[[0,0],[1,0],[0,1],[1,1]].map(([a,b])=>[q.x+a,q.y+b]).filter(z=>!bad(z[0],z[1]));if(c.length){Q=q;ex=c[rn(c.length)];break}}
-const pbr=h.cir&&PIT.fallDmg>=CIRC.breakDmg;if(pbr)h.cir=null;h.hp-=PIT.fallDmg;h.stun=1;if(h.hp<=0){h.hp=0;h.dead=1;if(h.cir)h.cir=null}
+const pbr=PIT.fallDmg>=CIRC.breakDmg&&cirClear(h);h.hp-=PIT.fallDmg;h.stun=1;if(h.hp<=0){h.hp=0;h.dead=1;cirClear(h)}
 S.pits=S.pits.filter(z=>z!==P&&z!==Q);if(ex){h.x=ex[0];h.y=ex[1]}
 S.fall=(S.fall||[]).filter(f=>NOW()<f.t+2500).concat({i,t:NOW()+tt,a:[cell[0],cell[1]],b:ex||[cell[0],cell[1]],pa:{x:P.x,y:P.y},pb:Q?{x:Q.x,y:Q.y}:{x:P.x,y:P.y}});
 S.log=(S.log?S.log+" ":"")+"🕳️ 숨은 구덩이! "+CLS[h.k].n+" 낙하 -"+PIT.fallDmg+(ex?" · 가장 먼 구덩이로 튕겨 나갔다!":"")+" 💫다음 턴 행동불능"+(pbr?" 🔯영창 끊김!":"")+(h.dead?" 💀":"");
@@ -65,8 +70,8 @@ function dealHits(hs,v,k,nm){const B=S.boss;const dv=e=>e.o===B&&S.champ=="vince
 function act0(h,j,x,y){const k=CLS[h.k],B=S.boss;
 if(j=="x"&&S.champ=="gron"){if(h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange||x<1||y<1||x>=N-1||y>=N-1||!(sw(x,y)||dw(x,y)))return 0;const gone=wDmg(x,y,RULE.hero.breakDmg);h.ap--;h.aT=NOW();h.aK="atk";S.log="🔨 "+k.n+"의 벽 부수기! 벽 -"+RULE.hero.breakDmg+(gone?" 🧱벽 파괴!":"");return 1}
 if(j=="x"){const b=beltAt(x,y);if(!b||h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange)return 0;S.belts=S.belts.filter(z=>z!==b);h.ap--;S.log="🔨 "+k.n+"이(가) 컨베이어를 파괴!";return 1}
-if(j=="m"){const c=qp(h,x,y,mvOf(h));if(h.ap<1||h.mc>=RULE.hero.movesPerTurn||!c||(h.cir&&h.cir.ch))return 0;h.x=x;h.y=y;h.ap--;h.mc++;S.mv.push({i:S.heroes.indexOf(h),c});PRES.path("h"+S.heroes.indexOf(h),c);{const m=crPath("h",h,c);ride(h);if(m)S.log=m}return 1}
-const s=k.sk[j];if(s.t=="g"||s.t=="o"||s.t=="w"){x=h.x;y=h.y}if(h.ap<s.c||ch(x,y,h.x,h.y)>s.r)return 0;
+if(j=="m"){const c=qp(h,x,y,mvOf(h));if(h.ap<1||h.mc>=RULE.hero.movesPerTurn||!c)return 0;h.x=x;h.y=y;h.ap--;h.mc++;S.mv.push({i:S.heroes.indexOf(h),c});PRES.path("h"+S.heroes.indexOf(h),c);{const m=crPath("h",h,c);ride(h);if(m)S.log=m}return 1}
+const s=k.sk[j];if(s.t=="g"||s.t=="o"){x=h.x;y=h.y}if(h.ap<s.c||(s.t!="w"&&ch(x,y,h.x,h.y)>s.r))return 0;
 if(s.cd&&h.cd&&h.cd[j]>0)return 0;if(s.lim&&h.lu&&(h.lu[j]||0)>=s.lim)return 0;
 const sv=()=>s.fx&&s.fx.dmgMax!==undefined?s.fx.dmgMin+Math.floor(RAND()*(s.fx.dmgMax-s.fx.dmgMin+1)):s.v;
 if(s.t=="l"){const dx=x-h.x,dy=y-h.y;if(!(dx||dy)||(dx&&dy&&Math.abs(dx)!=Math.abs(dy)))return 0;const sx=Math.sign(dx),sy=Math.sign(dy),fo=[],fr=[];for(let i=1;i<=s.r;i++){const X=h.x+sx*i,Y=h.y+sy*i;if(X<0||Y<0||X>=N||Y>=N)break;if(sw(X,Y)||dw(X,Y)){PRES.fx("burst",X,Y,(i-1)*70);hits(X,Y,0).forEach(e=>{if(!fo.some(z=>z.o===e.o))fo.push(e)});break}PRES.fx("burst",X,Y,(i-1)*70);hits(X,Y,0).forEach(e=>{if(!fo.some(z=>z.o===e.o))fo.push(e)});const a=hAt(X,Y);if(a&&a!==h&&!fr.includes(a))fr.push(a)}
@@ -89,11 +94,11 @@ const tc=(S.chests||[]).find(c=>c.k=="x"&&c.x==X&&c.y==Y);if(tc){S.chests=S.ches
 if(cells.length){const L2=cells[cells.length-1];h.x=L2[0];h.y=L2[1];h.nt=[h.x,h.y];PRES.path("h"+S.heroes.indexOf(h),cells);try{crPath("h",h,cells)}catch(e){}}
 S.log="🛡️ "+k.n+" 방패돌진! "+cells.length+"칸 돌진 (기세)"+msg;if(hit)dealHits(hit,s.fx.hit,k,"방패돌진");
 if(hz>0&&!S.end){const dm=s.fx.recoil*hz;h.hp-=dm;h.hurtT=NOW();S.log+=" · 기세로 무시한 효과 "+hz+"개 → 반동 -"+dm+" · 다음 턴 행동불능";if(h.hp<=0){h.hp=0;h.dead=1;S.log+=" 💀"}else h.stun=1}}
-else if(s.t=="b"){if(bad(x,y)||!h.cir||!inSq(h.cir.x,h.cir.y,cirR(h),x,y))return 0;h.x=x;h.y=y;h.tpT=NOW();S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.fx("tele",x,y,0);S.log=k.n+" 순간이동!";const m=crPath("h",h,[[x,y]]);ride(h);if(m)S.log=m}
+else if(s.t=="b"){if(bad(x,y)||!inMyCir(h,x,y))return 0;h.x=x;h.y=y;h.tpT=NOW();S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.fx("tele",x,y,0);S.log=k.n+" 순간이동!";const m=crPath("h",h,[[x,y]]);ride(h);if(m)S.log=m}
 else if(s.t=="o"){const R=new Map();for(let Y=0;Y<N;Y++)for(let X=0;X<N;X++){const d=ch(X,Y,h.x,h.y),v=d<=s.fx.radius?s.fx.near:s.fx.far;hits(X,Y,0).forEach(e=>{if(e.o.mw&&v<s.fx.near)return;const q=R.get(e.o);if(!q||q.v<v)R.set(e.o,{e,v})})}const g50=[],g10=[];R.forEach(q=>(q.v>=s.fx.near?g50:g10).push(q.e));PRES.fx("mana",h.x,h.y,0);if(g50.length)dealHits(g50,s.fx.near,k,"마력 방출");if(g10.length&&!S.end){const lg=S.log;dealHits(g10,s.fx.far,k,"마력 방출");if(g50.length)S.log=lg+" · "+S.log}if(!g50.length&&!g10.length)S.log=k.n+" 마력 방출! 맞은 적이 없다";else S.log="🔮 "+S.log}
 else if(s.t=="h"||s.t=="g"){const t=hAt(x,y);if(!t)return 0;if(s.t=="h"){t.hp=Math.min(t.max,t.hp+s.v);S.log=k.n+"의 치유! +"+s.v;PRES.fx("heal",t.x,t.y)}else{t.guard=1;S.log=k.n+" 방패막기! 반경 "+GRD.radius+"칸 아군 받는 피해 -"+pct(1-GRD.damageTaken)+" (턴 종료까지)"}}
-else if(s.t=="c"){if(h.cir||x<0||y<0||x>=N||y>=N||sw(x,y)||dw(x,y))return 0;h.cir={j:+j,x,y,lv:1,pw:0,sp:0,ch:0};S.log="🔯 "+k.n+" "+s.n+"! 이번 턴 끝에 발동 (영창하면 이월·강화)"}
-else if(s.t=="w"){const c=h.cir;if(!c||c.ch||c.lv>=CIRC.maxLv)return 0;c.ch=1;c.lv++;if(s.fx.kind=="power")c.pw++;else c.sp++;S.log="🔯 "+k.n+" "+s.n+"! "+CLS[h.k].sk[c.j].n+" Lv"+c.lv+(s.fx.kind=="power"?" (수치 +"+s.fx.add*c.pw+")":" (범위 사방 +"+c.sp*s.fx.add+"칸)")+" · 다음 턴으로 이월"}
+else if(s.t=="c"){if(x<0||y<0||x>=N||y>=N||sw(x,y)||dw(x,y))return 0;h.cirs=cirsOf(h).concat({j:+j,x,y,lv:1,pw:0,sp:0,ch:0});S.log="🔯 "+k.n+" "+s.n+"! 이번 턴 끝에 발동 (영창하면 이월·강화)"}
+else if(s.t=="w"){const c=cirPick(h,x,y);if(!c||h.wch||h.mc>0)return 0;c.ch=1;h.wch=1;c.lv++;if(s.fx.kind=="power")c.pw++;else c.sp++;S.log="🔯 "+k.n+" "+s.n+"! "+CLS[h.k].sk[c.j].n+" Lv"+c.lv+(s.fx.kind=="power"?" (수치 +"+s.fx.add*c.pw+")":" (범위 사방 +"+c.sp*s.fx.add+"칸)")+" · 다음 턴으로 이월"}
 else if(s.t=="d"&&s.fx&&s.fx.arc){const cs=arcCells(h,x,y);if(!cs.length)return 0;const hs=[];cs.forEach(([cx_,cy_])=>{PRES.fx("burst",cx_,cy_,0);hits(cx_,cy_,0).forEach(e=>{if(!hs.some(z=>z.o===e.o))hs.push(e)})});if(hs.length)dealHits(hs,sv(),k,s.n);else S.log=k.n+" "+s.n+" 빗나감!"}
 else{const hs=hits(x,y,s.a||0);if(h.k=="mage"&&s.t=="d")PRES.fx(s.a?"fire":"burst",x,y,0);if(hs.length)dealHits(hs,sv(),k,s.n);else S.log=k.n+" "+s.n+" 빗나감!"}
 h.ap-=s.c;h.aT=NOW();h.aK=(s.t=="d"||s.t=="l"||s.t=="r"||s.t=="o")?"atk":"cast";if(s.cd){h.cd=h.cd||{};h.cd[j]=s.cd+1}if(s.lim){h.lu=h.lu||{};h.lu[j]=(h.lu[j]||0)+1}return 1}
@@ -128,7 +133,7 @@ S.bag[side][k]--;S.log="🎒 "+nm+" "+ITEMS[k].n+" 사용! ("+ITEMS[k].d+")";ret
 /* 순간이동 스크롤: 보스 진영(g=발전기를 옮길지) / 용사 h */
 function scrollBoss(x,y,g){if(!S.bag||!S.bag.b.scroll)return 0;const u=g?S.gen:S.boss,O=g?S.boss:S.gen;if(ch(x,y,u.x,u.y)>ITEF.scroll.range)return 0;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const X=x+a,Y=y+b;if(X<0||Y<0||X>=N||Y>=N||blk(X,Y)||hAt(X,Y)||(O&&O.hp>0&&Math.abs(X-O.x)<=1&&Math.abs(Y-O.y)<=1))return 0}
 u.x=x;u.y=y;PRES.snap(g?"G":"B",x,y);S.bag.b.scroll--;S.log="📜 "+(g?"발전기":(CH[S.champ].bn||CH[S.champ].n))+" 순간이동!";return 1}
-function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.cir&&h.cir.ch&&!inSq(h.cir.x,h.cir.y,cirR(h),x,y)))return 0;if(h.cir&&!inSq(h.cir.x,h.cir.y,cirR(h),x,y))h.cir.tpo=1;const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{pitCheck(h,n)}catch(e){}return 1}
+function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.wch&&!inMyCir(h,x,y)))return 0;const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{pitCheck(h,n)}catch(e){}return 1}
 function pitHit(i,p){if(S.champ!="gron"||!S.pits||!S.pits.length)return 0;const a=CH.gron.at[i],c=cov(a,p),inC=z=>[[0,0],[1,0],[0,1],[1,1]].some(([x,y])=>c.has((z.y+y)*N+z.x+x)),hit=S.pits.filter(inC);if(!hit.length)return 0;
 S.gh=S.gh||[];const hid=hit.filter(z=>!z.rv),rev=hit.filter(z=>z.rv);hid.forEach(z=>S.gh.push({x:z.x,y:z.y}));S.pits=S.pits.filter(z=>!hid.includes(z));
 const P=rev[0];if(P){const cs=S.pits.filter(z=>z!==P).sort((u,v)=>Math.hypot(v.x-P.x,v.y-P.y)-Math.hypot(u.x-P.x,u.y-P.y));if(cs.length){const Q=cs[0],dx=Q.x-P.x,dy=Q.y-P.y,p2=p.map(([x,y])=>[cl(x+dx,0,N-1),cl(y+dy,0,N-1)]);S.atks.push({i,p:p2,echo:1});S.pfx=(S.pfx||[]).filter(f=>NOW()-f.t<3000).concat({t:NOW(),a:{x:P.x,y:P.y,rv:1},b:{x:Q.x,y:Q.y,rv:Q.rv?1:0}});S.pits=S.pits.filter(z=>z!==P&&z!==Q)}}
@@ -171,7 +176,7 @@ function bExtra(e,p){if(e.cd&&S.cd&&S.cd[e.id]>0)return 0;const cost=ecost(e);if
 function endBossTurn(){S.rev=[];S.mv=[];S.ph="hero";S.log=S.atks.filter(a=>!a.echo).length?"⚠️ 공격 예고 "+S.atks.filter(a=>!a.echo).length+"개(빨간 칸)! 용사 진영: 피하거나 공격하세요.":"보스가 공격을 예고하지 않았어요. 용사 진영 차례!";S.used={}}
 function endHeroTurn(){S.ph="resolve"}
 /* 용사 피해: 방패막기 경감 → 보호막(h.sh)이 먼저 막음 → 체력. nb=1 이면 영창 끊김 판정은 부른 쪽(정산)이 함 */
-function hurt(h,d,nb){if(S.heroes.some(k=>!k.dead&&k.guard&&ch(k.x,k.y,h.x,h.y)<=GRD.radius))d=Math.ceil(d*GRD.damageTaken);let a=0;if(h.sh>0){a=Math.min(h.sh,d);h.sh-=a;d-=a}h.hp-=d;h.hurtT=NOW();let br=0;if(!nb&&h.cir&&d>=CIRC.breakDmg){h.cir=null;br=1}if(h.hp<=0){h.hp=0;h.dead=1;if(h.cir)h.cir=null}return a||br?d+(a?" (🛡"+a+" 막음)":"")+(br?" 🔯영창 끊김!":""):d}
+function hurt(h,d,nb){if(S.heroes.some(k=>!k.dead&&k.guard&&ch(k.x,k.y,h.x,h.y)<=GRD.radius))d=Math.ceil(d*GRD.damageTaken);let a=0;if(h.sh>0){a=Math.min(h.sh,d);h.sh-=a;d-=a}h.hp-=d;h.hurtT=NOW();let br=0;if(!nb&&d>=CIRC.breakDmg&&cirClear(h))br=1;if(h.hp<=0){h.hp=0;h.dead=1;cirClear(h)}return a||br?d+(a?" (🛡"+a+" 막음)":"")+(br?" 🔯영창 끊김!":""):d}
 function robAct(r,o){const bon=(r.mvb||0)-slowOf(r);r.mvb=0;if(frozen(r))return;const hs=()=>S.heroes.filter(h=>!h.dead&&ch(h.x,h.y,r.x,r.y)<=ROB.chase).sort((a,b)=>ch(a.x,a.y,r.x,r.y)-ch(b.x,b.y,r.x,r.y));let t=hs()[0];if(!t)return;
 if(r.bind>0&&ch(t.x,t.y,r.x,r.y)>1)return;if(ch(t.x,t.y,r.x,r.y)>1){const st=r.y*N+r.x,pv={[st]:-1},q=[[r.x,r.y]];let end=-1;
 while(q.length){const [x,y]=q.shift();if(ch(x,y,t.x,t.y)<=1){end=y*N+x;break}for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=x+dx,ny=y+dy,i=ny*N+nx;if((dx||dy)&&pv[i]===undefined&&!bad(nx,ny)){pv[i]=y*N+x;q.push([nx,ny])}}}
@@ -185,7 +190,7 @@ if(hit){S.rev.push([b.x,b.y,1,b.en?1:0]);S.heroes.forEach((h,hi)=>{if(!h.dead&&c
 S.heroes.forEach((h,hi)=>{if(h.dead||!td[hi])return;const br=cirChk(h,tc[hi]);o.push(CLS[h.k].n+" -"+hurt(h,td[hi],1)+(br?" 🔯영창 끊김!":""))});
 S.rob.forEach(r=>robAct(r,o));mobsAct(o);chAge(o);
 S.fac.forEach(f=>{if(--f.cd<=0){f.cd=FAC.cycle;if(S.rob.length<ROB.max){const rg=[];for(let dx=-1;dx<=2;dx++)for(let dy=-1;dy<=2;dy++)if(dx<0||dx>1||dy<0||dy>1)rg.push([f.x+dx,f.y+dy]);shuffle(rg);const q=rg.find(z=>!bad(z[0],z[1]));if(q){const m=RHP[f.lv-1];S.rob.push({id:S.rid++,fid:f.id,x:q[0],y:q[1],hp:m,mx:m,lv:f.lv});o.push("🏭 Lv"+f.lv+" 로봇 생산!")}}}f.hp-=FAC.decay});S.sink=(S.sink||[]).filter(k=>NOW()-k.t<2000);S.fac.filter(f=>f.hp<=0).forEach(f=>{S.sink.push({x:f.x,y:f.y,lv:f.lv,en:f.en,t:NOW()});o.push("🏭 Lv"+f.lv+" 공장이 가라앉았다…")});S.fac=S.fac.filter(f=>f.hp>0);
-S.rob.forEach(r=>{if(r.bind>0)r.bind--});if(S.boss.bind>0)S.boss.bind--;if(S.gen&&S.gen.bind>0)S.gen.bind--;S.walls=S.walls.filter(w=>--w.t>0);S.rob.forEach(r=>{if(r.en&&--r.en==0){r.mx/=ROB.enhanceMult;r.hp=Math.min(r.hp,r.mx)}});S.fac.forEach(f=>{if(f.en)f.en--});if(S.boss.en)S.boss.en--;S.sec.bombs.forEach(b=>{if(b.en)b.en--});S.belts.forEach(b=>{if(b.en)b.en--});S.heroes.forEach(h=>{h.ap=h.k=="cleric"?cl((h.ap||0)+hAP(h),hAP(h),RULE.hero.clericApMax):hAP(h);if(h.cd)for(const q in h.cd)if(h.cd[q]>0)h.cd[q]--;if(h.lu)h.lu={};h.guard=0;h.nt=null;h.mc=0;h.mvb=0;if(h.stun>0){h.stun--;h.ap=0;h.mc=9;h.st2=1}else h.st2=0;if(h.sup>0){h.ap=0;h.mc=9}});if(S.cd)for(const q in S.cd)if(S.cd[q]>0)S.cd[q]--;if(S.gen){S.gen.ap=GAP()+(S.gen.bonus||0);S.gen.bonus=0;S.gen.ch=0;S.gen.mvb=0}S.boss.mvb=0;if(S.champ=="vince"){S.cry=(S.cry||[]).filter(c=>--c.t>0);crSpawn(CRY.perTurnMin+rn(CRY.perTurnMax-CRY.perTurnMin+1))}
+S.rob.forEach(r=>{if(r.bind>0)r.bind--});if(S.boss.bind>0)S.boss.bind--;if(S.gen&&S.gen.bind>0)S.gen.bind--;S.walls=S.walls.filter(w=>--w.t>0);S.rob.forEach(r=>{if(r.en&&--r.en==0){r.mx/=ROB.enhanceMult;r.hp=Math.min(r.hp,r.mx)}});S.fac.forEach(f=>{if(f.en)f.en--});if(S.boss.en)S.boss.en--;S.sec.bombs.forEach(b=>{if(b.en)b.en--});S.belts.forEach(b=>{if(b.en)b.en--});S.heroes.forEach(h=>{h.ap=h.k=="cleric"?cl((h.ap||0)+hAP(h),hAP(h),RULE.hero.clericApMax):hAP(h);if(h.cd)for(const q in h.cd)if(h.cd[q]>0)h.cd[q]--;if(h.lu)h.lu={};h.guard=0;h.nt=null;h.mc=0;if(h.wch)h.wch=0;h.mvb=0;if(h.stun>0){h.stun--;h.ap=0;h.mc=9;h.st2=1}else h.st2=0;if(h.sup>0){h.ap=0;h.mc=9}});if(S.cd)for(const q in S.cd)if(S.cd[q]>0)S.cd[q]--;if(S.gen){S.gen.ap=GAP()+(S.gen.bonus||0);S.gen.bonus=0;S.gen.ch=0;S.gen.mvb=0}S.boss.mvb=0;if(S.champ=="vince"){S.cry=(S.cry||[]).filter(c=>--c.t>0);crSpawn(CRY.perTurnMin+rn(CRY.perTurnMax-CRY.perTurnMin+1))}
 if(S.champ=="vince"&&S.rev.length)S.revT=NOW();
 S.log="공격 "+S.atks.length+"발 발동! "+(S.rev.length?"🗡️가시 함정 공개"+(S.rev.some(t=>t[2])?"(명중!) ":" "):"")+(o.length?o.join(", "):"피해 없음!");
 S.atks=[];S.mv=[];try{if(RAND()<CHR.spawnChance&&chSpawn(1))S.log+=" 📦 던전 어딘가에 상자가 나타났다…"}catch(e){}S.round++;S.boss.moved=0;S.boss.ap=bMax();if(S.facRef){S.facRef=0;S.boss.ap+=CST().factoryKillAp;if(S.gen&&S.gen.hp>0)S.gen.ap+=CST().factoryKillAp;S.log+=" 🏭공장 파괴 보상: 빈센토"+(S.gen&&S.gen.hp>0?"·발전기":"")+" AP +"+CST().factoryKillAp+"!"}if(frozen(S.boss))S.boss.ap=0;if(S.gen&&frozen(S.gen))S.gen.ap=0;S.ph="boss";
