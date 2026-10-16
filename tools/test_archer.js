@@ -19,26 +19,33 @@ const rhp = () => R("S.rob[0]?S.rob[0].hp:-1");
 
 ok(SN === 0 && HK > 0 && GR > 0 && PR > 0 && !R(`CLS.archer.sk.some(q=>q.n=="속사")`), `궁수 스킬 4개: 저격 ${SN} · 갈고리 ${HK} · 그랩 ${GR} · 관통 ${PR} (속사 삭제)`);
 
-// 저격: 8방향 · 사거리 7 · 처음 닿는 적 20 · 막힘 · 이동 안 했으면 2배
+// 저격(v80): 방향을 조준 → 용사 턴이 끝날 때(정산 시작) 발사 · 처음 닿는 적 SD · 막힘 · 그 턴에 끝까지 이동 안 했으면 2배
+const SD = R("CLS.archer.sk[0].fx.dmg"), SM = R("CLS.archer.sk[0].fx.stillMult");
+const fire = () => R(`apply({type:"endHero"});S.ph="resolve";resolve();1`);
 setup(); rob(15, 15);
-ok(act(SN, 11, 15) === 1 && rhp() === 99 - 40, `저격: 이동 안 한 턴 → 20×2 = 40 (${99 - rhp()})`);
-setup(); rob(15, 15); R("S.heroes[0].mc=1");
-ok(act(SN, 11, 15) === 1 && rhp() === 99 - 20, "저격: 이동한 턴 → 20");
-setup(); rob(15, 15); rob(17, 15); R("S.heroes[0].mc=1");
-ok(act(SN, 11, 15) === 1 && R("S.rob[0].hp") === 79 && R("S.rob[1].hp") === 99, "저격: 처음 닿는 적 하나만");
-setup(); wall(13, 15); rob(15, 15);
-ok(act(SN, 11, 15) === 1 && rhp() === 99, "저격: 벽에 막힘");
-setup(); rob(18, 15);
-ok(act(SN, 11, 15) === 1 && rhp() === 99, "저격: 사거리 7 밖은 안 닿음");
-setup(); rob(13, 18);
-ok(act(SN, 11, 16) === 1 && rhp() === 59, "저격: 대각선도 가능");
+ok(act(SN, 11, 15) === 1 && rhp() === 99 && R("!!S.heroes[0].aim"), "저격: 쏘면 바로 맞지 않고 조준만 (턴 끝에 발사)");
+fire(); ok(rhp() === 99 - SD * SM && !R("S.heroes[0].aim"), `저격: 턴 끝에 발사 · 이동 안 함 → ${SD}×${SM} (${99 - rhp()})`);
+setup(); rob(15, 15); act(SN, 11, 15); R(`apply({type:"heroAct",h:0,j:"m",x:10,y:14})`);
+fire(); ok(rhp() === 99, "저격: 조준한 뒤 걸으면 새 자리에서 같은 방향으로 발사 (그 줄엔 적 없음 → 빗나감)");
+setup(); rob(15, 15); act(SN, 11, 15); R(`apply({type:"heroAct",h:0,j:"m",x:9,y:15})`);
+fire(); ok(rhp() === 99 - SD, `저격: 조준 뒤 걸었으면 2배 아님 → ${SD} (발사 때 이동 여부 확인)`);
+setup(); rob(15, 15); R("S.heroes[0].mc=1"); act(SN, 11, 15);
+fire(); ok(rhp() === 99 - SD, `저격: 먼저 걷고 조준해도 → ${SD}`);
+setup(); rob(15, 15); rob(17, 15); R("S.heroes[0].mc=1"); act(SN, 11, 15); fire();
+ok(R("S.rob[0].hp") === 99 - SD && R("S.rob[1].hp") === 99, "저격: 처음 닿는 적 하나만");
+setup(); wall(13, 15); rob(15, 15); act(SN, 11, 15); fire();
+ok(rhp() === 99, "저격: 벽에 막힘");
+setup(); rob(18, 15); act(SN, 11, 15); fire();
+ok(rhp() === 99, "저격: 사거리 7 밖은 안 닿음");
+setup(); rob(13, 18); act(SN, 11, 16); fire();
+ok(rhp() === 99 - SD * SM, "저격: 대각선도 가능");
 setup(); ok(act(SN, 12, 16) === 0, "저격: 8방향이 아닌 칸은 못 고름");
 
 // 갈고리 화살: AP 2 · 쿨 2 · 4칸 이내 · 벽 너머 · 이동한 것으로 침
 setup(); for (let y = 10; y <= 20; y++) wall(12, y);
 ok(act(HK, 14, 15) === 1 && R("S.heroes[0].x") === 14 && R("S.heroes[0].ap") === 7, "갈고리: 벽 너머 4칸 이내 칸으로 이동 (AP 2)");
 ok(R(`S.heroes[0].cd[${HK}]`) === 3 && act(HK, 15, 15) === 0, "갈고리: 쿨타임 2턴");
-rob(16, 15); ok(act(SN, 15, 15) === 1 && rhp() === 79, "갈고리로 움직인 턴의 저격은 2배 아님");
+rob(16, 15); act(SN, 15, 15); fire(); ok(rhp() === 99 - SD, "갈고리로 움직인 턴의 저격은 2배 아님");
 setup(); ok(act(HK, 15, 15) === 0, "갈고리: 5칸은 불가");
 setup(); wall(13, 15); ok(act(HK, 13, 15) === 0, "갈고리: 벽 칸 위로는 착지 불가");
 
