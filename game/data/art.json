@@ -182,6 +182,12 @@
    "knight_cast": "art/t3a/knight_cast.png",
    "knight_hit": "art/t3a/knight_hit.png",
    "knight_dead": "art/t3a/knight_dead.png",
+   "archer_idle": "art/t3a/archer_idle.png",
+   "archer_move": "art/t3a/archer_move.png",
+   "archer_atk": "art/t3a/archer_atk.png",
+   "archer_cast": "art/t3a/archer_cast.png",
+   "archer_hit": "art/t3a/archer_hit.png",
+   "archer_dead": "art/t3a/archer_dead.png",
    "fx_heal": "art/t3a/fx_heal.png",
    "fx_burst": "art/t3a/fx_burst.png",
    "fx_shield": "art/t3a/fx_shield.png",
@@ -190,7 +196,11 @@
    "fx_judge": "art/t3a/fx_judge.png",
    "fx_fire": "art/t3a/fx_fire.png",
    "fx_tele": "art/t3a/fx_tele.png",
-   "fx_mana": "art/t3a/fx_mana.png"
+   "fx_mana": "art/t3a/fx_mana.png",
+   "fx_grab": "art/t3a/fx_grab.png",
+   "fx_hook": "art/t3a/fx_hook.png",
+   "fx_aim": "art/t3a/fx_aim.png",
+   "fx_pierce": "art/t3a/fx_pierce.png"
   },
   "ART": {
    "r1": "art/art1/r1.png",
