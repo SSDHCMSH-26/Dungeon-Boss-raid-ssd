@@ -1,7 +1,7 @@
 /* [규칙] 화면 없이 한 판 돌리기·상태 지문 — 서버 판정, 밸런스 시뮬레이션, 테스트(브라우저=Node 비교·리플레이)가 같이 씀 */
 
 // 연출 전용 칸(애니메이션 시각·이펙트 목록)과 AI 주사위(airng): 규칙 판단에 안 쓰이고 기기마다 시각이 달라서 "규칙 상태" 비교에서 뺌
-const PRES_KEYS = ["airng", "aT", "aK", "hurtT", "tpT", "enT", "fxT", "fxA", "revT", "rfxT", "rfx", "cfx", "fall", "pfx", "sink", "hop", "hfx"];
+const PRES_KEYS = ["airng", "aT", "aK", "hurtT", "tpT", "enT", "fxT", "fxA", "revT", "rfxT", "rfx", "cfx", "fall", "pfx", "sink", "hop", "hfx", "afx"];
 function ruleState(st) { return JSON.stringify(st, (k, v) => PRES_KEYS.indexOf(k) >= 0 ? undefined : v); }
 // 짧은 지문(FNV-1a 32bit) — 두 곳의 규칙 상태가 같은지 빠르게 비교
 function stateHash(st) {

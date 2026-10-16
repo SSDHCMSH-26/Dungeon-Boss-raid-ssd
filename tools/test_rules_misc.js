@@ -98,15 +98,19 @@ ok(R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`) === 0, "스태프 후리기: �
 { const seen = new Set(); for (let i = 0; i < 60; i++) { R(`S.rob[0].hp=99;S.heroes[2].lu={}`); R(`apply({type:"heroAct",h:2,j:0,x:11,y:10})`); seen.add(99 - R("S.rob[0].hp")); }
   ok([...seen].every(v => v >= 5 && v <= 10) && seen.size >= 4, `스태프 후리기: 피해가 무작위로 나옴 (${[...seen].sort((a, b) => a - b).join(",")})`); }
 
-// (v75) 영창한 턴엔 그 턴만 이동 -1 (걷기는 가능) · 먼저 걸으면 영창 잠김
+// (v77) 영창 유지 중 이동 -1: 영창한 그 턴은 그대로, 다음 턴부터(유지 중) -1, 마법진이 사라지면 복구 · 먼저 걸으면 영창 잠김
 setup("gron", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=10;S.heroes[2].ap=9`);
 { const MJ = R("CLS.mage.sk.findIndex(q=>q.t=='c')"), PJ = R("CLS.mage.sk.findIndex(q=>q.t=='w')");
+  const next = () => R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero";S.heroes[2].ap=9`);
   R(`apply({type:"heroAct",h:2,j:${MJ},x:10,y:14})`);
-  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:14})`) === 1 && R("mvOf(S.heroes[2])") === 2, "영창하면 그 턴 이동 3 → 2");
-  ok(R(`apply({type:"heroAct",h:2,j:"m",x:10,y:13})`) === 0 && R(`apply({type:"heroAct",h:2,j:"m",x:10,y:12})`) === 1, "영창한 뒤에도 걷기 가능 (2칸까지)");
-  R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero"`);
-  ok(R("mvOf(S.heroes[2])") === 3, "다음 턴엔 이동 거리 원래대로 3");
-  ok(R(`apply({type:"heroAct",h:2,j:"m",x:11,y:12})`) === 1 && R(`apply({type:"heroAct",h:2,j:${PJ},x:11,y:12})`) === 0, "먼저 걸으면 영창 잠김"); }
+  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:14})`) === 1 && R("mvOf(S.heroes[2])") === 3, "영창한 그 턴엔 이동 그대로 3");
+  ok(R(`apply({type:"heroAct",h:2,j:"m",x:10,y:13})`) === 1, "영창한 뒤에도 3칸 걷기 가능");
+  next();
+  ok(R("mvOf(S.heroes[2])") === 2, "다음 턴: 영창으로 유지 중인 마법진이 있으니 이동 3 → 2");
+  ok(R(`apply({type:"heroAct",h:2,j:"m",x:13,y:13})`) === 0 && R(`apply({type:"heroAct",h:2,j:"m",x:12,y:13})`) === 1, "유지 중엔 2칸까지만");
+  ok(R(`apply({type:"heroAct",h:2,j:${PJ},x:10,y:14})`) === 0, "먼저 걸으면 영창 잠김 (→ 이번 턴 끝에 발동)");
+  next();
+  ok(R("cirsOf(S.heroes[2]).length") === 0 && R("mvOf(S.heroes[2])") === 3, "마법진이 발동해 사라지면 이동 거리 복구 3"); }
 
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);

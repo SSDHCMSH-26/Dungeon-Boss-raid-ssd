@@ -80,7 +80,7 @@
         if (s.fx && (s.fx.dmgMin !== undefined || s.fx.dmgMax !== undefined)) { c.int(s.fx.dmgMin, p + ".fx.dmgMin", 0); c.int(s.fx.dmgMax, p + ".fx.dmgMax", 0); c.need(s.fx.dmgMin <= s.fx.dmgMax, p + ".fx", "dmgMin 이 dmgMax 보다 클 수 없어요"); }
       };
       // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
-      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"] };
+      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"], s: ["dmg", "stillMult"], p: ["dmg", "pull"], v: ["dmg", "shots"] };
       const FX_ID = { wall: ["hpPerLv", "turns", "turnsLater", "stackTurns", "maxLv"], trap: ["dmg", "max"], pit: ["fallDmg", "max"], belt: ["maxLen"], run: ["move", "enhancedMove"] };
       const fx = (s, keys, p) => {
         if (!keys || !c.obj(s.fx, p + ".fx")) return;
@@ -169,7 +169,7 @@
         c.int(b.hero.breakDmg, "hero.breakDmg", 0); c.int(b.hero.breakRange, "hero.breakRange", 1);
       }
       if (c.obj(b.status, "status")) c.int(b.status.paralyzeMove, "status.paralyzeMove", 0);
-      if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); c.int(b.circle.breakDmg, "circle.breakDmg", 1); if (b.circle.chantMove !== undefined) c.int(b.circle.chantMove, "circle.chantMove", 0); }
+      if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); if (b.circle.chantMove !== undefined) c.int(b.circle.chantMove, "circle.chantMove", 0); }
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

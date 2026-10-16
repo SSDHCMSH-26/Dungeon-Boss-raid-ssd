@@ -34,7 +34,7 @@ L = {
     "slow": ("레벨별 이동 감소", "Lv1, Lv2, Lv3"), "stunLv": ("행동불능 되는 레벨", ""), "add": ("영창 1번당 증가량", "위력: 수치 +, 확산: 반경 +"),
     "hpPerLv": ("레벨당 체력", ""), "turns": ("첫 벽 유지", "턴"), "turnsLater": ("같은 턴 두 번째부터 유지", "턴"),
     "stackTurns": ("겹쳐 쌓을 때 추가 유지", "턴"), "maxLv": ("최대 레벨", ""), "max": ("최대 개수", ""), "fallDmg": ("낙하 피해", ""),
-    "dmgMin": ("최소 피해", "무작위"), "dmgMax": ("최대 피해", "무작위"), "maxLen": ("한 줄 최대 길이", "칸"), "move": ("이동", "칸"), "enhancedMove": ("강화 시 이동", "칸"),
+    "stillMult": ("이동 안 한 턴 피해 배수", ""), "pull": ("끌어오는 칸 수", "칸"), "shots": ("발사 횟수", "번"), "dmgMin": ("최소 피해", "무작위"), "dmgMax": ("최대 피해", "무작위"), "maxLen": ("한 줄 최대 길이", "칸"), "move": ("이동", "칸"), "enhancedMove": ("강화 시 이동", "칸"),
     # 보스 능력치
     "apNoGen": ("발전기 파괴 후 AP", ""), "moveNoGen": ("발전기 파괴 후 추가 이동", "칸"),
     "damageTakenWithGen": ("발전기 가동 중 받는 피해 비율", "0.75 = 25% 줄임"), "factoryKillAp": ("공장 파괴 시 다음 턴 AP 회수", ""),
@@ -57,7 +57,7 @@ L = {
     "startChance": ("첫 턴 생성 확률", "0~1"), "startMin": ("첫 턴 생성 최소", ""), "startMax": ("첫 턴 생성 최대", ""),
     "spawnChance": ("매 턴 생성 확률", "0~1"), "heroOpenRange": ("용사가 여는 거리", "칸"), "bossOpenRange": ("보스가 여는 거리", "칸"),
     "spacing": ("상자끼리 최소 간격", "칸"), "heroClearance": ("용사와 떨어진 거리", "칸"), "bossClearance": ("보스와 떨어진 거리", "칸"),
-    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "chantMove": ("영창한 턴 이동 감소", "칸 (영창한 그 턴만)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
+    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "chantMove": ("영창 유지 중 이동 감소", "칸 (영창한 다음 턴부터, 마법진이 사라지면 복구)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
     # AI
     "delayMs": ("행동 전 기다림", "밀리초"), "approachDist": ("이보다 멀면 다가감", "칸"), "attackTries": ("턴마다 공격 시도", "번"),
     "chance": ("확률", "0~1"), "minAp": ("필요 AP", ""), "minPits": ("필요 구덩이 수", ""), "tries": ("시도 횟수", ""),
