@@ -5,7 +5,7 @@
      어디서 돌려도(브라우저·서버) 똑같은 판이 나옴 (리플레이·버그 재현·부정행위 검증)
    행동 목록:
      setPick{ids} pickHero{k} pickChamp{id} start
-     heroAct{h(용사 번호), j("m" 이동 / "x" 벽·벨트 부수기 / 스킬 번호), x, y}
+     heroAct{h(용사 번호), j("m" 이동 / "x" 벽·벨트 부수기 / 스킬 번호), x, y, p(여러 칸을 고르는 스킬: [[x,y],...])}
      heroItem{h, k} bossItem{gen, k} scrollHero{h, x, y} scrollBoss{gen, x, y}
      bossMove{x, y} bossAttack{i(공격 번호), p(칸 목록), fb} bossBuild{id(설치 스킬 id), p} genCharge
      endBoss endHero resolve settle(행동 뒤 정리: 상자 열기 판정 등) */
@@ -16,7 +16,7 @@ const ACTIONS = {
   pickHero: a => { const p = S.pick, i = p.indexOf(a.k); if (i >= 0) p.splice(i, 1); else if (p.length < 3) p.push(a.k); return 1; },
   pickChamp: a => chooseChamp(a.id),
   start: () => startGame(),
-  heroAct: a => act(S.heroes[a.h], a.j, a.x, a.y),
+  heroAct: a => act(S.heroes[a.h], a.j, a.x, a.y, a.p),
   heroItem: a => itemUse("h", S.heroes[a.h], a.k, CLS[S.heroes[a.h].k].n),
   bossItem: a => itemUse("b", a.gen ? S.gen : S.boss, a.k, bossName(a.gen)),
   scrollHero: a => scrollHero(S.heroes[a.h], a.x, a.y),
