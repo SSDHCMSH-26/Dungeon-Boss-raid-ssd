@@ -1,4 +1,4 @@
-/* 궁수 스킬 테스트 (v78) — 저격·갈고리 화살·그랩 화살·관통 화살(궁극기)
+/* 궁수 스킬 테스트 (v78~) — 저격·갈고리 화살·그랩 화살·관통 화살(궁극기)
    사용법: node tools/test_archer.js */
 const { createEngine } = require("./headless.js");
 let fail = 0;
@@ -63,6 +63,13 @@ ok(R("sw(N-1,15)") && R("sw(10,0)"), "관통: 맵 가장자리 벽은 남음");
 ok(R("(S.afx||[]).filter(f=>f.k=='del').length") >= 8 && R("(S.afx||[]).filter(f=>f.k=='line').length") === 2, "관통: 삭제된 칸마다 화면 표시(afx) · 화살 선 2개");
 ok(R(`S.heroes[0].cd[${PR}]`) === 9 && act(PR, 11, 15, [[11, 15], [12, 15]]) === 0, "관통: 쿨타임 8턴");
 setup(); R("S.heroes[0].ap=2"); ok(act(PR, 11, 15, [[11, 15], [12, 15]]) === 0, "관통: AP 3 필요");
+
+// (v79) 저격: AP 1 · 턴당 1번 (연달아 못 씀) · 다음 턴엔 다시
+setup(); rob(15, 15);
+ok(act(SN, 11, 15) === 1 && R("S.heroes[0].ap") === 8, "저격: AP 1");
+ok(act(SN, 11, 15) === 0, "저격: 같은 턴에 연달아 못 씀 (턴당 1번)");
+R(`apply({type:"endHero"});S.ph="resolve";resolve();S.ph="hero";S.heroes[0].ap=9`);
+ok(act(SN, 11, 15) === 1, "저격: 다음 턴엔 다시 사용");
 
 // 컴퓨터 궁수: 오류 없이 판 진행 + 저격 사용
 { const E2 = createEngine({ clock: "()=>0" }); let sn = 0;
