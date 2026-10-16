@@ -57,7 +57,7 @@ L = {
     "startChance": ("첫 턴 생성 확률", "0~1"), "startMin": ("첫 턴 생성 최소", ""), "startMax": ("첫 턴 생성 최대", ""),
     "spawnChance": ("매 턴 생성 확률", "0~1"), "heroOpenRange": ("용사가 여는 거리", "칸"), "bossOpenRange": ("보스가 여는 거리", "칸"),
     "spacing": ("상자끼리 최소 간격", "칸"), "heroClearance": ("용사와 떨어진 거리", "칸"), "bossClearance": ("보스와 떨어진 거리", "칸"),
-    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "chantMove": ("영창한 턴 이동 감소", "칸 (영창한 그 턴만)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
+    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "chantMove": ("영창 유지 중 이동 감소", "칸 (영창한 다음 턴부터, 마법진이 사라지면 복구)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
     # AI
     "delayMs": ("행동 전 기다림", "밀리초"), "approachDist": ("이보다 멀면 다가감", "칸"), "attackTries": ("턴마다 공격 시도", "번"),
     "chance": ("확률", "0~1"), "minAp": ("필요 AP", ""), "minPits": ("필요 구덩이 수", ""), "tries": ("시도 횟수", ""),

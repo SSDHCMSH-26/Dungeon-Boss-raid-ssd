@@ -1,8 +1,8 @@
 /* 마법진(마법사) 규칙 테스트 — 화면 없이 규칙 엔진(core)만으로
    사용법: node tools/test_circle.js
-   그리기·영창(그린 턴 포함)·이월·발동(영창 안 한 턴 끝), 위력/확산 영창, 끊김(한 번에 체력 피해 20 이상, 보호막 별개), 보호막,
+   그리기·영창(그린 턴 포함)·이월·발동(영창 안 한 턴 끝), 위력/확산 영창, 피해로 끊기지 않음(v77), 보호막,
    빙결(이동 감소·행동불능), 불바닥, 구덩이 발각, 놓는 곳(벽 칸 중심 불가, 건물 위 가능), 그론 벽 금지,
-   걸은 턴은 영창 잠김·영창한 턴은 그 턴만 이동 -1(v75), 여러 마법진·영창할 마법진 고르기·쿨타임(v76), 순간이동은 마법진 안으로만, AI, 리플레이 */
+   걸은 턴은 영창 잠김·영창으로 유지 중엔 다음 턴부터 이동 -1(v77), 여러 마법진·영창할 마법진 고르기·쿨타임(v76), 순간이동은 마법진 안으로만, AI, 리플레이 */
 const { createEngine } = require("./headless.js");
 let fail = 0;
 const ok = (c, m) => { console.log((c ? "OK   " : "FAIL ") + m); if (!c) fail++; };
@@ -33,17 +33,18 @@ ok(act(MJ, 15, 7) === 1 && R("S.heroes[2].ap") === 2, "화염 마법진 그리�
 ok(act(MJ, 15, 8) === 0 && R(`S.heroes[2].cd[${MJ}]`) === R(`CLS.mage.sk[${MJ}].cd`) + 1, `같은 마법진은 쿨타임(${R(`CLS.mage.sk[${MJ}].cd`)}턴) 동안 다시 못 그림`);
 ok(chant(PJ) === 1 && R("S.heroes[2].cirs[0].lv") === 2, "그린 턴에도 영창 가능 → Lv2");
 ok(chant(WJ) === 0, "영창은 턴당 1번");
-ok(R("mvOf(S.heroes[2])") === R("CLS.mage.mv") - R("CIRC.chantMove") && act("m", R("S.heroes[2].x"), R("S.heroes[2].y") + 3) === 0, `영창한 턴엔 이동 거리 -${R("CIRC.chantMove")} (3칸 걷기 불가)`);
+ok(R("mvOf(S.heroes[2])") === R("CLS.mage.mv"), "영창한 그 턴엔 이동 거리 그대로");
 ok(act(TJ, 18, 12) === 0, "순간이동: 마법진 밖으로는 불가");
 ok(act(TJ, 15, 8) === 1 && R("S.heroes[2].x") === 15 && R("S.heroes[2].y") === 8, "순간이동: 마법진 안으로는 가능 (영창한 턴에도)");
 ok(R(`S.heroes[2].cd[${TJ}]`) === 3, "순간이동 쿨타임 2턴 (정산 때마다 -1 → 2턴 기다림)");
 let h0 = bhp(); round();
 ok(bhp() === h0 && R("S.heroes[2].cirs[0].lv") === 2, "영창한 턴 끝: 발동 안 하고 이월");
 ok(act("m", 15, 10) === 1, "다음 턴: 걷기 가능 (영창 안 함)");
-ok(R("mvOf(S.heroes[2])") === R("CLS.mage.mv"), "영창 안 한 턴은 이동 거리 그대로 (영창한 그 턴만 감소)");
+ok(R("mvOf(S.heroes[2])") === R("CLS.mage.mv") - R("CIRC.chantMove"), `영창으로 유지 중인 다음 턴엔 이동 -${R("CIRC.chantMove")}`);
 ok(chant(WJ) === 0, "걸은 턴에는 영창 불가 (영창 탭 잠김)");
 h0 = bhp(); round();
 ok(h0 - bhp() === 35 + 5 && !R("cirsOf(S.heroes[2]).length"), `걸은 턴 끝에 이월 없이 발동: Lv2 35 + 위력 5 = 40 (보스 ${h0}→${bhp()})`);
+ok(R("mvOf(S.heroes[2])") === R("CLS.mage.mv"), "마법진이 발동해 사라지면 이동 거리 복구");
 setup("gron"); act(MJ, 15, 7); h0 = bhp(); round();
 ok(h0 - bhp() === 10 && !R("cirsOf(S.heroes[2]).length"), `그리고 영창 안 하면 그 턴 끝(보스 턴 전)에 바로 발동: Lv1 10 (${h0 - bhp()})`);
 setup("gron"); ok(act("m", 15, 10) === 1 && act(MJ, 15, 7) === 1 && chant(PJ) === 0, "걸은 뒤 그린 턴에도 영창 불가");
@@ -58,17 +59,12 @@ ok(R("(S.burn||[]).length") === 1, "Lv3 화염: 불바닥 생김");
 h0 = bhp(); round();
 ok(h0 - bhp() === 10 && R("(S.burn||[]).length") === 0, `다음 정산 때 불바닥 피해 10 후 사라짐 (${h0 - bhp()})`);
 
-// 3) 끊김: 한 번에 체력 피해 20 이상 (보호막으로 막힌 양은 빼고)
+// 3) (v77) 피해를 받아도 마법진은 끊기지 않음
 setup("gron"); act(MJ, 15, 7); chant(PJ); R(`S.heroes[2].x=20;S.heroes[2].y=20;S.atks=[{i:0,p:[[20,20]]}]`);
 let v0 = R("CH.gron.at[0].v");
 R(`apply({type:"endHero"});apply({type:"resolve"})`);
-ok(!R("cirsOf(S.heroes[2]).length") && /영창 끊김/.test(R("S.log")), `보스 공격 ${v0} 한 방 → 영창 끊김 (마법진 사라짐)`);
-setup("gron"); act(MJ, 15, 7); chant(PJ); R(`S.heroes[2].x=20;S.heroes[2].y=20;S.heroes[2].sh=${v0 - 19};S.atks=[{i:0,p:[[20,20]]}]`);
-R(`apply({type:"endHero"});apply({type:"resolve"})`);
-ok(R("cirsOf(S.heroes[2]).length>0") && R("S.heroes[2].sh") === 0, `보호막 ${v0 - 19} 이 막아 체력 피해 19 → 안 끊김`);
-setup("gron"); act(MJ, 15, 7); R(`S.heroes[2].x=20;S.heroes[2].y=20`);
-ok(/영창 끊김/.test(R(`hurt(S.heroes[2],12)+" "+hurt(S.heroes[2],12)`)) === false && R("cirsOf(S.heroes[2]).length>0"), "12 + 12 따로 두 번 → 안 끊김 (한 번에 20 이상만)");
-ok(/영창 끊김/.test(R(`""+hurt(S.heroes[2],20)`)) && !R("cirsOf(S.heroes[2]).length"), "한 번에 20 → 끊김");
+ok(R("cirsOf(S.heroes[2]).length") === 1 && !/끊김/.test(R("S.log")), `보스 공격 ${v0} 한 방을 맞아도 마법진 유지`);
+ok(R(`""+hurt(S.heroes[2],25)`) === "25" && R("cirsOf(S.heroes[2]).length") === 1, "큰 피해(25)도 마법진 유지");
 
 // 4) 수호 마법진: 범위 안 아군 보호막 5, 피해를 먼저 막음
 setup("gron"); R(`S.heroes[0].x=14;S.heroes[0].y=14;S.heroes[1].x=16;S.heroes[1].y=15`);

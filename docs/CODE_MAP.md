@@ -29,7 +29,7 @@
 
 ## 주요 함수 (검색 키워드)
 - **용사 행동**: `act` → `act0`(스킬별 분기; j=="x" 벽 부수기, "m" 이동, t==…) · `dealHits`(피해 적용·몬스터/벽 정리) · `hits`(지정 칸의 피격 대상: 보스·발전기·공장·로봇·몬스터·벽) · `hurt`(용사 피해, 방패막기 경감) · `qp`(퀸 이동 경로) · `pitCheck`/`chestPath`/`ride`(이동 중 효과)
-- **마법진(마법사)**: `h.cirs`(그린 마법진 목록, `cirsOf(h)`) · `h.wch`(이번 턴 영창함) · `cirPick`(영창할 마법진 고르기) · `inMyCir` · `cirR(h,c)`/`cirV(h,c)`(지금 반지름·수치) · `cirAt`(칸이 마법진 안인지) · `cirBad`(공장·발전기 겹침) · `cirFire`(정산 시작: 발동·이월) · `cirChk`(정산 피해 한 방씩 끊김 판정) · `burnTick`(불바닥) · `hurt`(보호막 `h.sh`·끊김) · 빙결 `o.sl`/`o.fz` → `slowOf`/`frozen` · 그리기 `drawCircles` · 탭 `L.mtab`
+- **마법진(마법사)**: `h.cirs`(그린 마법진 목록, `cirsOf(h)`) · `h.wch`(이번 턴 영창함) · `cirPick`(영창할 마법진 고르기) · `inMyCir` · `cirR(h,c)`/`cirV(h,c)`(지금 반지름·수치) · `cirAt`(칸이 마법진 안인지) · `cirBad`(공장·발전기 겹침) · `cirFire`(정산 시작: 발동·이월) · `burnTick`(불바닥) · `hurt`(보호막 `h.sh`) · `chantHold(h)`(영창 유지 중 → 이동 감소, 마법진 `c.hold`) · 빙결 `o.sl`/`o.fz` → `slowOf`/`frozen` · 그리기 `drawCircles` · 탭 `L.mtab`
 - **보스 행동**: `bAtk`(공격 예고) · `bEx`(설치/특수: wall, trap, dig, pit, hop, tchest, fac, bomb, belt, run) · `bMove`/`bMove0`/`bOk` · `bExtra` · `genCharge` · `endBoss`/`endHero`
 - **정산**: `resolve`(순서: 제압 틱 → 공격/함정/폭탄 → 로봇 → 몬스터 `mobsAct` → 상자 방치 `chAge` → 공장·쿨타임 → 새 상자 `chSpawn` → 라운드+1) · `robAct` · `runBelts`
 - **상자·몬스터**: `chSpawn`, `chOpen`, `chestScanAll`, `supTick`(제압 7피해), `mobSpawn`, `mobAct`, `mobStep`(BFS), `mobClean`, `chAge`

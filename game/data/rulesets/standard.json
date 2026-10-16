@@ -40,7 +40,6 @@
   },
   "circle": {
     "maxLv": 3,
-    "breakDmg": 20,
     "chantMove": 1
   }
 }
