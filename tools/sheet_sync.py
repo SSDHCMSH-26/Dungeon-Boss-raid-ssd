@@ -57,7 +57,7 @@ L = {
     "startChance": ("첫 턴 생성 확률", "0~1"), "startMin": ("첫 턴 생성 최소", ""), "startMax": ("첫 턴 생성 최대", ""),
     "spawnChance": ("매 턴 생성 확률", "0~1"), "heroOpenRange": ("용사가 여는 거리", "칸"), "bossOpenRange": ("보스가 여는 거리", "칸"),
     "spacing": ("상자끼리 최소 간격", "칸"), "heroClearance": ("용사와 떨어진 거리", "칸"), "bossClearance": ("보스와 떨어진 거리", "칸"),
-    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "chantMove": ("영창 유지 중 이동 감소", "칸 (영창한 다음 턴부터, 마법진이 사라지면 복구)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
+    "trapChestSpacing": ("함정 상자와 다른 상자 간격", "칸"), "idleSec": ("무응답 승리 처리 시간", "초 (둘이서 하기: 상대 차례에 이만큼 아무 행동이 없으면 승리 처리 버튼)"), "chantMove": ("영창 유지 중 이동 감소", "칸 (영창한 다음 턴부터, 마법진이 사라지면 복구)"), "paralyzeMove": ("마비 시 이동 감소", "칸"),
     # AI
     "delayMs": ("행동 전 기다림", "밀리초"), "approachDist": ("이보다 멀면 다가감", "칸"), "attackTries": ("턴마다 공격 시도", "번"),
     "chance": ("확률", "0~1"), "minAp": ("필요 AP", ""), "minPits": ("필요 구덩이 수", ""), "tries": ("시도 횟수", ""),
@@ -71,7 +71,7 @@ L = {
 }
 SEC = {  # 대상 이름에 쓰는 묶음 이름
     "mimic": "미믹", "gob": "보물 고블린", "trapChest": "함정 상자", "robot": "로봇", "factory": "공장", "bomb": "폭탄로봇",
-    "crystal": "번개 크리스탈", "chest": "보물상자", "status": "상태이상", "circle": "마법진", "hero": "용사",
+    "crystal": "번개 크리스탈", "chest": "보물상자", "status": "상태이상", "circle": "마법진", "online": "둘이서 하기", "hero": "용사",
     "boss": "컴퓨터 보스", "trapChest_ai": "함정 상자", "digPit": "구덩이 파기", "hopPit": "구덩이 이동", "wall": "벽 쌓기",
     "spikeTrap": "가시 함정", "bomb_ai": "폭탄로봇", "belt": "컨베이어", "selfCharge": "자기 강화", "generatorCharge": "발전",
     "dodgeCircle": "마법진 피하기", "generator": "발전기", "gron": "그론", "vince": "빈센토",
