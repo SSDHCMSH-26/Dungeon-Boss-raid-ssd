@@ -47,7 +47,7 @@ setInterval(()=>{if(fbm&&L.mode=="multi"&&L.scr=="game"&&S&&!S.end){const t=idle
 function onPh(){if(S&&S.ph!==turnPh){turnPh=S.ph;turnT=Date.now()}}
 function listen(){if(fbm)return listenFb();ref().onSnapshot(s=>{if(!s.exists)return;const v=s.data(),pp=S&&S.ph,nv=fixState(JSON.parse(v.s));L.bu=v.b;L.hu=v.h;if(S&&S.v&&nv.v&&nv.v<S.v)return;S=nv;L.wait=!(L.bu&&L.hu);if(S.ph!=pp){L.menu=1;L.act=null;L.picks=[];if(S.ph=="hero")L.si=Math.max(0,S.heroes.findIndex(h=>!h.dead))}pushPh=S.ph;netWarned=0;ui();tick()},netErr)}
 function listenFb(){ref().onSnapshot(s=>{if(!s.exists)return;const v=s.data(),pp=S&&S.ph;L.bu=v.b;L.hu=v.h;L.tb=ms(v.tb)||L.tb;L.th=ms(v.th)||L.th;L.wait=!(L.bu&&L.hu);
-if(host()){if(!S.end)hostQ(v.q||[])}else{const nv=fixState(JSON.parse(v.s));S=nv;pend=pend.filter(c=>c.n>(S.qa||0));replaying=1;try{pend.forEach(c=>{try{apply0(c.a)}catch(e){}})}finally{replaying=0}}
+if(host()){if(!S.end)hostQ(v.q||[])}else{let nv=null;try{nv=fixState(JSON.parse(v.s))}catch(e){}if(!nv||!Array.isArray(nv.heroes))return;S=nv;pend=pend.filter(c=>c.n>(S.qa||0));replaying=1;try{pend.forEach(c=>{try{apply0(c.a)}catch(e){}})}finally{replaying=0}}
 if(v.w)S.end=endMsg(v.w);if(S.ph!=pp){L.menu=1;L.act=null;L.picks=[];if(S.ph=="hero")L.si=Math.max(0,S.heroes.findIndex(h=>!h.dead))}onPh();pushPh=S.ph;netWarned=0;ui();tick()},netErr)}
 const reset=()=>{L.bag=0;L.insp=null;for(const k in VP)delete VP[k];L.act=null;L.picks=[];L.si=0;L.menu=1};
 async function create(){if(!await net())return;L.code=Math.random().toString(36).slice(2,6).toUpperCase();L.bu=L.role=="boss"?uid:"";L.hu=L.role=="hero"?uid:"";S=newS();L.wait=1;L.scr="game";reset();pend=[];doneQ=[];
