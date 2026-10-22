@@ -112,5 +112,17 @@ setup("gron", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=1
   next();
   ok(R("cirsOf(S.heroes[2]).length") === 0 && R("mvOf(S.heroes[2])") === 3, "마법진이 발동해 사라지면 이동 거리 복구 3"); }
 
+// (v83) 새 상자는 용사 턴이 시작될 때 용사에게 보임 — 보스 턴에 둔 함정 상자가 들통나지 않게
+setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.cd={};S.chests=[]`);
+ok(R(`apply({type:"bossBuild",id:"tchest",p:[[20,15]]})`) === 1, "함정 상자 설치");
+ok(R("view(S,'hero').chests.length") === 0 && !/함정 상자/.test(R("view(S,'hero').log")), "보스 턴 도중: 용사 화면엔 상자도, 함정 상자 글도 안 보임");
+ok(R("view(S,'boss').chests.length") === 1, "보스 화면엔 바로 보임");
+R(`apply({type:"endBoss"})`);
+ok(R("view(S,'hero').chests.length") === 1 && R("view(S,'hero').chests[0].k") === "t" && /상자가 나타났다/.test(R("S.log")), "용사 턴 시작: 보통 상자처럼 나타나고 '상자가 나타났다' 안내");
+R(`S.chests=[];S.heroes.forEach(h=>{h.x=2;h.y=27});S.boss.x=27;S.boss.y=2;apply({type:"endHero"});S.rng=1`);
+{ let made = 0; for (let i = 0; i < 40 && !made; i++) { R(`S.ph="resolve";S.chests=[];chSpawn(1)`); made = R("S.chests.length"); }
+  ok(made === 1 && R("view(S,'hero').chests.length") === 0, "정산 때 저절로 생긴 상자도 보스 턴 동안은 용사에게 안 보임");
+  R(`S.ph="boss";apply({type:"endBoss"})`); ok(R("view(S,'hero').chests.length") === 1, "→ 용사 턴 시작에 나타남 (보통 상자·함정 상자가 똑같이)"); }
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);
