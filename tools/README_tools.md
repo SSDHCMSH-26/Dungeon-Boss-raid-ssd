@@ -3,6 +3,7 @@
 - `sim.py` — 컴퓨터 보스 vs 컴퓨터 용사를 N판 돌려 승률/평균 라운드를 출력 (밸런스 확인용). 파일 경로는 상단의 `goto(...)` 수정.
 - `test_mobs_example.py`, `test_walls_example.py` — 규칙 테스트 작성 예시 (상태를 직접 세팅하고 함수 호출 → 결과 출력).
 - `extract_sprites_example.py` — 이미지 시트에서 스프라이트를 잘라 base64 로 변환하는 예시 (원본 이미지 경로는 본인 환경에 맞게 수정).
+- `test_online.py` — 둘이서 하기(Firebase 모드) 두 탭 대전 테스트(가짜 서버 `fake_firestore.js`). 통신 코드(`game/src/net/net.js`)를 바꾸면 돌림.
 - `cut_sprites.py` — 한 장짜리 캐릭터 설정 시트에서 스프라이트·효과를 잘라 투명 PNG 로 저장 (`python3 tools/cut_sprites.py 원본.png 설정.json`, 설정 예는 파일 맨 위 설명). 궁수 그림(v80)에 사용.
 - `extract_art.py` — `game/index.html` 의 base64 그림을 `game/art/` 파일로 분리 (v59에서 1회 실행 완료. 다시 돌려도 바뀌는 것 없음).
 - **코드 분리 검사 (v67~)**

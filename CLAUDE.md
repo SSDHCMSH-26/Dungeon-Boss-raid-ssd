@@ -3,7 +3,7 @@
 - 먼저 docs/README_HANDOFF.md, docs/CODE_MAP.md, docs/GAME_SPEC.md, docs/ARCHITECTURE.md 를 읽는다.
 - 게임 코드는 game/src/ 역할별 파일(규칙 계산은 src/core/), 수치·맵·글자는 game/data/*.json. 필요한 부분만 부분 수정(패치)한다.
 - src/core/ 는 화면·기기 상태(L)·Date.now·Math.random 을 직접 쓰지 않는다(PRES/NOW/RAND 사용). 게임 변경은 apply({type:...}) 로.
-- 수정 후 테스트: node tools/check_core.js · node tools/validate_data.js · node tools/headless.js selftest · python3 tools/test_engine_parity.py · node tools/test_circle.js · node tools/test_archer.js · node tools/test_rules_misc.js · python3 tools/compare_versions.py <이전 game 폴더>
+- 수정 후 테스트: node tools/check_core.js · node tools/validate_data.js · node tools/headless.js selftest · python3 tools/test_engine_parity.py · node tools/test_circle.js · node tools/test_archer.js · node tools/test_rules_misc.js · (통신 코드를 바꿨으면) python3 tools/test_online.py · python3 tools/compare_versions.py <이전 game 폴더>
 - 밸런스(승률) 비교용 AI 대전은 사용자가 요청할 때만 한다. 작동 확인용 테스트는 평소대로 한다.
 - 사용자는 모바일. 머지를 부탁할 때는 항상 PR 링크(https://github.com/SSDHCMSH-26/Dungeon-Boss-raid-ssd/pull/번호)를 함께 준다.
 - 수치 원본은 구글 시트 "던전 보스 레이드 수치표"(ID 1nfH8sz39G5GcpEO8hVVvkcqCZP32NOfWP_cPiZuz5gc, 탭: 용사·용사 스킬·보스·몬스터·아이템·상자·규칙·컴퓨터 AI). 사용자가 "시트 반영해줘" 하면: 탭마다 get_values('탭'!A:E) → {탭: 행들} JSON 으로 저장 → python3 tools/sheet_sync.py apply 파일 (먼저 --dry 로 바뀐 목록 확인) → 바뀐 스킬의 설명(sm·d) 속 숫자도 고침 → 테스트 → PR. 반대로 JSON 수치를 코드 작업으로 바꿨으면 sheet_sync.py export 로 시트도 갱신해 둘 것. **새 수치(새 스킬·새 효과·새 규칙 값)를 data 에 추가하면 반드시 시트에도 추가**: tools/sheet_sync.py 의 L(항목 한국어 이름·설명)에 새 키를 넣고 export → 해당 탭에 update_values 로 다시 쓰고(값은 문자열로) 서식(값 칸 노란색 + 숫자 서식 **텍스트**: "1, 2, 0" 이 날짜로 바뀌는 것 방지) 범위도 맞춤, 사용자에게 시트에 추가된 항목을 알려 줄 것.

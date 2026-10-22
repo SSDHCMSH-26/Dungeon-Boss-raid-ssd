@@ -41,5 +41,8 @@
   "circle": {
     "maxLv": 3,
     "chantMove": 1
+  },
+  "online": {
+    "idleSec": 180
   }
 }

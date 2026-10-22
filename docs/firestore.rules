@@ -1,26 +1,45 @@
 rules_version = '2';
 // 던전 보스 레이드 — 둘이서 하기(Firestore) 보안 규칙
 // 붙여넣는 곳: Firebase 콘솔 → Firestore Database → "규칙" 탭 → 전부 지우고 이 내용 붙여넣기 → "게시"
-// 뜻: 로그인(익명)한 사람만 방을 읽고, 방에 들어온 두 사람(b 보스, h 용사)만 그 방을 고칠 수 있음.
-//     빈자리에는 자기 자신만 앉을 수 있고, 남의 자리는 못 바꿈. 방 삭제는 불가. 상태 글자는 최대 약 900KB.
+//
+// 구조: games/{방코드}            = 공개 기록 (b 보스 uid, h 용사 uid, s 용사에게 보여 줄 상태(숨긴 정보 없음), q 용사 명령 목록,
+//                                    tb/th 보스·용사 마지막 저장 시각, w 기권·무응답 승리)
+//       games/{방코드}/priv/s     = 보스만 읽고 쓰는 전체 상태(숨긴 함정·폭탄 포함)
+// 보스 기기가 심판: 공개 기록의 상태(s)는 보스만 바꿈. 용사는 명령(q)·자기 시각(th)·기권/무응답 승리(w)만 씀.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /games/{code} {
+      function me() { return request.auth.uid; }
+      function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+      function okKeys() { return request.resource.data.keys().hasOnly(['b', 'h', 's', 'q', 'tb', 'th', 'w']); }
+      function okSize() { return request.resource.data.s is string && request.resource.data.s.size() < 900000; }
+      // 용사가 쓰는 w: 아직 결과가 없고, 자기 이름으로, 기권(ff)이거나 보스가 60초 넘게 아무것도 안 했을 때의 무응답 승리(to)
+      function okHeroW() {
+        return !('w' in changed()) || (
+          !('w' in resource.data) && request.resource.data.w.by == me() && (
+            request.resource.data.w.k == 'ff' ||
+            (request.resource.data.w.k == 'to' && 'tb' in resource.data && request.time > resource.data.tb + duration.value(60, 's'))));
+      }
+
       allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.keys().hasOnly(['b', 'h', 's'])
-        && request.resource.data.s is string && request.resource.data.s.size() < 900000
-        && (request.resource.data.b == request.auth.uid || request.resource.data.h == request.auth.uid);
-      allow update: if request.auth != null
-        && request.resource.data.keys().hasOnly(['b', 'h', 's'])
-        && request.resource.data.s is string && request.resource.data.s.size() < 900000
-        && (
-          ((resource.data.b == request.auth.uid || resource.data.h == request.auth.uid)
-            && request.resource.data.b == resource.data.b && request.resource.data.h == resource.data.h)
-          || (resource.data.b == "" && request.resource.data.b == request.auth.uid && request.resource.data.h == resource.data.h)
-          || (resource.data.h == "" && request.resource.data.h == request.auth.uid && request.resource.data.b == resource.data.b)
+      allow create: if request.auth != null && okKeys() && okSize()
+        && ((request.resource.data.b == me() && request.resource.data.h == '')
+         || (request.resource.data.h == me() && request.resource.data.b == ''));
+      allow update: if request.auth != null && okKeys() && okSize() && (
+          // 보스(심판): 자리(b·h)만 빼고 무엇이든
+          (resource.data.b == me() && request.resource.data.b == resource.data.b && request.resource.data.h == resource.data.h)
+          // 용사: 명령·자기 시각·기권/무응답 승리만
+          || (resource.data.h == me() && changed().hasOnly(['q', 'th', 'w']) && okHeroW())
+          // 빈자리에 참가 (자기 자신만)
+          || (resource.data.b == '' && request.resource.data.b == me() && changed().hasOnly(['b', 'tb']))
+          || (resource.data.h == '' && request.resource.data.h == me() && changed().hasOnly(['h', 'th']))
         );
       allow delete: if false;
+
+      match /priv/{doc} {
+        allow read, write: if request.auth != null
+          && get(/databases/$(database)/documents/games/$(code)).data.b == request.auth.uid;
+      }
     }
   }
 }
