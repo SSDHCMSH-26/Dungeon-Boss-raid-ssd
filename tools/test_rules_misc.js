@@ -136,5 +136,17 @@ setup("gron"); R(`S.ph="boss";S.boss.ap=6;S.cd={};S.used={};S.log="보스 차례
   R(`apply({type:"endBoss"});apply({type:"endHero"});apply({type:"resolve"})`);
   ok(R("S.sec.hap||0") === 0 && R("view(S,'hero').boss.ap") === R("S.boss.ap"), "새 라운드: 숨김 AP 기록 초기화"); }
 
+// (v84) 함정 컷인 기록: 가시 함정·구덩이·미믹(함정 상자)
+setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.cuts=[];S.boss.x=10;S.boss.y=12;S.heroes[0].x=10;S.heroes[0].y=20`);
+R(`apply({type:"bossBuild",id:"trap",p:[[10,19]]});apply({type:"endBoss"});apply({type:"heroAct",h:0,j:"m",x:10,y:18});apply({type:"endHero"});apply({type:"resolve"})`);
+ok(R("(S.cuts||[]).some(c=>c.k=='spike'&&c.h==0)"), "가시 함정을 밟으면 컷인 기록 (기사)");
+setup("gron"); R(`S.cuts=[];S.pits=[{x:10,y:17},{x:3,y:3}];S.heroes[0].x=10;S.heroes[0].y=20;S.ph="hero"`);
+R(`apply({type:"heroAct",h:0,j:"m",x:10,y:17})`);
+ok(R("(S.cuts||[]).some(c=>c.k=='pit'&&c.h==0)"), "숨은 구덩이에 빠지면 컷인 기록");
+setup("gron"); R(`S.cuts=[];S.chests=[{id:1,x:10,y:19,k:"x"}];MOB.trapChest.mimicChance=1;S.heroes[0].x=10;S.heroes[0].y=20;S.ph="hero"`);
+R(`apply({type:"settle"})`);
+ok(R("(S.cuts||[]).some(c=>c.k=='mimic'&&c.h==0)"), "함정 상자(미믹)를 열면 컷인 기록");
+R(`MOB.trapChest.mimicChance=DATA.monsters.trapChest.mimicChance`);
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);

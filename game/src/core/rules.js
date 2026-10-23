@@ -77,13 +77,17 @@ afxAdd([{k:"line",a:[h.x,h.y],b:end,c:"#ff9a3c"}].concat(fx));let m=Object.keys(
 /* 저격 발사(정산 시작, 마법진 다음): 조준한 방향으로 지금 위치에서 발사, 이번 턴에 끝까지 이동하지 않았으면(걷기·갈고리 없음) 피해 ×stillMult */
 function aimFire(o){S.heroes.forEach(h=>{const a=h.aim;if(!a)return;delete h.aim;if(h.dead||S.end)return;const k=CLS[h.k],s=k.sk[a.j],r=arrowFirst(h,a.d[0],a.d[1],s.r),st=!(h.mc>0||h.mvd),v=s.fx.dmg*(st?s.fx.stillMult:1);
 afxAdd([{k:"line",a:[h.x,h.y],b:arrEnd(h,a.d,r.cs),c:"#ffe58a"}]);h.aT=NOW();h.aK="atk";if(r.hs){const e=r.cs[r.cs.length-1];PRES.fx("burst",e[0],e[1],0);dealHits(r.hs,v,k,s.n+(st?" (이동 안 함 ×"+s.fx.stillMult+")":""));o.push("🏹 "+S.log)}else o.push("🏹 "+k.n+" "+s.n+" — 막혔거나 빗나감")})}
+/* 함정 컷인(화면 크게 그림+글): 용사가 가시 함정·구덩이·미믹(함정 상자)에 당하면 S.cuts 에 남김 → 화면이 차례로 보여 줌(그림·연출용, 규칙 지문엔 안 들어감) */
+/* 순간이동 스크롤 효과(그림용): 떠난 칸엔 스크롤 그림, 도착 칸엔 순간이동 빛 — 각 1칸 크기 */
+function sfxAdd(ax,ay,bx,by){S.sfx=(S.sfx||[]).filter(f=>NOW()-f.t<3000).concat({a:[ax,ay],b:[bx,by],t:NOW()})}
+function cutIn(k,h){if(!h)return;S.cuts=(S.cuts||[]).filter(c=>NOW()-c.t<10000).concat({k,h:S.heroes.indexOf(h),t:NOW()})}
 function act(h,j,x,y,p){const n=S.mv.length,r=act0(h,j,x,y,p);if(r){try{pitCheck(h,n)}catch(e){}try{chestPath(h,n)}catch(e){}}return r}
 function pitCheck(h,n){if(h.dead||!S.pits||!S.pits.length||(h.nt&&h.nt[0]==h.x&&h.nt[1]==h.y))return;const i=S.heroes.indexOf(h),ents=S.mv.slice(n).filter(r=>r.i==i),path=[];ents.forEach(r=>r.c.forEach(c=>path.push(c)));const armed=(x,y)=>{const i=pitAt(x,y);return i>=0&&!S.pits[i].rv};let k=path.findIndex(c=>armed(c[0],c[1]));if(k<0){if(!armed(h.x,h.y))return;path.push([h.x,h.y]);k=path.length-1}
 const cell=path[k],P=S.pits[pitAt(cell[0],cell[1])];let cnt=0;ents.forEach(r=>{const len=r.c.length;r.c=r.c.slice(0,Math.max(0,k+1-cnt));cnt+=len});
 PRES.trim("h"+i,path.length-1-k);const tt=PRES.fallDelay("h"+i);
 const cs=S.pits.filter(z=>z!==P).sort((a,b)=>Math.hypot(b.x-P.x,b.y-P.y)-Math.hypot(a.x-P.x,a.y-P.y));let Q=null,ex=null;h.x=cell[0];h.y=cell[1];
 for(const q of cs){const c=[[0,0],[1,0],[0,1],[1,1]].map(([a,b])=>[q.x+a,q.y+b]).filter(z=>!bad(z[0],z[1]));if(c.length){Q=q;ex=c[rn(c.length)];break}}
-h.hp-=PIT.fallDmg;h.stun=1;if(h.hp<=0){h.hp=0;h.dead=1;cirClear(h)}
+cutIn("pit",h);h.hp-=PIT.fallDmg;h.stun=1;if(h.hp<=0){h.hp=0;h.dead=1;cirClear(h)}
 S.pits=S.pits.filter(z=>z!==P&&z!==Q);if(ex){h.x=ex[0];h.y=ex[1]}
 S.fall=(S.fall||[]).filter(f=>NOW()<f.t+2500).concat({i,t:NOW()+tt,a:[cell[0],cell[1]],b:ex||[cell[0],cell[1]],pa:{x:P.x,y:P.y},pb:Q?{x:Q.x,y:Q.y}:{x:P.x,y:P.y}});
 S.log=(S.log?S.log+" ":"")+"🕳️ 숨은 구덩이! "+CLS[h.k].n+" 낙하 -"+PIT.fallDmg+(ex?" · 가장 먼 구덩이로 튕겨 나갔다!":"")+" 💫다음 턴 행동불능"+(h.dead?" 💀":"");
@@ -139,7 +143,7 @@ function enhanceCells(c){let n=0;S.rob.forEach(r=>{if(c.has(r.y*N+r.x)){if(!r.en
 function bAtk(i,p,fb){const c=CH[S.champ],a=c.at[i],U=c.gen&&!gDead()&&!(fb&&S.boss.en>0)?S.gen:S.boss;if(!U||U.hp<=0||U.ap<a.c||p.length!=a.pk||p.some(q=>ch(q[0],q[1],U.x,U.y)>a.r))return 0;S.atks.push({i,p});U.ap-=a.c;let n=enhanceCells(cov(a,p));const ph_=pitHit(i,p);S.log="⚠️ "+a.n+" 예고! (예고 "+S.atks.filter(z=>!z.echo).length+"개)"+(ph_&&ph_.g?" 🕳️숨어 있던 구덩이가 드러나 무너졌다!":"")+(n?" 🔷아군 "+n+"곳 강화!":"");return 1}
 function chSpawn(n){S.chests=S.chests||[];if(mapSet("chestSpawn")===false)return 0;S.cid=S.cid||1;let made=0;for(let k=0;k<n&&S.chests.length<CHR.max;k++){for(let a=0;a<80;a++){const x=1+rn(N-2),y=4+rn(N-8);if(bad(x,y)||beltAt(x,y)||pitAt(x,y)>=0||S.chests.some(c=>ch(c.x,c.y,x,y)<CHR.spacing)||(S.cry||[]).some(c=>c.x==x&&c.y==y)||S.heroes.some(h=>ch(h.x,h.y,x,y)<=CHR.heroClearance)||ch(S.boss.x,S.boss.y,x,y)<=CHR.bossClearance||(S.gen&&ch(S.gen.x,S.gen.y,x,y)<=CHR.bossClearance))continue;S.chests.push({id:S.cid++,x,y,k:"t",nw:1});made++;break}}return made}
 function chOpen(c,side,u){S.chests=S.chests.filter(z=>z!==c);S.cfx=(S.cfx||[]).filter(f=>NOW()-f.t<4000);S.gold=S.gold||{b:0,h:0};S.bag=S.bag||{b:bag0(),h:bag0()};
-if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:NOW(),k:"trap"});if(side=="b"){S.cd=S.cd||{};S.cd.tchest=0;return "📦 그론이 상자를 회수! 함정 상자였다 (설치 쿨타임 초기화)"}const mim=RAND()<MOB.trapChest.mimicChance;if(mim){u.sup=MOB.mimic.suppressTurns;u.ap=0;u.mc=9;mobSpawn(c,"mimic",u);return "👾 미믹이었다! "+CLS[u.k].n+" 제압당했다! (최대 "+MOB.mimic.suppressTurns+"턴 행동불능 · 턴마다 "+MOB.mimic.suppressDmg+" 피해 · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제)"}mobSpawn(c,"gob",u);return "💰 보물 고블린이 튀어나왔다! 금화를 가장 많이 가진 용사를 노린다"}
+if(c.k=="x"){S.cfx.push({x:c.x,y:c.y,t:NOW(),k:"trap"});if(side=="b"){S.cd=S.cd||{};S.cd.tchest=0;return "📦 그론이 상자를 회수! 함정 상자였다 (설치 쿨타임 초기화)"}const mim=RAND()<MOB.trapChest.mimicChance;if(mim){u.sup=MOB.mimic.suppressTurns;u.ap=0;u.mc=9;cutIn("mimic",u);mobSpawn(c,"mimic",u);return "👾 미믹이었다! "+CLS[u.k].n+" 제압당했다! (최대 "+MOB.mimic.suppressTurns+"턴 행동불능 · 턴마다 "+MOB.mimic.suppressDmg+" 피해 · 아군이 곁에 오거나 미믹을 쓰러뜨리면 해제)"}mobSpawn(c,"gob",u);return "💰 보물 고블린이 튀어나왔다! 금화를 가장 많이 가진 용사를 노린다"}
 let gq=RAND()*LOOTW,gl=LOOT.gold[0][0];for(const [v,w] of LOOT.gold){if(gq<w){gl=v;break}gq-=w}
 const r=RAND(),it=(LOOTI.find(z=>r<z[1])||["empty"])[0];if(side=="b")S.gold.b+=gl;else u.gold=(u.gold||0)+gl;if(it!="empty")S.bag[side][it]++;S.cfx.push({x:c.x,y:c.y,t:NOW(),k:it=="empty"?"gold":it});
 return "🎁 "+(side=="b"?"보스":"용사 진영")+"이(가) 보물상자를 열었다! 💰 금화 +"+gl+(it!="empty"?" · "+ITEMS[it].n+" 획득":"")}
@@ -161,8 +165,8 @@ else if(k=="scroll"){if(u.sup>0)return {err:"⛓ 제압 중에는 스크롤을 �
 S.bag[side][k]--;S.log="🎒 "+nm+" "+ITEMS[k].n+" 사용! ("+ITEMS[k].d+")";return {ok:1}}
 /* 순간이동 스크롤: 보스 진영(g=발전기를 옮길지) / 용사 h */
 function scrollBoss(x,y,g){if(!S.bag||!S.bag.b.scroll)return 0;const u=g?S.gen:S.boss,O=g?S.boss:S.gen;if(ch(x,y,u.x,u.y)>ITEF.scroll.range)return 0;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const X=x+a,Y=y+b;if(X<0||Y<0||X>=N||Y>=N||blk(X,Y)||hAt(X,Y)||(O&&O.hp>0&&Math.abs(X-O.x)<=1&&Math.abs(Y-O.y)<=1))return 0}
-u.x=x;u.y=y;PRES.snap(g?"G":"B",x,y);S.bag.b.scroll--;S.log="📜 "+(g?"발전기":(CH[S.champ].bn||CH[S.champ].n))+" 순간이동!";return 1}
-function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.wch&&!inMyCir(h,x,y)))return 0;const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{pitCheck(h,n)}catch(e){}return 1}
+sfxAdd(u.x,u.y,x,y);u.x=x;u.y=y;PRES.snap(g?"G":"B",x,y);S.bag.b.scroll--;S.log="📜 "+(g?"발전기":(CH[S.champ].bn||CH[S.champ].n))+" 순간이동!";return 1}
+function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.wch&&!inMyCir(h,x,y)))return 0;sfxAdd(h.x,h.y,x,y);const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{pitCheck(h,n)}catch(e){}return 1}
 function pitHit(i,p){if(S.champ!="gron"||!S.pits||!S.pits.length)return 0;const a=CH.gron.at[i],c=cov(a,p),inC=z=>[[0,0],[1,0],[0,1],[1,1]].some(([x,y])=>c.has((z.y+y)*N+z.x+x)),hit=S.pits.filter(inC);if(!hit.length)return 0;
 S.gh=S.gh||[];const hid=hit.filter(z=>!z.rv),rev=hit.filter(z=>z.rv);hid.forEach(z=>S.gh.push({x:z.x,y:z.y}));S.pits=S.pits.filter(z=>!hid.includes(z));
 const P=rev[0];if(P){const cs=S.pits.filter(z=>z!==P).sort((u,v)=>Math.hypot(v.x-P.x,v.y-P.y)-Math.hypot(u.x-P.x,u.y-P.y));if(cs.length){const Q=cs[0],dx=Q.x-P.x,dy=Q.y-P.y,p2=p.map(([x,y])=>[cl(x+dx,0,N-1),cl(y+dy,0,N-1)]);S.atks.push({i,p:p2,echo:1});S.pfx=(S.pfx||[]).filter(f=>NOW()-f.t<3000).concat({t:NOW(),a:{x:P.x,y:P.y,rv:1},b:{x:Q.x,y:Q.y,rv:Q.rv?1:0}});S.pits=S.pits.filter(z=>z!==P&&z!==Q)}}
@@ -218,7 +222,7 @@ if(end>=0){const path=[];for(let i=end;i!=st;i=pv[i])path.unshift(i);const bg=Ma
 t=hs()[0];if(t&&ch(t.x,t.y,r.x,r.y)<=1){o.push("🤖Lv"+r.lv+"→"+CLS[t.k].n+" -"+hurt(t,ROB.atkBase+ROB.atkPerLv*(r.lv-1)));(S.rfx=S.rfx||[]).push({x:t.x,y:t.y,en:r.en?1:0});S.rfxT=NOW()}}
 function resolve(){if(S.atks.length){S.fxT=NOW();S.fxA=S.atks.map(a=>({i:a.i,p:a.p}))}const td={},tc={},o=[],add=(hi,v)=>{td[hi]=(td[hi]||0)+v;(tc[hi]=tc[hi]||[]).push(v)},passes=(x,y)=>{for(const r of S.mv)if(r.c.some(q=>q[0]==x&&q[1]==y))return r.i;return S.heroes.findIndex(h=>!h.dead&&h.x==x&&h.y==y&&!(h.nt&&h.nt[0]==x&&h.nt[1]==y))};S.rev=[];S.rfx=[];S.gh=[];cirFire(o);aimFire(o);burnTick(o);if(S.end){S.log=o.join(", ");return}supTick(o);
 S.heroes.forEach(h=>{if(h.par>0)h.par--});S.atks.forEach(a0=>{const a=CH[S.champ].at[a0.i],c=cov(a,a0.p);S.heroes.forEach((h,hi)=>{if(!h.dead&&c.has(h.y*N+h.x)){add(hi,a.v);if(a.par){h.par=1;o.push("⚡ "+CLS[h.k].n+" 마비!")}}})});
-S.sec.traps.forEach(t=>{const hi=passes(t[0],t[1]);if(hi>=0)add(hi,TR.v);S.rev.push([t[0],t[1],hi>=0?1:0])});S.sec.traps=[];
+S.sec.traps.forEach(t=>{const hi=passes(t[0],t[1]);if(hi>=0){add(hi,TR.v);cutIn("spike",S.heroes[hi])}S.rev.push([t[0],t[1],hi>=0?1:0])});S.sec.traps=[];
 S.sec.bombs=S.sec.bombs.filter(b=>{let hit=passes(b.x,b.y)>=0;if(!hit){for(let st=0;st<(b.en?BMB.enhancedMove:BMB.move)&&!hit;st++){const nx=b.x+b.dx,ny=b.y+b.dy;if(blk(nx,ny)){if(st==0)return false;break}b.x=nx;b.y=ny;hit=!!hAt(nx,ny)}}
 if(hit){S.rev.push([b.x,b.y,1,b.en?1:0]);S.heroes.forEach((h,hi)=>{if(!h.dead&&ch(h.x,h.y,b.x,b.y)<=1)add(hi,BOMBV)});return false}return true});
 S.heroes.forEach((h,hi)=>{if(h.dead||!td[hi])return;o.push(CLS[h.k].n+" -"+hurt(h,td[hi],1))});

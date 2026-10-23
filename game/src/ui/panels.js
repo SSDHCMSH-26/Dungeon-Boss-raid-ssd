@@ -76,4 +76,4 @@ if(!hsd)p+=('<p>'+T("ui.11")+'</p>')}
 else if(!mine())p='<p>'+(S.ph=="resolve"?T("ui.12"):T("ui.13"))+'</p>';
 else if(S.ph=="boss")p=BT(T("ui.14"),"endBoss()","end")+(L.menu?"":('<p>'+T("ui.15")+'</p>'));
 else p=BT(T("ui.16"),"endHero()","end")+(L.menu?"":('<p>'+T("ui.17")+'</p>'));
-try{p+=onlineBar()}catch(e){}$("pn").innerHTML=p;save()}
+try{p+=onlineBar()}catch(e){}$("pn").innerHTML=p;try{cutinCheck()}catch(e){}save()}

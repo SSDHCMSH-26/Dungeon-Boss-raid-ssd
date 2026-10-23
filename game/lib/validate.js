@@ -215,7 +215,7 @@
         const v = b.images[k];
         if (isObj(v)) for (const n in v) img(v[n], "images." + k + "." + n); else img(v, "images." + k);
       }
-      ["T3A", "ART", "ART2", "ART3", "ART3_EXTRA", "MOBA", "FXD", "CRYSTAL"].forEach(k => isObj(b.images) && c.obj(b.images[k], "images." + k));
+      ["T3A", "ART", "ART2", "ART3", "ART3_EXTRA", "MOBA", "FXD", "CRYSTAL", "CUT"].forEach(k => isObj(b.images) && c.obj(b.images[k], "images." + k));
       if (c.obj(b.designs, "designs")) {
         const d = b.designs;
         if (c.need(Array.isArray(d.order) && d.order.length > 0 && d.order.every(isStr), "designs.order", "디자인 ID 목록이어야 해요"))

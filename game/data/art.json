@@ -163,6 +163,17 @@
   }
  },
  "images": {
+  "CUT": {
+   "pit1": "art/cutin/pit1.jpg",
+   "pit2": "art/cutin/pit2.jpg",
+   "pit3": "art/cutin/pit3.jpg",
+   "spike1": "art/cutin/spike1.jpg",
+   "spike2": "art/cutin/spike2.jpg",
+   "spike3": "art/cutin/spike3.jpg",
+   "mimic1": "art/cutin/mimic1.jpg",
+   "mimic2": "art/cutin/mimic2.jpg",
+   "mimic3": "art/cutin/mimic3.jpg"
+  },
   "T3A": {
    "cleric_idle": "art/t3a/cleric_idle.png",
    "cleric_move": "art/t3a/cleric_move.png",
