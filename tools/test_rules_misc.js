@@ -112,5 +112,29 @@ setup("gron", '["knight","cleric","mage"]'); R(`S.heroes[2].x=10;S.heroes[2].y=1
   next();
   ok(R("cirsOf(S.heroes[2]).length") === 0 && R("mvOf(S.heroes[2])") === 3, "마법진이 발동해 사라지면 이동 거리 복구 3"); }
 
+// (v83) 새 상자는 용사 턴이 시작될 때 용사에게 보임 — 보스 턴에 둔 함정 상자가 들통나지 않게
+setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.cd={};S.chests=[]`);
+ok(R(`apply({type:"bossBuild",id:"tchest",p:[[20,15]]})`) === 1, "함정 상자 설치");
+ok(R("view(S,'hero').chests.length") === 0 && !/상자/.test(R("view(S,'hero').log")), "보스 턴 도중: 용사 화면엔 상자도, 함정 상자 글도 안 보임");
+ok(R("view(S,'boss').chests.length") === 1, "보스 화면엔 바로 보임");
+R(`apply({type:"endBoss"})`);
+ok(R("view(S,'hero').chests.length") === 1 && R("view(S,'hero').chests[0].k") === "t" && /상자가 나타났다/.test(R("S.log")), "용사 턴 시작: 보통 상자처럼 나타나고 '상자가 나타났다' 안내");
+R(`S.chests=[];S.heroes.forEach(h=>{h.x=2;h.y=27});S.boss.x=27;S.boss.y=2;apply({type:"endHero"});S.rng=1`);
+{ let made = 0; for (let i = 0; i < 40 && !made; i++) { R(`S.ph="resolve";S.chests=[];chSpawn(1)`); made = R("S.chests.length"); }
+  ok(made === 1 && R("view(S,'hero').chests.length") === 0, "정산 때 저절로 생긴 상자도 보스 턴 동안은 용사에게 안 보임");
+  R(`S.ph="boss";apply({type:"endBoss"})`); ok(R("view(S,'hero').chests.length") === 1, "→ 용사 턴 시작에 나타남 (보통 상자·함정 상자가 똑같이)"); }
+
+// (v83) 숨김 스킬은 힌트조차 없음: 글·AP·쿨타임
+setup("gron"); R(`S.ph="boss";S.boss.ap=6;S.cd={};S.used={};S.log="보스 차례 시작";S.pits=[]`);
+{ const ap0 = R("S.boss.ap"), x0 = R("S.boss.x"), y0 = R("S.boss.y");
+  ok(R(`apply({type:"bossBuild",id:"pit",p:[]})`) === 1 && R(`apply({type:"bossBuild",id:"trap",p:[[${x0},${y0}+3]]})`) === 1, "구덩이 파기 + 가시 함정 설치");
+  ok(R("S.boss.ap") < ap0 && /🔒/.test(R("S.log")), `보스 화면: AP 실제로 줄고(${ap0}→${R("S.boss.ap")}) 비밀 글 보임`);
+  ok(R("view(S,'hero').log") === "보스 차례 시작" && !/구덩이|함정|만지작/.test(R("view(S,'hero').log")), `용사 화면 글: 직전 공개 글 그대로 ("${R("view(S,'hero').log")}")`);
+  ok(R("view(S,'hero').boss.ap") === ap0, `용사 화면 보스 AP: 숨김 스킬에 쓴 AP 는 안 줄어든 것처럼 (${R("view(S,'hero').boss.ap")})`);
+  ok(R("view(S,'hero').cd") === undefined && R("view(S,'hero').pits.length") === 0, "용사 화면: 보스 쿨타임·숨은 구덩이 없음");
+  ok(R(`apply({type:"bossMove",x:${x0}+1,y:${y0}})`) === 1 && R("view(S,'hero').boss.ap") === ap0 - 1, "보이는 행동(이동)에 쓴 AP 는 그대로 줄어 보임");
+  R(`apply({type:"endBoss"});apply({type:"endHero"});apply({type:"resolve"})`);
+  ok(R("S.sec.hap||0") === 0 && R("view(S,'hero').boss.ap") === R("S.boss.ap"), "새 라운드: 숨김 AP 기록 초기화"); }
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);
