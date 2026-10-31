@@ -20,7 +20,7 @@
   };
   // 맵 파일(공식 맵·나중에 공유 맵) — 목록(maps/index.json)에 적힌 ID 마다 data/maps/<id>.json
   const MAP = { format: "pdr-map", version: 1, maxBytes: 65536, size: 30, tiles: { ".": "floor", "#": "wall" },
-    generators: ["maze"], objects: ["chest", "trapChest", "pit"],
+    generators: ["maze"], objects: ["chest", "trapChest", "pit", "spike", "mimic", "goblin", "robot", "factory", "bomb", "belt"],
     keys: ["format", "version", "id", "name", "author", "champion", "ruleset", "size", "tiles", "generator", "spawns", "objects", "settings"], settings: { chestSpawn: "boolean" } };
   const mapPath = id => "data/maps/" + id + ".json";
   const ID_RE = /^[a-z0-9_-]{1,64}$/;
@@ -341,20 +341,36 @@
     if (json.objects !== undefined && c.need(Array.isArray(json.objects), "objects", "목록([ ])이어야 해요")) {
       const R = D && D.rules, cnt = {};
       if (!c.need(json.objects.length <= 200, "objects", "물건이 너무 많아요 (최대 200개)")) return c.errs;
+      // 놓을 수 있는 것은 보스 테마(champions.json 의 mapObjects)마다 다름 — 예) 그론 맵엔 로봇·공장 불가
+      const allow = ch && Array.isArray(ch.mapObjects) ? ch.mapObjects : MAP.objects;
+      // 바닥층(가시 함정·컨베이어·구덩이)은 유닛·상자와 같은 칸에 있어도 되지만 서로·벽·시작 위치와는 안 겹침
+      const floor = new Map(), FLOOR = { spike: 1, belt: 1, pit: 1 }, spawnCells = new Set(used.keys());
+      const sz = t => t === "pit" || t === "factory" ? 2 : 1;
       Array.from(json.objects).forEach((o, i) => {
         const p = "objects[" + i + "]";
         if (!c.obj(o, p)) return;
         if (!c.need(MAP.objects.indexOf(o.type) >= 0, p + ".type", "다음 중 하나여야 해요: " + MAP.objects.join(", "))) return;
+        if (!c.need(allow.indexOf(o.type) >= 0, p + ".type", "이 보스 테마(" + json.champion + ")에선 놓을 수 없어요: " + o.type)) return;
         cnt[o.type] = (cnt[o.type] || 0) + 1;
         if (!pt(o, p)) return;
-        const cells = o.type === "pit" ? [[o.x, o.y], [o.x + 1, o.y], [o.x, o.y + 1], [o.x + 1, o.y + 1]] : [[o.x, o.y]];
+        if (o.type === "robot" || o.type === "factory") { if (o.lv !== undefined || o.type === "robot") c.int(o.lv, p + ".lv", 1, 3); }
+        if (o.type === "bomb") c.need(Number.isInteger(o.dx) && Number.isInteger(o.dy) && Math.abs(o.dx) <= 1 && Math.abs(o.dy) <= 1 && (o.dx || o.dy), p, "폭탄로봇 방향(dx, dy)이 8방향 중 하나여야 해요");
+        if (o.type === "belt") c.int(o.d, p + ".d", 0, 3);
+        const n = sz(o.type), cells = [];
+        for (let dy = 0; dy < n; dy++) for (let dx = 0; dx < n; dx++) cells.push([o.x + dx, o.y + dy]);
         if (!c.need(cells.every(([x, y]) => x < N && y < N), p, "맵 밖으로 나가요")) return;
         c.need(cells.every(([x, y]) => !wall(x, y)), p, "벽 위에 놓을 수 없어요");
-        mark(cells, p + "(" + o.type + ")");
+        if (FLOOR[o.type]) {
+          cells.forEach(([x, y]) => { const k = y * N + x; if (floor.has(k)) c.need(false, p, floor.get(k) + " 와 겹쳐요 (" + x + "," + y + ")"); else floor.set(k, p + "(" + o.type + ")"); if (spawnCells.has(k)) c.need(false, p, "시작 위치(" + used.get(k) + ") 위에 놓을 수 없어요"); });
+          if (o.type === "pit") mark(cells, p + "(pit)");
+        } else mark(cells, p + "(" + o.type + ")");
       });
+      const lim = (t, max, nm) => { if (max !== undefined) c.need((cnt[t] || 0) <= max, "objects", nm + "는 최대 " + max + "개예요"); };
+      const M = D && D.monsters, gx = id => D && D.skills && D.skills.champions && D.skills.champions.gron && (D.skills.champions.gron.ex || []).filter(e => e.id === id).map(e => e.fx && e.fx.max)[0];
       if (R && R.chest) c.need((cnt.chest || 0) + (cnt.trapChest || 0) <= R.chest.max, "objects", "상자는 최대 " + R.chest.max + "개예요");
-      const pitMax = D && D.skills && D.skills.champions && D.skills.champions.gron && (D.skills.champions.gron.ex || []).filter(e => e.id === "pit").map(e => e.fx && e.fx.max)[0];
-      if (pitMax !== undefined) c.need((cnt.pit || 0) <= pitMax, "objects", "구덩이는 최대 " + pitMax + "개예요");
+      lim("pit", gx("pit"), "구덩이"); lim("spike", gx("trap"), "가시 함정");
+      if (M) { lim("robot", M.robot && M.robot.max, "로봇"); lim("factory", M.factory && M.factory.max, "공장"); lim("bomb", M.bomb && M.bomb.max, "폭탄로봇"); }
+      c.need((cnt.mimic || 0) + (cnt.goblin || 0) <= 10, "objects", "미믹·보물 고블린은 합쳐서 최대 10마리예요");
     }
     // 길 확인: 용사마다 벽을 부수지 않고 보스 옆까지 걸어갈 수 있어야 함 (지도가 있는 맵만)
     if (grid && bossA && !c.errs.length) {

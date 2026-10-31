@@ -19,7 +19,7 @@ DATA = os.path.join(ROOT, "game", "data")
 FILES = {"heroes": "heroes.json", "skills": "skills.json", "champions": "champions.json", "monsters": "monsters.json",
          "items": "items.json", "loot": "loot.json", "rules": "rulesets/standard.json", "ai": "ai.json"}
 HEAD = ["대상", "항목", "값", "설명", "키"]
-SKIP = {"format", "version", "ok", "bash", "gen", "vr", "esc", "dg", "par", "arc", "kind", "pk"}
+SKIP = {"format", "version", "ok", "mapObjects", "bash", "gen", "vr", "esc", "dg", "par", "arc", "kind", "pk"}
 
 # 항목 이름(한국어)과 짧은 설명
 L = {

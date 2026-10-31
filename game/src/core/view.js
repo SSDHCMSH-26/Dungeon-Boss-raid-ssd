@@ -20,5 +20,7 @@ function view(st, side) {
   delete v.plog;
   if (v.boss && st.sec && st.sec.hap) v.boss.ap += st.sec.hap;
   delete v.cd;
+  // 사용자 맵(S.cmap)에 적힌 숨은 물건(가시 함정·구덩이·함정 상자·폭탄로봇) 위치도 빼고 보냄
+  if (v.cmap && Array.isArray(v.cmap.objects)) v.cmap.objects = v.cmap.objects.filter(o => ["spike", "pit", "trapChest", "bomb"].indexOf(o.type) < 0);
   return v;
 }

@@ -10,6 +10,12 @@
 
 ## 핵심 상태 `S` (온라인 시 JSON 으로 동기화) — v67: `sec`(보스 비밀: traps·bombs·bid), `used`(턴 사용 횟수), `seed`·`rng`(규칙 무작위), `airng`(AI 무작위) 추가
 `ph`(setup/boss/hero/resolve) · `round` · `champ`(gron/vince) · `map`(문자열 N*N, "1"=벽) · `boss`{x,y,hp,max,ap,moved,bind,en…} · `gen`(빈센토전 발전기) · `heroes[]`{k,x,y,hp,max,ap,mc,guard,par,dead,stun,sup,cd{},nt,gold…} · `atks`(예고된 공격) · `rev`(공개된 함정) · `mv`(이번 턴 이동 기록) · `pits` · `chests[]`{id,x,y,k("t"/"x"),age} · `mobs[]`{id,k("mimic"/"gob"),x,y,hp,mx,hold,vi,gold,loot,items} · `walls[]`{x,y,t,lv,hp} · `mw`(맵 기본 벽의 손상 체력) · `belts`/`fac`/`rob`/`cry`(빈센토 요소) · `gold`{b,h}(보스 합산) · `bag`{b,h}{potion,scroll,gem} · `cd`(보스 쿨타임) · `hfx`/`cfx`/`rfx`(연출용) · `end`(종료 메시지) · `log`.
+## 맵 만들기 (v85) — `src/ui/editor.js`
+- `L.scr=="editor"` 이면 `ui()` 가 `edUI()` 로. 초안 목록 `ED.list`(localStorage `pdr_editor`), 현재 초안 `edMap()`(pdr-map JSON), 도구 `ED.tool`, 되돌리기 `ED.undo/redo`
+- 미리보기: `edPreview()` 가 초안으로 `S` 를 새로 만들어(`S.cmap`) 진짜 `draw()` 로 그림 + `edOverlay()`(칸 줄·용사 번호)
+- 칸 편집 `edApply(x,y,first)`, 검사 `edErrs()`(= `PDRValidate.map`), 해 보기 `edPlay(role)` → 게임 중 `L.edTest`, 돌아가기 `edBackFromPlay()`
+- 엔진 쪽: `mapOf` 는 `S.cmap` 우선, `placeObjects(objects)` 가 배치물을 놓음, 가시 함정 `[x,y,1]` 은 맵에 깐 것(밟기 전까지 유지)
+
 ## 로컬 상태 `L` (화면용만 — v67 부터 traps/bombs/used/bid 는 S 로 이동)
 `mode`(solo/local/multi) · `role`(boss/hero) · `act`(선택 중 스킬) · `picks`(찍은 칸) · `design`(old/t2/t3) · `traps`/`bombs`(보스가 숨겨 설치한 것) · `used`(턴당 사용 횟수) · `bag`(가방 열림) 등.
 
