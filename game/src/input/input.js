@@ -12,5 +12,5 @@ function okAct(){const a=L.act,p=L.picks;let r=0;
 if(a=="i")r=useScroll(p[0][0],p[0][1]);else if(S.ph=="boss"){if(a=="m")r=apply({type:"bossMove",x:p[0][0],y:p[0][1]});else if(a[0]=="a")r=apply({type:"bossAttack",i:+a.slice(1),p:p,fb:L.bsel!="g"});else r=apply({type:"bossBuild",id:spec(a).id,p:p})}
 else r=apply(p.length>1?{type:"heroAct",h:L.si,j:a,x:p[0][0],y:p[0][1],p:p}:{type:"heroAct",h:L.si,j:a,x:p[0][0],y:p[0][1]});
 if(r){const hid=S.ph=="boss"&&a!="m"&&a[0]=="e"&&["trap","bomb"].includes(spec(a).id);L.act=null;L.picks=[];if(hid){ui();$("lg").textContent="🕳️ 숨김 설치 완료 (용사에겐 보이지 않아요)"}else sync()}else $("lg").textContent="❌ 범위 밖이거나 사용할 수 없는 위치예요"}
-function zoom(d){let i=ZL.indexOf(Z);if(i<0)i=1;Z=ZL[cl(i+d,0,ZL.length-1)];draw()}
+function zoom(d){const f=L.zfit||12,lv=[f].concat(ZL.filter(z=>z>f));let i=lv.indexOf(Z);if(i<0)i=0;Z=lv[cl(i+d,0,lv.length-1)];draw()}
 function jump(w){const h=sel(),p=w&&h?[h.x,h.y]:[S.boss.x,S.boss.y];W.scrollTo({left:p[0]*Z-W.clientWidth/2,top:p[1]*Z-W.clientHeight/2})}
