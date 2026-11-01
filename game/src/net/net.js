@@ -60,7 +60,7 @@ if(fbm){if(L.role=="boss"){await ref().update({b:uid,tb:FV().serverTimestamp()})
 else await ref().set({b:L.bu,h:L.hu,s:JSON.stringify(S)});onPh();listen();ui()}
 function startSolo(){S=newS();L.scr="game";L.wait=0;reset();L.code="";ui();tick()}
 const SAVEK="pdr_save";
-function save(){try{if(L.scr!="game"||!S||S.end){localStorage.removeItem(SAVEK);return}localStorage.setItem(SAVEK,JSON.stringify({S,m:L.mode,r:L.role,si:L.si,c:L.code}))}catch(e){}}
+function save(){try{if(L.scr=="editor"||L.edTest)return;if(L.scr!="game"||!S||S.end){localStorage.removeItem(SAVEK);return}localStorage.setItem(SAVEK,JSON.stringify({S,m:L.mode,r:L.role,si:L.si,c:L.code}))}catch(e){}}
 function loadSave(){try{const d=JSON.parse(localStorage.getItem(SAVEK)||"null");return d&&d.S&&!d.S.end?d:null}catch(e){return null}}
 async function rejoin(){if(!await net()){L.scr="menu";ui();return}const d=await ref().get();if(!d.exists){alert("방을 찾을 수 없어요");L.scr="menu";ui();return}const v=d.data();L.bu=v.b;L.hu=v.h;if(uid==L.bu)L.role="boss";else if(uid==L.hu)L.role="hero";else{alert("이 방의 참가자가 아니에요");L.scr="menu";ui();return}pend=[];doneQ=[];
 if(fbm&&L.role=="boss"){const pv=await pref().get();S=fixState(JSON.parse(pv.exists?pv.data().s:v.s))}else S=fixState(JSON.parse(v.s));if(v.w)S.end=endMsg(v.w);onPh();L.wait=!(L.bu&&L.hu);listen();ui();tick()}

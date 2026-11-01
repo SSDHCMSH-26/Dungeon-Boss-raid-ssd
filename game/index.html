@@ -72,6 +72,7 @@ body.d-g #w{box-shadow:0 0 0 3px #2b1a1c,0 0 14px #e0553a44}body.d-g .b.on{color
 .gcard .vh{background:repeating-linear-gradient(45deg,#e0553a 0 6px,#140a0a 6px 12px)}
 .gcard.on{background:linear-gradient(135deg,#34191b,#150b0d);box-shadow:0 0 0 3px #ffd34d,0 0 18px #ffd34daa}
 p{font-size:12.5px;color:var(--m);margin:4px 0}
+@media (orientation:landscape) and (min-width:700px){body.ed main{max-width:none}body.ed #g{display:grid!important;grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"st st" "tb pn" "mw pn";gap:4px 10px;align-items:start}body.ed #st{grid-area:st}body.ed #tb{grid-area:tb}body.ed #mw{grid-area:mw}body.ed #pn{grid-area:pn;grid-row:2/4;max-height:calc(100vh - 80px);overflow:auto}body.ed #w{height:calc(100vh - 130px)}body.ed #lg{display:none}}
 input{flex:1;min-width:90px;padding:9px;border:3px solid var(--ln);background:var(--pn);color:var(--fg);font-size:15px;text-transform:uppercase}
 </style></head><body><main>
 <h1><span data-t="html.title">PIXEL DUNGEON RAID</span><small data-t="html.subtitle">30×30 · 1대1 턴제 보스 레이드</small></h1>
@@ -97,7 +98,7 @@ if(!err.length){DATA.maps={};await Promise.all((DATA.mapIndex.maps||[]).map(asyn
 if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
-const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
+const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
 window.removeEventListener("error",onErr);

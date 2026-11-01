@@ -5,7 +5,8 @@
     "n": "던전메이커 그론",
     "s": "안경 쓴 개구쟁이 미로 설계자",
     "m": "장난감 미로 던전",
-    "ok": 1,
+    "mapObjects": ["chest", "trapChest", "pit", "spike", "mimic", "goblin"],
+  "ok": 1,
     "bash": 1,
     "stats": {
       "hp": 420,
@@ -17,7 +18,8 @@
     "n": "공장장 빈센토",
     "s": "깐깐한 안경 쓴 공장장 할아버지 · 공격은 발전기 유닛이 맡아요",
     "m": "자동화 로봇 공장",
-    "ok": 1,
+    "mapObjects": ["chest", "robot", "factory", "bomb", "belt"],
+  "ok": 1,
     "bn": "빈센토",
     "gen": 1,
     "stats": {

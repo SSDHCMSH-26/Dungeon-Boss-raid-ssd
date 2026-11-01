@@ -1,7 +1,7 @@
 /* [입력] 맵 터치·버튼 → 행동 */
 const spec=a=>a=="i"?{id:"item",pk:1,r:ITEF.scroll.range,n:"📜 순간이동 스크롤"}:a[0]=="a"?CH[S.champ].at[+a.slice(1)]:CH[S.champ].ex[+a.slice(1)];
 const need=()=>S.ph=="boss"&&L.act!==null&&L.act!="m"?spec(L.act).pk:(S.ph=="hero"&&typeof L.act=="number"&&sel()&&(CLS[sel().k].sk[L.act].fx||{}).shots)||1;
-cv.onclick=e=>{const r=cv.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/Z),y=Math.floor((e.clientY-r.top)/Z);if(x<0||y<0||x>=N||y>=N)return;if(S.ph!="setup"&&(L.act===null||!mine())){const u=unitAt(x,y);if(u){L.insp=u;L.itab="info"}}if(!mine())return ui();
+cv.onclick=e=>{if(L.scr=="editor")return;const r=cv.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/Z),y=Math.floor((e.clientY-r.top)/Z);if(x<0||y<0||x>=N||y>=N)return;if(S.ph!="setup"&&(L.act===null||!mine())){const u=unitAt(x,y);if(u){L.insp=u;L.itab="info"}}if(!mine())return ui();
 if(L.act===null){if(S.ph=="hero"){const i=S.heroes.findIndex(h=>!h.dead&&h.x==x&&h.y==y);if(i>=0){L.si=i;L.menu=1}}else if(inB(x,y)){L.menu=1;L.bsel="v"}else if(inG(x,y)){L.menu=1;L.bsel="g"}return ui()}
 if(S.ph=="boss"&&L.act!=="m"&&spec(L.act).id=="dig"&&!(sw(x,y)||dw(x,y))&&L.picks.findIndex(q=>q[0]==x&&q[1]==y)<0){$("lg").textContent="⛏️ 벽 칸만 고를 수 있어요";return}
 if(S.ph=="boss"&&L.act!=="m"&&spec(L.act).id=="hop"&&pitAt(x,y)<0&&L.picks.findIndex(q=>q[0]==x&&q[1]==y)<0){$("lg").textContent="🌀 구덩이 칸만 고를 수 있어요";return}
