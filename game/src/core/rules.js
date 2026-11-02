@@ -81,9 +81,10 @@ afxAdd([{k:"line",a:[h.x,h.y],b:arrEnd(h,a.d,r.cs),c:"#ffe58a"}]);h.aT=NOW();h.a
 /* 순간이동 스크롤 효과(그림용): 떠난 칸엔 스크롤 그림, 도착 칸엔 순간이동 빛 — 각 1칸 크기 */
 function sfxAdd(ax,ay,bx,by){S.sfx=(S.sfx||[]).filter(f=>NOW()-f.t<3000).concat({a:[ax,ay],b:[bx,by],t:NOW()})}
 function cutIn(k,h){if(!h)return;S.cuts=(S.cuts||[]).filter(c=>NOW()-c.t<10000).concat({k,h:S.heroes.indexOf(h),t:NOW()})}
-/* 가시 함정은 밟는 순간 바로 터짐: 이번 행동으로 지나간 칸(S.mv)에 숨은 가시 함정이 있으면 즉시 피해·컷인·공개 후 사라짐 (돌진처럼 S.mv 를 안 남기는 이동은 무시) */
-function trapCheck(h,n){if(h.dead||!S.sec||!S.sec.traps.length)return;const i=S.heroes.indexOf(h),cells=[];S.mv.slice(n).filter(r=>r.i==i).forEach(r=>r.c.forEach(c=>cells.push(c)));
-for(const [x,y] of cells){const k=S.sec.traps.findIndex(t=>t[0]==x&&t[1]==y);if(k<0)continue;S.sec.traps.splice(k,1);if(S.tp)S.tp=S.tp.filter(t=>!(t[0]==x&&t[1]==y));S.rev=(S.rev||[]).concat([[x,y,1]]);PRES.fx("burst",x,y,0);cutIn("spike",h);
+/* 가시 함정·숨은 폭탄로봇은 밟는 순간 바로 터짐: 이번 행동으로 지나간 칸(S.mv)에 숨은 가시 함정이 있으면 즉시 피해·컷인·공개 후 사라짐 (돌진처럼 S.mv 를 안 남기는 이동은 무시) */
+function trapCheck(h,n){if(h.dead||!S.sec||!(S.sec.traps.length||S.sec.bombs.length))return;const i=S.heroes.indexOf(h),cells=[];S.mv.slice(n).filter(r=>r.i==i).forEach(r=>r.c.forEach(c=>cells.push(c)));
+for(const [x,y] of cells){const bi=S.sec.bombs.findIndex(b=>b.x==x&&b.y==y);if(bi>=0){const b=S.sec.bombs.splice(bi,1)[0];S.rev=(S.rev||[]).concat([[x,y,1,b.en?1:0]]);PRES.fx("burst",x,y,0);const hs=S.heroes.filter(z=>!z.dead&&ch(z.x,z.y,x,y)<=1);S.log=(S.log?S.log+" ":"")+"💣 "+CLS[h.k].n+" 숨은 폭탄로봇을 밟았다! "+hs.map(z=>CLS[z.k].n+" -"+hurt(z,BOMBV)+(z.dead?" 💀":"")).join(", ");if(h.dead)break;continue}
+const k=S.sec.traps.findIndex(t=>t[0]==x&&t[1]==y);if(k<0)continue;S.sec.traps.splice(k,1);if(S.tp)S.tp=S.tp.filter(t=>!(t[0]==x&&t[1]==y));S.rev=(S.rev||[]).concat([[x,y,1]]);PRES.fx("burst",x,y,0);cutIn("spike",h);
 const d=hurt(h,TR.v);S.log=(S.log?S.log+" ":"")+"📍 "+CLS[h.k].n+" 가시 함정을 밟았다! -"+d+(h.dead?" 💀":"");if(h.dead)break}}
 function act(h,j,x,y,p){const n=S.mv.length,r=act0(h,j,x,y,p);if(r){try{trapCheck(h,n)}catch(e){}try{pitCheck(h,n)}catch(e){}try{chestPath(h,n)}catch(e){}}return r}
 function pitCheck(h,n){if(h.dead||!S.pits||!S.pits.length||(h.nt&&h.nt[0]==h.x&&h.nt[1]==h.y))return;const i=S.heroes.indexOf(h),ents=S.mv.slice(n).filter(r=>r.i==i),path=[];ents.forEach(r=>r.c.forEach(c=>path.push(c)));const armed=(x,y)=>{const i=pitAt(x,y);return i>=0&&!S.pits[i].rv};let k=path.findIndex(c=>armed(c[0],c[1]));if(k<0){if(!armed(h.x,h.y))return;path.push([h.x,h.y]);k=path.length-1}

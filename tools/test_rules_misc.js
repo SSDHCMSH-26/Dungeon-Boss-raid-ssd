@@ -162,5 +162,14 @@ R(`apply({type:"bossBuild",id:"trap",p:[[10,20]]});apply({type:"endBoss"})`);
 { const hp0 = R("S.heroes[0].hp"); R(`apply({type:"endHero"});apply({type:"resolve"})`);
   ok(R("S.heroes[0].hp") < hp0, "함정 칸에 가만히 서 있으면 예전처럼 턴 끝에 터짐"); }
 
+// (v87) 숨은 폭탄로봇도 밟는 순간 바로 터짐
+setup("vince"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.sec.bombs=[];S.sec.bombs.push({id:99,x:10,y:19,dx:1,dy:0});S.heroes[0].x=10;S.heroes[0].y=20;S.heroes[1].x=11;S.heroes[1].y=20;S.heroes[2].x=20;S.heroes[2].y=25;S.walls=[];S.ph="hero"`);
+{ const a0 = R("S.heroes[0].hp"), b0 = R("S.heroes[1].hp"), c0 = R("S.heroes[2].hp");
+  R(`apply({type:"heroAct",h:0,j:"m",x:10,y:18})`);
+  ok(R("S.heroes[0].hp") === a0 - R("BOMBV") && R("S.heroes[1].hp") === b0 - R("BOMBV") && R("S.heroes[2].hp") === c0 && R("S.ph") === "hero", "폭탄로봇 칸을 지나가자마자 3×3 폭발 (옆 아군도, 먼 아군은 무사)");
+  ok(R("S.sec.bombs.length") === 0 && /폭탄로봇을 밟았다/.test(R("S.log")), "폭탄로봇은 바로 사라지고 안내");
+  R(`apply({type:"endHero"});apply({type:"resolve"})`);
+  ok(R("S.heroes[0].hp") === a0 - R("BOMBV"), "턴이 끝나도 두 번 터지지 않음"); }
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);
