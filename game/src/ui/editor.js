@@ -83,20 +83,21 @@ function edUI() {
   if (ED.view != "edit") { st.textContent = T("ed.title"); pn.innerHTML = edHome(); return }
   const m = edMap(); if (!m) { ED.view = "home"; return edUI() }
   const er = edErrs(); st.innerHTML = "🛠 " + CH[m.champion].n + " · " + m.name + " · " + (er.length ? '<a href="#" onclick="ED.showErr=!ED.showErr;ui();return false" style="color:#ffb347">' + T("ed.bad").replace("{n}", er.length) + "</a>" : T("ed.ok"));
-  if (!L.fit && W.clientWidth) { Z = W.clientWidth >= N * 24 ? 24 : 16; L.fit = 1 }
+  if (!L.fit) fitMap();
   cv.style.touchAction = ED.tool == "pan" ? "" : "none"; draw();
   let p = (ED.showErr && er.length ? '<div class="ht" style="color:#ffb347">' + er.map(e => "• " + e).join("<br>") + "</div>" : "");
   p += '<div class="r">' + BT(T("ed.undo"), "edUndo(0)", "s", !ED.undo.length) + BT(T("ed.redo"), "edUndo(1)", "s", !ED.redo.length) + BT(T("ed.play"), "edPlayMenu()", "go s", !!er.length) + BT(T("ed.export"), "edExport()", "s") + BT(T("ed.back"), "edHomeGo()", "s") + "</div>";
   if (ED.playMenu) p += '<div class="r">' + (er.length ? '<p>' + T("ed.playFix") + "</p>" : BT(T("ed.playHero"), "edPlay('hero')", "go") + BT(T("ed.playBoss"), "edPlay('boss')", "go") + BT(T("ed.playLocal"), "edPlay('local')", "go")) + "</div>";
   if (ED.code) p += '<p>' + T("ed.exportHint") + '</p><textarea id="edc" readonly style="width:100%;height:70px;font-size:11px;background:var(--pn);color:var(--fg);border:3px solid var(--ln)">' + ED.code + '</textarea><div class="r">' + BT(T("ed.copy"), "edCopy()", "s") + "</div>";
-  edTools(m.champion).forEach(([g, ts]) => { p += '<div class="ht">' + g + '</div><div class="r" style="margin:3px 0">' + ts.map(t => BT(ED_TN()[t] + (t == "hero" ? " " + (ED.hero + 1) : ""), "edPick('" + t + "')", "s" + (ED.tool == t ? " on" : ""))).join("") + "</div>" });
-  if (ED.tool == "robot" || ED.tool == "factory") p += '<div class="r">' + T("ed.lv") + " " + [1, 2, 3].map(v => BT("Lv" + v, "ED.lv=" + v + ";ui()", "s" + (ED.lv == v ? " on" : ""))).join("") + "</div>";
-  if (ED.tool == "bomb") p += '<div class="r">' + T("ed.dir") + " " + ED_DIRS8.map((d, i) => BT(ED_AR8[i], "ED.bdir=[" + d + "];ui()", "s" + (ED.bdir[0] == d[0] && ED.bdir[1] == d[1] ? " on" : ""))).join("") + "</div>";
-  if (ED.tool == "belt") p += '<div class="r">' + T("ed.dir") + " " + ED_AR4.map((a, i) => BT(a, "ED.dir=" + i + ";ui()", "s" + (ED.dir == i ? " on" : ""))).join("") + "</div>";
-  if (ED.tool != "pan") p += '<p>' + T("ed.tapHint") + "</p>";
+  let tl = '';
+  edTools(m.champion).forEach(([g, ts]) => { tl += '<div class="ht">' + g + '</div><div class="r" style="margin:3px 0">' + ts.map(t => BT(ED_TN()[t] + (t == "hero" ? " " + (ED.hero + 1) : ""), "edPick('" + t + "')", "s" + (ED.tool == t ? " on" : ""))).join("") + "</div>" });
+  if (ED.tool == "robot" || ED.tool == "factory") tl += '<div class="r">' + T("ed.lv") + " " + [1, 2, 3].map(v => BT("Lv" + v, "ED.lv=" + v + ";ui()", "s" + (ED.lv == v ? " on" : ""))).join("") + "</div>";
+  if (ED.tool == "bomb") tl += '<div class="r">' + T("ed.dir") + " " + ED_DIRS8.map((d, i) => BT(ED_AR8[i], "ED.bdir=[" + d + "];ui()", "s" + (ED.bdir[0] == d[0] && ED.bdir[1] == d[1] ? " on" : ""))).join("") + "</div>";
+  if (ED.tool == "belt") tl += '<div class="r">' + T("ed.dir") + " " + ED_AR4.map((a, i) => BT(a, "ED.dir=" + i + ";ui()", "s" + (ED.dir == i ? " on" : ""))).join("") + "</div>";
+  if (ED.tool != "pan") tl += '<p>' + T("ed.tapHint") + "</p>";
   p += '<div class="r"><input id="edn" value="' + m.name.replace(/"/g, "&quot;") + '" maxlength="40" style="text-transform:none" onchange="edRename(this.value)" placeholder="' + T("ed.name") + '"></div>';
   p += '<label style="font-size:13px"><input type="checkbox" style="flex:none;min-width:0" ' + (!m.settings || m.settings.chestSpawn !== false ? "checked" : "") + ' onchange="edChest(this.checked)"> ' + T("ed.chest") + "</label>";
-  pn.innerHTML = p;
+  pn.innerHTML = p; const qk = $("qk"); qk.innerHTML = tl; qk.style.display = "block";
 }
 function edHome() {
   edLoad(); let p = '<p>' + T("ed.pickTheme") + '</p><div class="r">' + Object.keys(CH).filter(k => CH[k].ok).map(k => BT(img(k, 24) + " " + CH[k].n, "ED.pickCh='" + k + "';ui()", ED.pickCh == k ? "on" : "")).join("") + "</div>";
