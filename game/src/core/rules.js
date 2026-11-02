@@ -81,7 +81,12 @@ afxAdd([{k:"line",a:[h.x,h.y],b:arrEnd(h,a.d,r.cs),c:"#ffe58a"}]);h.aT=NOW();h.a
 /* 순간이동 스크롤 효과(그림용): 떠난 칸엔 스크롤 그림, 도착 칸엔 순간이동 빛 — 각 1칸 크기 */
 function sfxAdd(ax,ay,bx,by){S.sfx=(S.sfx||[]).filter(f=>NOW()-f.t<3000).concat({a:[ax,ay],b:[bx,by],t:NOW()})}
 function cutIn(k,h){if(!h)return;S.cuts=(S.cuts||[]).filter(c=>NOW()-c.t<10000).concat({k,h:S.heroes.indexOf(h),t:NOW()})}
-function act(h,j,x,y,p){const n=S.mv.length,r=act0(h,j,x,y,p);if(r){try{pitCheck(h,n)}catch(e){}try{chestPath(h,n)}catch(e){}}return r}
+/* 가시 함정·숨은 폭탄로봇은 밟는 순간 바로 터짐: 이번 행동으로 지나간 칸(S.mv)에 숨은 가시 함정이 있으면 즉시 피해·컷인·공개 후 사라짐 (돌진처럼 S.mv 를 안 남기는 이동은 무시) */
+function trapCheck(h,n){if(h.dead||!S.sec||!(S.sec.traps.length||S.sec.bombs.length))return;const i=S.heroes.indexOf(h),cells=[];S.mv.slice(n).filter(r=>r.i==i).forEach(r=>r.c.forEach(c=>cells.push(c)));
+for(const [x,y] of cells){const bi=S.sec.bombs.findIndex(b=>b.x==x&&b.y==y);if(bi>=0){const b=S.sec.bombs.splice(bi,1)[0];S.rev=(S.rev||[]).concat([[x,y,1,b.en?1:0]]);PRES.fx("burst",x,y,0);const hs=S.heroes.filter(z=>!z.dead&&ch(z.x,z.y,x,y)<=1);S.log=(S.log?S.log+" ":"")+"💣 "+CLS[h.k].n+" 숨은 폭탄로봇을 밟았다! "+hs.map(z=>CLS[z.k].n+" -"+hurt(z,BOMBV)+(z.dead?" 💀":"")).join(", ");if(h.dead)break;continue}
+const k=S.sec.traps.findIndex(t=>t[0]==x&&t[1]==y);if(k<0)continue;S.sec.traps.splice(k,1);if(S.tp)S.tp=S.tp.filter(t=>!(t[0]==x&&t[1]==y));S.rev=(S.rev||[]).concat([[x,y,1]]);PRES.fx("burst",x,y,0);cutIn("spike",h);
+const d=hurt(h,TR.v);S.log=(S.log?S.log+" ":"")+"📍 "+CLS[h.k].n+" 가시 함정을 밟았다! -"+d+(h.dead?" 💀":"");if(h.dead)break}}
+function act(h,j,x,y,p){const n=S.mv.length,r=act0(h,j,x,y,p);if(r){try{trapCheck(h,n)}catch(e){}try{pitCheck(h,n)}catch(e){}try{chestPath(h,n)}catch(e){}}return r}
 function pitCheck(h,n){if(h.dead||!S.pits||!S.pits.length||(h.nt&&h.nt[0]==h.x&&h.nt[1]==h.y))return;const i=S.heroes.indexOf(h),ents=S.mv.slice(n).filter(r=>r.i==i),path=[];ents.forEach(r=>r.c.forEach(c=>path.push(c)));const armed=(x,y)=>{const i=pitAt(x,y);return i>=0&&!S.pits[i].rv};let k=path.findIndex(c=>armed(c[0],c[1]));if(k<0){if(!armed(h.x,h.y))return;path.push([h.x,h.y]);k=path.length-1}
 const cell=path[k],P=S.pits[pitAt(cell[0],cell[1])];let cnt=0;ents.forEach(r=>{const len=r.c.length;r.c=r.c.slice(0,Math.max(0,k+1-cnt));cnt+=len});
 PRES.trim("h"+i,path.length-1-k);const tt=PRES.fallDelay("h"+i);
@@ -166,7 +171,7 @@ S.bag[side][k]--;S.log="🎒 "+nm+" "+ITEMS[k].n+" 사용! ("+ITEMS[k].d+")";ret
 /* 순간이동 스크롤: 보스 진영(g=발전기를 옮길지) / 용사 h */
 function scrollBoss(x,y,g){if(!S.bag||!S.bag.b.scroll)return 0;const u=g?S.gen:S.boss,O=g?S.boss:S.gen;if(ch(x,y,u.x,u.y)>ITEF.scroll.range)return 0;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const X=x+a,Y=y+b;if(X<0||Y<0||X>=N||Y>=N||blk(X,Y)||hAt(X,Y)||(O&&O.hp>0&&Math.abs(X-O.x)<=1&&Math.abs(Y-O.y)<=1))return 0}
 sfxAdd(u.x,u.y,x,y);u.x=x;u.y=y;PRES.snap(g?"G":"B",x,y);S.bag.b.scroll--;S.log="📜 "+(g?"발전기":(CH[S.champ].bn||CH[S.champ].n))+" 순간이동!";return 1}
-function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.wch&&!inMyCir(h,x,y)))return 0;sfxAdd(h.x,h.y,x,y);const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{pitCheck(h,n)}catch(e){}return 1}
+function scrollHero(h,x,y){if(!S.bag||!S.bag.h.scroll)return 0;if(!h||h.dead||h.sup>0||ch(x,y,h.x,h.y)>ITEF.scroll.range||bad(x,y)||(h.wch&&!inMyCir(h,x,y)))return 0;sfxAdd(h.x,h.y,x,y);const n=S.mv.length;h.x=x;h.y=y;S.mv.push({i:S.heroes.indexOf(h),c:[[x,y]]});PRES.snap("h"+S.heroes.indexOf(h),x,y);S.bag.h.scroll--;S.log="📜 "+CLS[h.k].n+" 순간이동!";try{trapCheck(h,n)}catch(e){}try{pitCheck(h,n)}catch(e){}return 1}
 function pitHit(i,p){if(S.champ!="gron"||!S.pits||!S.pits.length)return 0;const a=CH.gron.at[i],c=cov(a,p),inC=z=>[[0,0],[1,0],[0,1],[1,1]].some(([x,y])=>c.has((z.y+y)*N+z.x+x)),hit=S.pits.filter(inC);if(!hit.length)return 0;
 S.gh=S.gh||[];const hid=hit.filter(z=>!z.rv),rev=hit.filter(z=>z.rv);hid.forEach(z=>S.gh.push({x:z.x,y:z.y}));S.pits=S.pits.filter(z=>!hid.includes(z));
 const P=rev[0];if(P){const cs=S.pits.filter(z=>z!==P).sort((u,v)=>Math.hypot(v.x-P.x,v.y-P.y)-Math.hypot(u.x-P.x,u.y-P.y));if(cs.length){const Q=cs[0],dx=Q.x-P.x,dy=Q.y-P.y,p2=p.map(([x,y])=>[cl(x+dx,0,N-1),cl(y+dy,0,N-1)]);S.atks.push({i,p:p2,echo:1});S.pfx=(S.pfx||[]).filter(f=>NOW()-f.t<3000).concat({t:NOW(),a:{x:P.x,y:P.y,rv:1},b:{x:Q.x,y:Q.y,rv:Q.rv?1:0}});S.pits=S.pits.filter(z=>z!==P&&z!==Q)}}
