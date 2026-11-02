@@ -158,9 +158,9 @@ R(`apply({type:"bossBuild",id:"trap",p:[[10,19]]});apply({type:"endBoss"})`);
   R(`apply({type:"endHero"});apply({type:"resolve"})`);
   ok(R("S.heroes[0].hp") === hp0 - R("TR.v"), "턴이 끝나도 두 번 맞지 않음"); }
 setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.boss.x=10;S.boss.y=12;S.heroes[0].x=10;S.heroes[0].y=20`);
-R(`apply({type:"bossBuild",id:"trap",p:[[10,20]]});apply({type:"endBoss"})`);
-{ const hp0 = R("S.heroes[0].hp"); R(`apply({type:"endHero"});apply({type:"resolve"})`);
-  ok(R("S.heroes[0].hp") < hp0, "함정 칸에 가만히 서 있으면 예전처럼 턴 끝에 터짐"); }
+ok(R(`apply({type:"bossBuild",id:"trap",p:[[10,20]]})`) === 0 && R("S.sec.traps.length") === 0, "용사가 서 있는 칸엔 가시 함정을 깔 수 없음");
+ok(R(`apply({type:"bossBuild",id:"trap",p:[[10,12]]})`) === 0, "보스가 서 있는 칸에도 불가");
+ok(R(`apply({type:"bossBuild",id:"trap",p:[[10,19]]})`) === 1, "빈 칸엔 설치 가능");
 
 // (v87) 숨은 폭탄로봇도 밟는 순간 바로 터짐
 setup("vince"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.sec.bombs=[];S.sec.bombs.push({id:99,x:10,y:19,dx:1,dy:0});S.heroes[0].x=10;S.heroes[0].y=20;S.heroes[1].x=11;S.heroes[1].y=20;S.heroes[2].x=20;S.heroes[2].y=25;S.walls=[];S.ph="hero"`);
