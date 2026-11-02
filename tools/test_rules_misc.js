@@ -148,5 +148,19 @@ R(`apply({type:"settle"})`);
 ok(R("(S.cuts||[]).some(c=>c.k=='mimic'&&c.h==0)"), "함정 상자(미믹)를 열면 컷인 기록");
 R(`MOB.trapChest.mimicChance=DATA.monsters.trapChest.mimicChance`);
 
+// (v87) 가시 함정은 지나가는 순간 바로 터짐 (턴 종료를 안 눌러도)
+setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.cuts=[];S.boss.x=10;S.boss.y=12;S.heroes[0].x=10;S.heroes[0].y=20`);
+R(`apply({type:"bossBuild",id:"trap",p:[[10,19]]});apply({type:"endBoss"})`);
+{ const hp0 = R("S.heroes[0].hp");
+  R(`apply({type:"heroAct",h:0,j:"m",x:10,y:18})`);
+  ok(R("S.heroes[0].hp") === hp0 - R("TR.v") && R("S.ph") === "hero", `지나가자마자 피해 ${R("TR.v")} (아직 용사 차례)`);
+  ok(R("S.sec.traps.length") === 0 && R("(S.cuts||[]).some(c=>c.k=='spike')") && /가시 함정을 밟았다/.test(R("S.log")), "함정은 바로 사라지고 컷인·안내");
+  R(`apply({type:"endHero"});apply({type:"resolve"})`);
+  ok(R("S.heroes[0].hp") === hp0 - R("TR.v"), "턴이 끝나도 두 번 맞지 않음"); }
+setup("gron"); R(`S.ph="boss";S.boss.ap=9;S.used={};S.boss.x=10;S.boss.y=12;S.heroes[0].x=10;S.heroes[0].y=20`);
+R(`apply({type:"bossBuild",id:"trap",p:[[10,20]]});apply({type:"endBoss"})`);
+{ const hp0 = R("S.heroes[0].hp"); R(`apply({type:"endHero"});apply({type:"resolve"})`);
+  ok(R("S.heroes[0].hp") < hp0, "함정 칸에 가만히 서 있으면 예전처럼 턴 끝에 터짐"); }
+
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);
