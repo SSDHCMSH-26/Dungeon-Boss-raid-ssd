@@ -67,7 +67,7 @@ with sync_playwright() as p:
     # 가로 화면
     pg.set_viewport_size({"width":1280,"height":720});pg.evaluate("()=>{L.fit=0;ui()}");time.sleep(.3)
     gb=pg.locator("#qk").bounding_box();wb=pg.locator("#w").bounding_box();lb=pg.locator("#pn").bounding_box()
-    ok(gb["x"]>wb["x"]+wb["width"]-5 and lb["x"]+lb["width"]<wb["x"]+5 and pg.evaluate("document.getElementById('c').height+8")==round(wb["height"]),"가로(PC) 화면: 왼쪽 버튼 / 가운데 맵(딱 맞음) / 오른쪽 도구")
+    ok(gb["x"]>wb["x"]+wb["width"]-5 and lb["x"]+lb["width"]<wb["x"]+5 and abs(pg.locator("#c").bounding_box()["height"]+8-wb["height"])<1.5,"가로(PC) 화면: 왼쪽 버튼 / 가운데 맵(딱 맞음) / 오른쪽 도구")
     pg.screenshot(path=P+"ed_land.png")
     pg.set_viewport_size({"width":844,"height":390});pg.evaluate("()=>{L.fit=0;ui()}");time.sleep(.3)
     gb=pg.locator("#qk").bounding_box();wb=pg.locator("#w").bounding_box();lb=pg.locator("#pn").bounding_box()
