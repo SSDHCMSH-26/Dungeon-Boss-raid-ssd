@@ -51,7 +51,7 @@ function edApply(x, y, first) {
 }
 /* 맵 칸 터치·문지르기 (지형·지우개는 문질러 여러 칸) */
 let edLast = null;
-function edCell(e) { const r = cv.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / Z), Math.floor((e.clientY - r.top) / Z)] }
+function edCell(e) { const r = cv.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) * N / r.width), Math.floor((e.clientY - r.top) * N / r.height)] }
 cv.addEventListener("pointerdown", e => { if (L.scr != "editor" || ED.view != "edit" || ED.tool == "pan") return; e.preventDefault(); const [x, y] = edCell(e); ED.painting = 1; edLast = x + "," + y; if (edApply(x, y, 1)) edChanged(); try { cv.setPointerCapture(e.pointerId) } catch (x_) { } });
 cv.addEventListener("pointermove", e => { if (!ED.painting || L.scr != "editor") return; const [x, y] = edCell(e), k = x + "," + y; if (k == edLast) return; edLast = k; if ((ED.tool == "wall" || ED.tool == "floor" || ED.tool == "erase") && edApply(x, y, 0)) edChanged() });
 const edStop = () => { ED.painting = 0; edLast = null }; cv.addEventListener("pointerup", edStop); cv.addEventListener("pointercancel", edStop);
