@@ -65,7 +65,7 @@ function menu(){const sv=loadSave();$("m").innerHTML=(sv?BT("▶ 이어하기 ("
 function ui(){if(document.body)document.body.className=T2()?(S&&S.champ=="gron"?"d-g":"d-v2"):({vince:"d-v"})[L.design]||"";layoutFix();$("m").style.display=L.scr=="menu"?"block":"none";$("g").style.display=L.scr=="menu"?"none":"block";if(L.scr=="menu"){L.fit=0;return menu()}if(L.scr=="editor"){document.body.className+=" ed";return edUI()}
 if(!L.fit)fitMap();
 draw();const B=S.boss,bsd=L.role=="boss"||L.mode=="local",hsd=L.role=="hero"||L.mode=="local";let u="",p="";$("lg").textContent=bsd||!(S.log||"").startsWith("🔒")?S.log:(S.plog||"");
-$("st").textContent=S.end||(L.wait?"⏳ 상대 대기 중 · 방 코드 "+L.code:(S.champ?CH[S.champ].n+" · ":"")+"R"+S.round+" · "+(S.ph=="setup"?T("ui.1"):own()=="boss"?T("ui.2"):T("ui.3"))+" · 나: "+(L.mode=="local"?T("ui.4"):L.role=="boss"?T("menu.12"):T("menu.13"))+(L.code?" · 방 "+L.code:""));
+insUI();$("st").textContent=S.end||(L.wait?"⏳ 상대 대기 중 · 방 코드 "+L.code:(S.champ?CH[S.champ].n+" · ":"")+"R"+S.round+" · "+(S.ph=="setup"?T("ui.1"):own()=="boss"?T("ui.2"):T("ui.3"))+" · 나: "+(L.mode=="local"?T("ui.4"):L.role=="boss"?T("menu.12"):T("menu.13"))+(L.code?" · 방 "+L.code:""));
 if(S.ph!="setup"){u='<div class="u" style="min-width:100%" onclick="L.menu=1;ui()">'+img(S.champ,18)+' '+CH[S.champ].n+' · HP '+B.hp+'/'+B.max+' · AP '+(bsd?B.ap:B.ap+((S.sec&&S.sec.hap)||0))+'/'+bMax()+(S.gen?' · ⚡발전기 HP '+S.gen.hp+' AP '+S.gen.ap+'/'+GAP():'')+bar(B.hp,B.max,"#e33")+'</div>'+S.heroes.map((e,i)=>'<div class="u'+(i==L.si?" s":"")+(e.dead?" x":"")+'" onclick="L.si='+i+';L.menu=1;ui()">'+img(e.k,18)+' '+CLS[e.k].n+' '+e.hp+'/'+e.max+' · AP '+e.ap+(e.guard?" 🛡":"")+bar(e.hp,e.max,"#3c3")+'</div>').join("")}
 $("un").innerHTML=u;$("am").innerHTML=amH();$("am").style.display=amH()?"block":"none";{const qk=qkH();$("qk").innerHTML=qk;$("qk").style.display=qk?"block":"none"}{const cf=cfH();$("cf").innerHTML=cf;$("cf").style.display=cf?"block":"none";const ip=ipH();$("ip").innerHTML=ip;$("ip").style.display=ip?"block":"none"}
 if(S.end)p=BT(T("ui.5"),"L.scr='menu';L.wait=0;ui()","go");
@@ -77,3 +77,8 @@ else if(!mine())p='<p>'+(S.ph=="resolve"?T("ui.12"):T("ui.13"))+'</p>';
 else if(S.ph=="boss")p=BT(T("ui.14"),"endBoss()","end")+(L.menu?"":('<p>'+T("ui.15")+'</p>'));
 else p=BT(T("ui.16"),"endHero()","end")+(L.menu?"":('<p>'+T("ui.17")+'</p>'));
 try{p+=onlineBar()}catch(e){}if(L.edTest)p+='<div class="r">'+BT(T("ed.toEditor"),"edBackFromPlay()","s")+"</div>";$("pn").innerHTML=p;try{cutinCheck()}catch(e){}save()}
+
+/* 간파 줄: 왼쪽 = 용사 쪽, 오른쪽 = 보스 쪽. 가운데(0)에서 얻은 쪽으로 채워지고, 눈금은 혜택 단계(2·3·5·7) */
+function insUI(){const e=$("ins"),C=RULE.insight;if(!e)return;if(!C||S.ph=="setup"){e.style.display="none";return}const I=S.ins||{v:0,st:0,note:""},M=C.insMax,v=I.v,w=Math.abs(v)/M*50;
+let tk="";[2,3,5,7].forEach(t=>{tk+='<u style="left:'+(50+t/M*50)+'%"></u><u style="left:'+(50-t/M*50)+'%"></u>'});
+e.style.display="block";e.innerHTML='<div class="ib"><span>🧙 '+(v<0?"<b>"+(-v)+"</b>":0)+'</span><div class="ig"><i style="left:'+(v<0?50-w:50)+'%;width:'+w+'%;background:'+(v<0?"#5ac8ff":"#e0553a")+'"></i>'+tk+'<u style="left:50%;background:#fff"></u></div><span>'+(v>0?"<b>"+v+"</b>":0)+' 👹</span></div>'+(I.note?'<div class="in">'+I.note+"</div>":"")}

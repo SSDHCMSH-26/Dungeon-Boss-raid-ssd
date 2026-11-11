@@ -61,7 +61,7 @@ setup(); wall(14, 15); rob(17, 15);
 ok(act(GR, 11, 15) === 1 && rhp() === 99, "그랩: 벽에 막힘");
 
 // 관통 화살: AP 3 · 쿨 8 · 2방향 · 길 위 벽·함정·폭탄·구덩이·상자·컨베이어 삭제(가장자리 벽 제외)
-setup(); wall(13, 15); R(`S.walls=[{x:15,y:15,t:3,lv:1}];S.sec.traps=[[17,15],[10,12]];S.sec.bombs=[{id:1,x:19,y:15,dx:0,dy:0}];S.sec.bid=1;S.pits=[{x:20,y:15},{x:5,y:5}];S.chests=[{x:23,y:15,k:"x"}];S.belts=[{x:10,y:11,d:0,en:0,t:1}]`);
+setup(); wall(13, 15); R(`S.walls=[{x:15,y:15,t:3,lv:1}];S.sec.traps=[[17,15],[10,12]];S.sec.bombs=[{id:1,x:19,y:15,dx:0,dy:0}];S.sec.bid=1;S.pits=[{x:20,y:15},{x:5,y:5}];S.chests=[{x:23,y:15,k:"x"}];S.belts=[{x:10,y:11,d:0,en:0,t:1}];S.ins={v:0,last:"",st:0,got:{b:{},h:{2:S.round,3:S.round,5:S.round,7:S.round}},note:""}`); // 간파 단계 혜택(AP+1 등)은 이 테스트에서 끔
 ok(act(PR, 11, 15, [[11, 15], [10, 14]]) === 1 && R("S.heroes[0].ap") === 6, "관통: 2방향 발사 (AP 3)");
 ok(!R("sw(13,15)") && R("S.walls.length") === 0, "관통: 맵 벽·설치 벽 삭제");
 ok(R("S.sec.traps.length") === 0 && R("S.sec.bombs.length") === 0, "관통: 숨은 함정·폭탄로봇 삭제 (두 번째 화살이 위쪽 함정도)");

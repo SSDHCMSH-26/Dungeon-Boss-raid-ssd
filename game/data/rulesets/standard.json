@@ -44,5 +44,16 @@
   },
   "online": {
     "idleSec": 180
+  },
+  "insight": {
+    "insMax": 10,
+    "insGain": 1,
+    "actionCap": 3,
+    "comboBonus": 1,
+    "comboMax": 2,
+    "resetTurns": 10,
+    "t2HeroAp": 1,
+    "t2BossAp": 2,
+    "t2Cd": 1
   }
 }

@@ -12,6 +12,10 @@ function view(st, side) {
   delete v.sec;
   delete v.used;
   if (!scanned) { delete v.tp; delete v.bp; v.atks = (v.atks || []).filter(a => !a.echo); }
+  else if (v.scan.rad != null) { // 계시는 고른 범위 안만 공개
+    const inA = (x, y) => Math.abs(x - v.scan.x) <= v.scan.rad && Math.abs(y - v.scan.y) <= v.scan.rad;
+    v.tp = (v.tp || []).filter(t => inA(t[0], t[1])); v.bp = (v.bp || []).filter(b => inA(b.x, b.y) || (v.scanB || []).indexOf(b.id) >= 0);
+  }
   v.pits = (v.pits || []).filter(p => p.rv);
   // 새 상자(nw)는 용사 턴이 시작될 때까지 안 보임, 함정 상자는 보통 상자로 보임
   v.chests = (v.chests || []).filter(c => !c.nw).map(c => c.k === "x" && !c.rv ? Object.assign({}, c, { k: "t" }) : c);
