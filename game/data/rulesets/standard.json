@@ -55,5 +55,10 @@
     "t2HeroAp": 1,
     "t2BossAp": 2,
     "t2Cd": 1
+  },
+  "search": {
+    "searchAp": 1,
+    "searchRange": 3,
+    "searchArea": 3
   }
 }
