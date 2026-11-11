@@ -80,7 +80,7 @@
         if (s.fx && (s.fx.dmgMin !== undefined || s.fx.dmgMax !== undefined)) { c.int(s.fx.dmgMin, p + ".fx.dmgMin", 0); c.int(s.fx.dmgMax, p + ".fx.dmgMax", 0); c.need(s.fx.dmgMin <= s.fx.dmgMax, p + ".fx", "dmgMin 이 dmgMax 보다 클 수 없어요"); }
       };
       // 효과 수치(fx)가 꼭 있어야 하는 스킬: 용사는 종류(t), 보스는 id 로 구분
-      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"], s: ["dmg", "stillMult"], p: ["dmg", "pull"], v: ["dmg", "shots"] };
+      const FX_T = { g: ["damageTaken", "radius"], r: ["hit", "recoil"], l: ["dmg", "heal"], u: ["bindBoss", "bindOther", "area"], o: ["radius", "near", "far"], c: ["radius"], w: ["add"], s: ["dmg", "stillMult"], p: ["dmg", "pull"], v: ["dmg", "shots"] };
       const FX_ID = { wall: ["hpPerLv", "turns", "turnsLater", "stackTurns", "maxLv"], trap: ["dmg", "max"], pit: ["fallDmg", "max"], belt: ["maxLen"], run: ["move", "enhancedMove"] };
       const fx = (s, keys, p) => {
         if (!keys || !c.obj(s.fx, p + ".fx")) return;
@@ -171,6 +171,8 @@
       if (c.obj(b.status, "status")) c.int(b.status.paralyzeMove, "status.paralyzeMove", 0);
       if (b.online !== undefined && c.obj(b.online, "online")) c.int(b.online.idleSec, "online.idleSec", 30);
       if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); if (b.circle.chantMove !== undefined) c.int(b.circle.chantMove, "circle.chantMove", 0); }
+      if (b.insight !== undefined && c.obj(b.insight, "insight")) { const g = b.insight; c.int(g.insMax, "insight.insMax", 3); c.int(g.insGain, "insight.insGain", 1); c.int(g.actionCap, "insight.actionCap", 1); c.int(g.comboBonus, "insight.comboBonus", 0); c.int(g.comboMax, "insight.comboMax", 0); c.int(g.resetTurns, "insight.resetTurns", 1); c.int(g.t2HeroAp, "insight.t2HeroAp", 0); c.int(g.t2BossAp, "insight.t2BossAp", 0); c.int(g.t2Cd, "insight.t2Cd", 0); }
+      if (b.search !== undefined && c.obj(b.search, "search")) { c.int(b.search.searchAp, "search.searchAp", 0); c.int(b.search.searchRange, "search.searchRange", 1); c.int(b.search.searchArea, "search.searchArea", 1); c.need(b.search.searchArea % 2 === 1, "search.searchArea", "홀수여야 해요 (3 = 3×3)"); }
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

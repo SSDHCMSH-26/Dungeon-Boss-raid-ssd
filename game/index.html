@@ -19,6 +19,7 @@ h1 small{display:block;font:600 12px "Noto Sans KR",sans-serif;color:var(--m);te
 canvas{display:block;image-rendering:pixelated}
 #am{display:none;position:static;margin:6px 0;overflow:auto;background:var(--pn);border:3px solid var(--gd);box-shadow:0 0 0 3px var(--ln);padding:6px;z-index:5}
 #am .b{background:rgba(58,47,91,.72)}#am .b.go{background:rgba(63,155,74,.8)}#am .b:disabled{opacity:.3}
+#ins{display:none;margin:4px 0;font-size:11px}#ins .ib{display:flex;align-items:center;gap:6px}#ins .ig{flex:1;height:9px;position:relative;background:#0008;border:1px solid var(--ln)}#ins .ig i{position:absolute;top:0;bottom:0}#ins .ig u{position:absolute;top:-2px;bottom:-2px;width:1px;background:#fff6}#ins .in{opacity:.85;margin-top:2px}
 #qk{display:none;margin:6px 0;padding:6px;background:var(--pn);border:3px solid var(--gd);box-shadow:0 0 0 3px var(--ln)}#qk .r{margin:4px 0}#ip{display:none;margin:6px 0;padding:8px;background:var(--pn);border:3px solid var(--gd);box-shadow:0 0 0 3px var(--ln)}
 #ip .iph{display:flex;justify-content:space-between;align-items:center;gap:8px}#ip .ipn b{font-size:16px}#ip .ipn img{vertical-align:middle}
 #ip .ipt{font-size:11px;padding:1px 6px;border:1px solid var(--m);margin-left:6px;color:var(--m)}#ip .ipt.foe{border-color:#e55;color:#f99}
@@ -95,7 +96,7 @@ input{flex:1;min-width:90px;padding:9px;border:3px solid var(--ln);background:va
 <h1><span data-t="html.title">PIXEL DUNGEON RAID</span><small data-t="html.subtitle">30×30 · 1대1 턴제 보스 레이드</small><small id="ver" style="opacity:.55"></small></h1>
 <div id="m"></div>
 <div id="g" style="display:none">
-<div id="gl"><div id="st"></div><div id="lg"></div>
+<div id="gl"><div id="st"></div><div id="ins"></div><div id="lg"></div>
 <div id="tb" class="r" style="margin:2px 0 6px"><button class="b s" onclick="zoom(-1)">➖</button><button class="b s" onclick="zoom(1)">➕</button><button class="b s" onclick="jump(0)" data-t="tb.boss">👹 보스</button><button class="b s" onclick="jump(1)" data-t="tb.hero">🧙 용사</button><button class="b s" onclick="setDesign()" data-t="tb.design">🎨 디자인</button></div></div>
 <div id="gc"><div id="mw"><div id="w"><canvas id="c"></canvas></div><div id="am"></div></div></div>
 <div id="gr"><div id="qk"></div>
@@ -117,8 +118,8 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v89",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
-const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
+const GAME_VER="v90",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
 window.removeEventListener("error",onErr);
