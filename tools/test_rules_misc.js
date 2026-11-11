@@ -203,16 +203,19 @@ R(`S.round=13;S.ins.v=1;S.ins.last="";S.sec.traps=[[10,17]];S.heroes[0].ap=9;S.h
 R(`apply({type:"heroAct",h:0,j:"m",x:10,y:16})`);
 ok(R("S.ins.got.b[2]") === 13, "10턴이 지나면 다시 받을 수 있음");
 
-// (v90) 수색: 기본 행동 · AP 1 · 주위 3×3 숨은 것 개수 · 고른 칸에 있으면 간파(파괴·AP 반환) · 팀 전체 턴당 1번
-setup("gron"); R(`S.ph="hero";S.sec.traps=[[11,18],[12,19],[20,20]];S.pits=[{x:9,y:17}];S.heroes[0].x=10;S.heroes[0].y=20;S.heroes[0].ap=3;S.heroes[1].x=12;S.heroes[1].y=21;S.heroes[1].ap=3`);
-ok(R(`apply({type:"heroAct",h:0,j:"q",x:11,y:19})`) === 1 && R("S.srch[0].n") === 3 && R("S.heroes[0].ap") === 2, "수색(빗나감): 주위 3×3 에 함정 2 + 구덩이 1 = 3개, AP 1 사용");
-ok(R("S.sec.traps.length") === 3 && !R("S.ins"), "빗나가면 아무것도 안 없어지고 간파도 없음");
-ok(R(`apply({type:"heroAct",h:1,j:"q",x:12,y:19})`) === 0, "같은 턴엔 다른 용사도 수색 불가 (팀 공유)");
-ok(R(`apply({type:"heroAct",h:0,j:"q",x:20,y:20})`) === 0, "사거리 밖 불가");
-R(`apply({type:"endHero"});apply({type:"resolve"});apply({type:"endBoss"});S.sec.traps=[[11,18],[12,19]];S.heroes[1].ap=3`);
-ok(R(`apply({type:"heroAct",h:1,j:"q",x:12,y:19})`) === 1 && R("S.sec.traps.length") === 1 && R("S.heroes[1].ap") === 3, "수색(명중): 그 칸의 함정 파괴 · AP 돌려받음");
-ok(R("S.ins.v") === -1 && R("S.srch[0].n") === 1 && R("S.srch[0].hit") === 1, "명중하면 용사 간파 +1, 남은 숨은 것 1개 표시");
-ok(R("view(S,'hero').srch.length") === 1, "수색 결과는 용사 화면에 보임");
+// (v91) 탐지 오드: 기본 행동 · AP 2 · 사거리 3 · 주위 3×3 숨은 것 개수 · 팀 전체 턴당 2번 · 0개면 AP -4 + 남은 횟수 소진
+setup("gron"); R(`S.ph="hero";S.sec.traps=[[11,18],[12,19],[20,20]];S.pits=[{x:9,y:17}];S.chests=[{id:9,x:11,y:20,k:"x"}];S.heroes[0].x=10;S.heroes[0].y=20;S.heroes[0].ap=3;S.heroes[1].x=12;S.heroes[1].y=21;S.heroes[1].ap=3;S.heroes[2].x=14;S.heroes[2].y=21;S.heroes[2].ap=3`);
+ok(R(`apply({type:"heroAct",h:0,j:"q",x:11,y:19})`) === 1 && R("S.srch[0].n") === 3 && R("S.heroes[0].ap") === 1, "탐지(빗나감): 함정 2 + 구덩이 1 = 3개 (함정 상자는 안 셈), AP 2 사용");
+ok(R("S.sec.traps.length") === 3 && R("S.chests.length") === 1 && !R("S.ins"), "빗나가면 아무것도 안 없어지고 간파도 없음");
+ok(R(`apply({type:"heroAct",h:0,j:"q",x:20,y:20})`) === 0 && R(`apply({type:"heroAct",h:0,j:"q",x:11,y:19})`) === 0, "사거리 밖 불가 · AP 부족 불가");
+ok(R(`apply({type:"heroAct",h:1,j:"q",x:12,y:19})`) === 1 && R("S.sec.traps.length") === 2 && R("S.heroes[1].ap") === 3, "2번째(다른 용사): 고른 칸의 함정 간파·파괴, AP 안 씀");
+ok(R("S.ins.v") === -1 && R("S.srch[1].n") === 1 && R("S.srch[1].hit") === 1, "명중하면 용사 간파 +1, 남은 숨은 것 1개 표시");
+ok(R(`apply({type:"heroAct",h:2,j:"q",x:14,y:20})`) === 0, "턴당 2번까지 (팀 공유)");
+R(`apply({type:"endHero"});apply({type:"resolve"});apply({type:"endBoss"});S.sec.traps=[[20,20]];S.pits=[{x:9,y:17}];S.heroes.forEach(h=>h.ap=3)`);
+ok(R(`apply({type:"heroAct",h:0,j:"q",x:10,y:18})`) === 1 && R("S.pits.length") === 1 && R("S.srch[0].n") === 1 && R("S.srch[0].hit") === 0, "구덩이 칸을 찍어도 파괴되지 않고 개수만 셈");
+ok(R(`apply({type:"heroAct",h:1,j:"q",x:13,y:21})`) === 1 && R("S.srch[1].n") === 0 && R("S.heroes[1].ap") === 0, "0개: AP 4 소모(가진 만큼, 0 아래로는 안 내려감)");
+R(`S.srchN=0;S.heroes[2].ap=6`);
+ok(R(`apply({type:"heroAct",h:2,j:"q",x:15,y:21})`) === 1 && R("S.heroes[2].ap") === 2 && R(`apply({type:"heroAct",h:2,j:"q",x:15,y:20})`) === 0, "0개: 첫 번째에 헛짚어도 남은 횟수를 모두 잃음");
 
 console.log(fail ? fail + "개 실패" : "규칙 테스트 모두 통과");
 process.exit(fail ? 1 : 0);

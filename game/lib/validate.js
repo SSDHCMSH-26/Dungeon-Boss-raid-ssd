@@ -172,7 +172,7 @@
       if (b.online !== undefined && c.obj(b.online, "online")) c.int(b.online.idleSec, "online.idleSec", 30);
       if (b.circle !== undefined && c.obj(b.circle, "circle")) { c.int(b.circle.maxLv, "circle.maxLv", 1); if (b.circle.chantMove !== undefined) c.int(b.circle.chantMove, "circle.chantMove", 0); }
       if (b.insight !== undefined && c.obj(b.insight, "insight")) { const g = b.insight; c.int(g.insMax, "insight.insMax", 3); c.int(g.insGain, "insight.insGain", 1); c.int(g.actionCap, "insight.actionCap", 1); c.int(g.comboBonus, "insight.comboBonus", 0); c.int(g.comboMax, "insight.comboMax", 0); c.int(g.resetTurns, "insight.resetTurns", 1); c.int(g.t2HeroAp, "insight.t2HeroAp", 0); c.int(g.t2BossAp, "insight.t2BossAp", 0); c.int(g.t2Cd, "insight.t2Cd", 0); }
-      if (b.search !== undefined && c.obj(b.search, "search")) { c.int(b.search.searchAp, "search.searchAp", 0); c.int(b.search.searchRange, "search.searchRange", 1); c.int(b.search.searchArea, "search.searchArea", 1); c.need(b.search.searchArea % 2 === 1, "search.searchArea", "홀수여야 해요 (3 = 3×3)"); }
+      if (b.search !== undefined && c.obj(b.search, "search")) { c.int(b.search.searchAp, "search.searchAp", 0); c.int(b.search.searchRange, "search.searchRange", 1); c.int(b.search.searchArea, "search.searchArea", 1); c.int(b.search.searchUses, "search.searchUses", 1); c.int(b.search.searchMissAp, "search.searchMissAp", 0); c.need(b.search.searchArea % 2 === 1, "search.searchArea", "홀수여야 해요 (3 = 3×3)"); }
       c.int(b.mapWallHp, "mapWallHp", 1);
       if (c.obj(b.crystal, "crystal")) {
         const r = b.crystal;

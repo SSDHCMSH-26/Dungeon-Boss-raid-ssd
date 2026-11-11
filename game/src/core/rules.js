@@ -81,17 +81,19 @@ afxAdd([{k:"line",a:[h.x,h.y],b:arrEnd(h,a.d,r.cs),c:"#ffe58a"}]);h.aT=NOW();h.a
 /* 순간이동 스크롤 효과(그림용): 떠난 칸엔 스크롤 그림, 도착 칸엔 순간이동 빛 — 각 1칸 크기 */
 function sfxAdd(ax,ay,bx,by){S.sfx=(S.sfx||[]).filter(f=>NOW()-f.t<3000).concat({a:[ax,ay],b:[bx,by],t:NOW()})}
 function cutIn(k,h){if(!h)return;S.cuts=(S.cuts||[]).filter(c=>NOW()-c.t<10000).concat({k,h:S.heroes.indexOf(h),t:NOW()})}
-/* 수색(기본 행동, 용사 진영이 한 턴에 한 번): 고른 칸 주위 area×area 안에 숨은 것(가시 함정·폭탄로봇·안 들킨 구덩이·함정 상자)이 몇 개인지 알려 줌.
-   고른 그 칸에 숨은 것이 있으면 간파: 그것을 없애고, 간파 수치를 얻고, 쓴 AP 를 돌려받음 */
-function search(h,x,y){const Q=RULE.search,k=CLS[h.k],AR=(Q.searchArea-1)>>1,hit=[];S.srchR=S.round;
+/* 탐지 오드(기본 행동, 용사 진영이 한 턴에 searchUses 번): 내 위치에서 searchRange 안의 칸을 고르면
+   그 칸 주위 area×area 안에 숨은 것(가시 함정·폭탄로봇·안 들킨 구덩이)이 몇 개인지 알려 줌. 함정 상자는 감지 안 됨.
+   고른 그 칸에 가시 함정·폭탄로봇이 있으면 간파: 파괴 + 간파 수치 + AP 안 씀. (구덩이는 개수만 세고 파괴 안 됨)
+   아무것도 없었으면(0개) 헛짚음: 이번 턴 남은 횟수를 모두 잃고 AP 를 searchMissAp 만큼 씀 */
+const srchUsed=()=>S.srchR==S.round?(S.srchN||0):0;
+function search(h,x,y){const Q=RULE.search,k=CLS[h.k],AR=(Q.searchArea-1)>>1,hit=[];S.srchN=srchUsed()+1;S.srchR=S.round;
 const ti=S.sec.traps.findIndex(t=>t[0]==x&&t[1]==y);if(ti>=0){S.sec.traps.splice(ti,1);if(S.tp)S.tp=S.tp.filter(t=>!(t[0]==x&&t[1]==y));hit.push("가시 함정")}
 const bi=S.sec.bombs.findIndex(b=>b.x==x&&b.y==y);if(bi>=0){S.sec.bombs.splice(bi,1);if(S.bp)S.bp=S.bp.filter(b=>!(b.x==x&&b.y==y));hit.push("폭탄로봇")}
-const pi=pitAt(x,y);if(pi>=0&&!S.pits[pi].rv){S.pits.splice(pi,1);hit.push("구덩이")}
-const ci=(S.chests||[]).findIndex(c=>c.x==x&&c.y==y&&c.k=="x"&&!c.rv);if(ci>=0){S.chests.splice(ci,1);hit.push("함정 상자")}
 let n=S.sec.traps.filter(t=>inSq(x,y,AR,t[0],t[1])).length+S.sec.bombs.filter(b=>inSq(x,y,AR,b.x,b.y)).length;
-(S.pits||[]).forEach(z=>{if(!z.rv&&[[0,0],[1,0],[0,1],[1,1]].some(([a,b])=>inSq(x,y,AR,z.x+a,z.y+b)))n++});(S.chests||[]).forEach(c=>{if(c.k=="x"&&!c.rv&&inSq(x,y,AR,c.x,c.y))n++});
-if(!hit.length)h.ap-=Q.searchAp;S.srch=(S.srch||[]).filter(z=>z.r==S.round).concat({x,y,n,r:S.round,hit:hit.length?1:0});PRES.fx("purify",x,y,0);
-S.log="🔍 "+k.n+" 수색! "+(hit.length?hit.join("·")+" 간파 — 파괴! (AP 돌려받음) · ":"")+"주변 "+Q.searchArea+"×"+Q.searchArea+" 에 "+(hit.length?"남은 ":"")+"숨은 것 "+n+"개";
+(S.pits||[]).forEach(z=>{if(!z.rv&&[[0,0],[1,0],[0,1],[1,1]].some(([a,b])=>inSq(x,y,AR,z.x+a,z.y+b)))n++});
+const miss=!hit.length&&n==0;if(miss){h.ap=Math.max(0,h.ap-Q.searchMissAp);S.srchN=Q.searchUses}else if(!hit.length)h.ap-=Q.searchAp;
+S.srch=(S.srch||[]).filter(z=>z.r==S.round).concat({x,y,n,r:S.round,hit:hit.length?1:0});PRES.fx("purify",x,y,0);
+S.log="🔍 "+k.n+" 탐지 오드! "+(hit.length?hit.join("·")+" 간파 — 파괴! (AP 안 씀) · 주변 "+Q.searchArea+"×"+Q.searchArea+" 에 남은 숨은 것 "+n+"개":miss?"아무것도 감지되지 않았다… (AP -"+Q.searchMissAp+" · 이번 턴 탐지 끝)":"주변 "+Q.searchArea+"×"+Q.searchArea+" 에 숨은 것 "+n+"개");
 if(hit.length)insGain("h",hit.length);return 1}
 /* 가시 함정·숨은 폭탄로봇은 밟는 순간 바로 터짐: 이번 행동으로 지나간 칸(S.mv)에 숨은 가시 함정이 있으면 즉시 피해·컷인·공개 후 사라짐 (돌진처럼 S.mv 를 안 남기는 이동은 무시) */
 function trapCheck(h,n){if(h.dead||!S.sec||!(S.sec.traps.length||S.sec.bombs.length))return;const i=S.heroes.indexOf(h),cells=[];S.mv.slice(n).filter(r=>r.i==i).forEach(r=>r.c.forEach(c=>cells.push(c)));
@@ -111,7 +113,7 @@ S.log=(S.log?S.log+" ":"")+"🕳️ 숨은 구덩이! "+CLS[h.k].n+" 낙하 -"+P
 if(S.heroes.every(z=>z.dead))S.end="👹 보스 진영 승리! 용사가 전멸했습니다."}
 function dealHits(hs,v,k,nm){const B=S.boss;const dv=e=>e.o===B&&S.champ=="vince"&&S.gen&&S.gen.hp>0?Math.round(v*CST().damageTakenWithGen):v;hs.forEach(e=>{e.o.hp-=dv(e);if(e.o.k=="mimic"||e.o.k=="gob")e.o.hurtT=NOW()});S.log=k.n+" "+nm+" 명중! "+hs.map(e=>e.n+" -"+dv(e)).join(" · ")+(hs.some(e=>e.o===B&&dv(e)<v)?" (🛡발전기 가동 중: 빈센토 피해 -"+pct(1-CST().damageTakenWithGen)+")":"");if(S.fac.some(f=>f.hp<=0)){S.facRef=1;S.log+=" 🏭공장 파괴! 다음 턴 빈센토·발전기 AP +"+CST().factoryKillAp+" 회수"}S.fac=S.fac.filter(f=>f.hp>0);S.rob=S.rob.filter(q=>q.hp>0);if(S.walls.some(w=>w.hp<=0)){S.walls=S.walls.filter(w=>w.hp>0);mwClean();S.log+=" 🧱벽 파괴!"}else if(mwClean())S.log+=" 🧱벽 파괴!";S.log+=mobClean();if(S.gen&&S.gen.hp<=0){S.gen.hp=0;S.log+=" ⚡발전기 파괴!";if(!S.genDead){S.genDead=1;let nn=0;const cs=[];for(let dx=-3;dx<=3;dx++)for(let dy=-3;dy<=3;dy++)cs.push([S.gen.x+dx,S.gen.y+dy]);shuffle(cs).sort((a,b)=>ch(a[0],a[1],S.gen.x,S.gen.y)-ch(b[0],b[1],S.gen.x,S.gen.y));for(const [x,y] of cs){if(nn>=ROB.wreckCount)break;if(x<1||y<1||x>=N-1||y>=N-1||bad(x,y)||hAt(x,y)||rb(x,y)||inB(x,y))continue;S.rob.push({id:S.rid++,fid:0,x,y,hp:RHP[ROB.wreckLv-1],mx:RHP[ROB.wreckLv-1],lv:ROB.wreckLv,en:0});nn++}if(nn)S.log+=" 🤖발전기 잔해에서 Lv"+ROB.wreckLv+" 로봇 "+nn+"기 가동!"}}if(B.hp<=0){B.hp=0;S.end="🎉 용사 진영 승리! "+CH[S.champ].n+" 격파!"}}
 function act0(h,j,x,y,p){const k=CLS[h.k],B=S.boss;
-if(j=="q"){const Q=RULE.search;if(!Q||h.ap<Q.searchAp||S.srchR==S.round||x<0||y<0||x>=N||y>=N||ch(x,y,h.x,h.y)>Q.searchRange)return 0;return search(h,x,y)}
+if(j=="q"){const Q=RULE.search;if(!Q||h.ap<Q.searchAp||srchUsed()>=Q.searchUses||x<0||y<0||x>=N||y>=N||ch(x,y,h.x,h.y)>Q.searchRange)return 0;return search(h,x,y)}
 if(j=="x"&&S.champ=="gron"){if(h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange||x<1||y<1||x>=N-1||y>=N-1||!(sw(x,y)||dw(x,y)))return 0;const gone=wDmg(x,y,RULE.hero.breakDmg);h.ap--;h.aT=NOW();h.aK="atk";S.log="🔨 "+k.n+"의 벽 부수기! 벽 -"+RULE.hero.breakDmg+(gone?" 🧱벽 파괴!":"");return 1}
 if(j=="x"){const b=beltAt(x,y);if(!b||h.ap<1||ch(x,y,h.x,h.y)>RULE.hero.breakRange)return 0;S.belts=S.belts.filter(z=>z!==b);h.ap--;S.log="🔨 "+k.n+"이(가) 컨베이어를 파괴!";return 1}
 if(j=="m"){const c=qp(h,x,y,mvOf(h));if(h.ap<1||h.mc>=RULE.hero.movesPerTurn||!c)return 0;h.x=x;h.y=y;h.ap--;h.mc++;S.mv.push({i:S.heroes.indexOf(h),c});PRES.path("h"+S.heroes.indexOf(h),c);{const m=crPath("h",h,c);ride(h);if(m)S.log=m}return 1}
