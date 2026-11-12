@@ -1,7 +1,7 @@
 /* [화면] 테마 4 — 보랏빛 다크 판타지 UI (사용자 시안 기준)
    그림·맵·유닛은 테마 3 과 같고, 패널 모양만 다름:
    보스·용사 초상 카드(HP·AP 막대) / 아이콘이 있는 스킬 카드(◆AP 배지) / 맵 위 가운데 상황 배너 / 큰 턴 종료 버튼 */
-const t4On = () => L.design == "t4";
+const t4On = () => L.design == "t4" || L.design == "t5"; // 테마 5 도 카드·로고는 테마 4 것을 씀
 // 스킬 아이콘: 있는 그림(assets)을 다시 씀. 없으면 글 앞의 그림 글자, 그것도 없으면 ◆
 const T4IC = {
   d_knight: "fx_burst", d_mage: "mage_atk", g: "fx_shield", r: "knight_atk", h: "fx_heal", l: "fx_judge", u: "fx_purify",
