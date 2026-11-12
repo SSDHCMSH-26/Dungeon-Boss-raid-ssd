@@ -32,7 +32,17 @@ function cfH(){if(!mine()||L.act===null)return"";const bs=S.ph=="boss",a=L.act,q
 let nm,hint=T("cfH.1");
 if(bs){nm=a=="m"?T("ipH.18"):a=="i"?T("cfH.2"):q.n;if(q&&q.id=="bomb")hint=T("cfH.3");else if(q&&q.id=="belt")hint="① 시작 칸 → ② 끝 칸 (한 줄, 최대 "+EXS("belt").fx.maxLen+"칸)";else if(q&&q.id=="fac")hint=T("cfH.4");else if(q&&q.id=="dig")hint="피해를 줄 벽 칸을 터치 (최대 "+q.pk+"칸, 다시 터치하면 해제)";else if(q&&q.id=="hop")hint="이동할 구덩이 칸을 터치 ("+q.r+"칸 이내)"}
 else{const k=CLS[sel().k];nm=a=="m"?T("ipH.18"):a=="i"?T("cfH.2"):a=="q"?"🔍 탐지 오드":a=="x"?(S.champ=="gron"?T("ipH.19"):T("ipH.20")):k.sk[a].n;if(a=="q")hint="살펴볼 칸을 터치 (사거리 "+RULE.search.searchRange+" · 그 칸 주위 "+RULE.search.searchArea+"×"+RULE.search.searchArea+" 에 숨은 것 개수를 알려 줌 · 그 칸에 함정·폭탄로봇이 있으면 간파 · 0개면 AP -"+RULE.search.searchMissAp+")";else if(a=="x")hint=S.champ=="gron"?T("cfH.5"):T("cfH.6");else if(a!="m"&&a!="i"&&a!="x"&&(k.sk[a].t=="s"||k.sk[a].t=="p"))hint="쏠 방향의 칸을 터치 (직선·대각선, "+k.sk[a].r+"칸까지 · 처음 닿는 적)";else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="k")hint="이동할 칸을 터치 ("+k.sk[a].r+"칸 이내 빈 칸, 벽 너머 가능)";else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="v")hint="쏠 방향 칸을 "+((k.sk[a].fx||{}).shots||1)+"곳 터치 (같은 방향이면 그 줄의 다른 칸을 터치)";else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="w")hint="영창할 마법진의 칸을 터치 (빛나는 칸)";else if(a!="m"&&a!="i"&&k.sk[a].t=="l")hint="쏠 방향의 칸을 터치 (직선·대각선, "+k.sk[a].r+"칸까지 나아가요)";else if(a!="m"&&a!="i"&&k.sk[a].t=="r")hint="돌진할 방향의 칸을 터치 (직선·대각선, 무조건 "+k.sk[a].r+"칸 돌진)";else if(a!="m"&&a!="i"&&k.sk[a].t=="g")hint=T("cfH.7");else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="o")hint="자신(마법사) 칸을 터치해 마력을 방출합니다 ("+k.sk[a].fx.radius+"칸 이내 "+k.sk[a].fx.near+" · 전체 "+k.sk[a].fx.far+")";else if(a!="m"&&a!="i"&&k.sk[a].t=="u")hint=T("cfH.8");else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="c"){const R=k.sk[a].fx.radius*2+1;hint="마법진 중심 칸을 터치 (사거리 "+k.sk[a].r+" · 범위 "+R+"×"+R+" · 공장·발전기 위는 불가)"}else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].t=="b")hint=T("cfH.10");else if(a!="m"&&a!="i"&&a!="x"&&k.sk[a].fx&&k.sk[a].fx.arc)hint=T("cfH.11")}
-return '<div class="ht"><b>'+nm+'</b> · '+hint+'</div><div class="r">'+BT("✔ 확정 ("+L.picks.length+"/"+need()+")","okAct()","go s",(q&&q.vr?L.picks.length<1:L.picks.length!=need()))+BT(T("cfH.9"),"pickA(null)","s")+'</div>'}
+return '<div class="ht"><b>'+nm+'</b> · '+hint+'</div><div class="r">'+BT("✔ 확정 ("+L.picks.length+"/"+need()+")","okAct()","go s",!okReady())+BT(T("cfH.9"),"pickA(null)","s")+'</div>'}
+/* 확정할 수 있는지 (고른 칸 수가 맞는지) */
+function okReady(){const q=S.ph=="boss"&&L.act!="m"&&L.act!="i"?spec(L.act):null;return q&&q.vr?L.picks.length>=1:L.picks.length==need()}
+/* 맵 위 확정 말풍선: 마지막으로 고른 칸 바로 옆에 ✔확정 / ✖ (오른쪽 패널까지 손을 옮기지 않아도 되게) */
+function fqUI(){const mw=$("mw");if(!mw)return;let f=$("fq");const on=L.scr=="game"&&S&&mine()&&L.act!==null&&L.picks.length>0;
+if(!on){if(f)f.style.display="none";return}
+if(!f){mw.insertAdjacentHTML("beforeend",'<div id="fq"></div>');f=$("fq")}
+const ok=okReady(),n=need();f.innerHTML='<button class="b go s"'+(ok?"":" disabled")+' onclick="okAct()">✔ 확정'+(n>1?" ("+L.picks.length+"/"+n+")":"")+'</button><button class="b s" onclick="pickA(null)">✖</button>';f.style.display="flex";fqPos()}
+function fqPos(){const f=$("fq"),mw=$("mw"),w=$("w");if(!f||f.style.display=="none"||!L.picks.length)return;const p=L.picks[L.picks.length-1],c=cv.getBoundingClientRect(),m=mw.getBoundingClientRect(),v=w.getBoundingClientRect(),cs=c.width/N;
+const cx_=c.left+(p[0]+.5)*cs,top=c.top+p[1]*cs,bot=c.top+(p[1]+1)*cs,fw=f.offsetWidth,fh=f.offsetHeight;let y=top-fh-6;if(y<v.top+4)y=bot+6;if(y+fh>v.bottom-4)y=Math.max(v.top+4,top-fh-6);
+const x=Math.max(v.left+4,Math.min(v.right-fw-4,cx_-fw/2));f.style.left=(x-m.left)+"px";f.style.top=(y-m.top)+"px"}
 function qkH(){if(!mine()||S.ph=="setup"||S.end||L.act!==null)return"";const bs=S.ph=="boss";let mv,dis;
 if(bs){const c=CH[S.champ],B=S.boss,u=c.gen?(L.bsel||"v"):"v";mv=(T("qkH.1")+"<br>"+"<small>")+(c.bash?CST().move+"칸 · 벽을 부수며 돌진":"직선·대각선 "+bMv()+"칸"+(gDead()?" (발전기 파괴 +"+CST().moveNoGen+")":""))+"</small>";dis=u!="v"||B.moved||B.ap<1}
 else{const e=sel();if(!e)return"";mv=(T("qkH.1")+"<br>"+"<small>"+"직선 ")+mvOf(e)+"칸"+(e.par>0?" (⚡마비 -"+RULE.status.paralyzeMove+")":"")+(chantHold(e)&&CIRC.chantMove?" ("+T("qkH.2")+" -"+CIRC.chantMove+")":"")+" · "+e.mc+"/"+RULE.hero.movesPerTurn+"회</small>";dis=e.dead||e.ap<1||e.mc>=RULE.hero.movesPerTurn||mvOf(e)<1}
@@ -76,7 +86,7 @@ if(!hsd)p+=('<p>'+T("ui.11")+'</p>')}
 else if(!mine())p='<p>'+(S.ph=="resolve"?T("ui.12"):T("ui.13"))+'</p>';
 else if(S.ph=="boss")p=t4On()?t4End(T("ui.14"),"endBoss()"):BT(T("ui.14"),"endBoss()","end")+(L.menu?"":('<p>'+T("ui.15")+'</p>'));
 else p=t4On()?t4End(T("ui.16"),"endHero()"):BT(T("ui.16"),"endHero()","end")+(L.menu?"":('<p>'+T("ui.17")+'</p>'));
-try{p+=onlineBar()}catch(e){}if(L.edTest)p+='<div class="r">'+BT(T("ed.toEditor"),"edBackFromPlay()","s")+"</div>";$("pn").innerHTML=p;try{cutinCheck()}catch(e){}save()}
+try{p+=onlineBar()}catch(e){}if(L.edTest)p+='<div class="r">'+BT(T("ed.toEditor"),"edBackFromPlay()","s")+"</div>";$("pn").innerHTML=p;try{cutinCheck()}catch(e){}try{fqUI()}catch(e){}save()}
 
 /* 간파 줄: 왼쪽 = 용사 쪽, 오른쪽 = 보스 쪽. 가운데(0)에서 얻은 쪽으로 채워지고, 눈금은 혜택 단계(2·3·5·7) */
 function insUI(){const e=$("ins"),C=RULE.insight;if(!e)return;if(!C||S.ph=="setup"){e.style.display="none";return}const I=S.ins||{v:0,st:0,note:""},M=C.insMax,v=I.v,w=Math.abs(v)/M*50;
