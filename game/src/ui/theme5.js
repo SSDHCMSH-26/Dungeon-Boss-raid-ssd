@@ -4,7 +4,7 @@
    - 맵 위: 상황 배너(위 가운데), 행동 메뉴는 고른 유닛 옆에 목록 팝업
    - 오른쪽: 이동·가방 · 고른 행동의 상세 창(큰 그림 · AP · 설명 · 효과 범위 · 확정) · 큰 턴 종료
    유닛 카드·로고·아이콘은 테마 4 것을 같이 씀 (t4On 은 테마 4·5 모두 참) */
-const t5On = () => L.design == "t5";
+const t5On = () => L.design == "t5" || L.design == "t6"; // 테마 6 도 같은 배치
 // 행동 목록 한 줄: 아이콘 · 이름 · 한 줄 설명 · AP
 function t5Row([lab, a, dis]) {
   const sp = String(lab).split("<br>"), head = sp[0], desc = (sp[1] || "").replace(/<\/?small>/g, "");
@@ -41,7 +41,7 @@ function t5Detail(hint, ok) {
   let nm = f.n, em = ""; const me = /^(\p{Extended_Pictographic}️?)\s*/u.exec(nm); if (me) { em = me[1]; nm = nm.slice(me[0].length); }
   const pic = f.src ? '<img src="' + f.src + '" alt="">' : '<span class="t4em">' + (em || "◆") + "</span>";
   return '<div class="t5dt">' + nm + '</div><div class="t5pic">' + pic + '</div><div class="t5cost">◆ AP 소모 <b>' + f.ap + '</b></div><p class="t5desc">' + f.d + '</p><div class="t5sep">→ 효과 범위 ←</div>' + t5Grid(f.r, f.cross) +
-    '<div class="t5hint">' + hint + '</div><div class="r">' + BT("✔ 확정 (" + L.picks.length + "/" + need() + ")", "okAct()", "go s", !ok) + BT(T("cfH.9"), "pickA(null)", "s") + "</div>";
+    '<div class="t5hint">' + hint + '</div><div class="r">' + (t6On() ? t6Ok(!ok, need() > 1 ? L.picks.length + "/" + need() : "") : BT("✔ 확정 (" + L.picks.length + "/" + need() + ")", "okAct()", "go s", !ok)) + BT(T("cfH.9"), "pickA(null)", "s") + "</div>";
 }
 // 턴 종료: 모래시계 + 두 줄
 function t5End(lab, fn) {

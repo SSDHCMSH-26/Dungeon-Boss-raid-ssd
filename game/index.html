@@ -202,6 +202,44 @@ body.land.t5 #gr>#am{margin:0 0 6px;flex:0 1 auto;overflow:auto;min-height:0}
 @media (max-height:520px){body.land.t5 #t4logo{display:none}body.land.t5 .t5pic{height:54px}body.land.t5 .t5pic img{max-height:54px}body.land.t5 .t5dt{font-size:14px;padding:5px}body.land.t5 .t5desc{font-size:11px;margin:2px 0}body.land.t5 .t5sep,body.land.t5 .t5gd{display:none}body.land.t5 .t5hint{display:none}
  body.land.t5 .t5ic{width:32px;height:32px}body.land.t5 .t5ic img{max-width:30px;max-height:30px}body.land.t5 #am .b.t5r{padding:4px 8px;gap:8px}body.land.t5 .t5tx b{font-size:12.5px}body.land.t5 .t5tx small{font-size:10px}
  body.land.t5 .b.end.t5e{padding:7px 18px;gap:8px}body.land.t5 .t5hg{font-size:20px}body.land.t5 .t5e b{font-size:16px}body.land.t5 .t5e small{font-size:10px}body.land.t5 #tb .b{width:36px;height:36px;font-size:16px}body.land.t5 #gc #st{font-size:11px;padding:4px 22px;top:4px}}
+/* ── 테마 6: 사용자 그림 스킨 (body.t4.t5.t6 — 배치는 테마 5) ── */
+body.t6{background:radial-gradient(ellipse at 50% 30%,#3a3045 0%,#221b2c 55%,#120e18 100%) fixed;background-color:#18131f}
+/* 패널: 장식 모서리 테두리 그림(가운데는 비우고 어두운 바탕) */
+body.t6 #am,body.t6 #cf,body.t6 #ip{border:16px solid transparent;border-image:url(art/t6/frame.png) 30 fill stretch;border-image-width:16px;border-image-outset:0;background:none;box-shadow:none;border-radius:0}
+body.t6 #am,body.t6 #cf,body.t6 #ip{border-image-source:url(art/t6/frame.png);border-image-slice:30;background:#16111f;background-clip:padding-box}
+body.t6 #am::before,body.t6 #am::after{display:none}
+body.t6 .u.t4b,body.t6 .u.t4h{border:12px solid transparent;border-image:url(art/t6/card.png) 16 14 12 26 stretch;border-image-width:10px 8px 8px 14px;background:#1a1424;background-clip:padding-box;box-shadow:none;border-radius:0;padding:2px 4px}
+body.t6 .u.t4b::before,body.t6 .u.t4b::after{display:none}
+body.t6 .u.t4h.s{background:linear-gradient(90deg,#3d2a63,#1d1530);background-clip:padding-box;box-shadow:0 0 14px #8b5cf688}
+body.t6 .u.t4h.s::after{right:-15px}
+/* 메뉴 머리: 보석 + 제목, 닫기 X 그림 */
+body.t6 #am .ah>span::before{content:"";display:inline-block;width:22px;height:22px;margin-right:6px;vertical-align:middle;background:url(art/t6/gem.png) center/contain no-repeat}
+body.t6 #am .ah .x{width:30px;height:30px;padding:0;font-size:0;border:0;background:url(art/t6/btn_x.png) center/contain no-repeat;flex:none}
+/* 상세 창 제목: 보라 판 */
+body.t6 .t5dt{color:#efe6ff;background:linear-gradient(#3a2a5c,#211736);box-shadow:inset 0 -1px 0 #8a6fd0;margin:0 0 8px;border-radius:3px}
+body.t6 .t5dt::before{content:"";display:inline-block;width:22px;height:22px;margin-right:6px;vertical-align:-4px;background:url(art/t6/gem.png) center/contain no-repeat}
+/* 그림 버튼: 확정 · 턴 종료 · 탭 · 도구 */
+body.t6 .b.t6ok{background:none;border:0;box-shadow:none;padding:0;position:relative;flex:1;min-width:0}
+body.t6 .b.t6ok img{display:block;width:100%;max-width:240px;margin:0 auto;image-rendering:auto}
+body.t6 .b.t6ok i{position:absolute;right:14%;top:50%;transform:translateY(-50%);font-style:normal;font-size:11px;color:#e3d6ff}
+body.t6 #cf .r .b.t6ok{flex:2.2}
+body.t6 .b.t6ok:disabled{opacity:.45;filter:grayscale(.7)}
+body.t6 #fq{background:#000a;border-color:#8a6fd0;align-items:center}body.t6 #fq .b.t6ok{flex:none}body.t6 #fq .b.t6ok img{width:120px}
+body.t6 .b.end.t6e{display:flex;flex-direction:column;align-items:center;gap:0;background:none;border:0;box-shadow:none;clip-path:none;padding:0;width:100%}
+body.t6 .b.end.t6e img{width:100%;max-width:300px;display:block;image-rendering:auto;filter:drop-shadow(0 0 10px #8b5cf6aa)}
+body.t6 .b.end.t6e small{font-size:11px;color:#c9bde6;margin-top:-2px}
+body.t6 .b.end.t6e:active img{transform:translateY(2px)}
+body.t6 #qk{background:none;border:0;box-shadow:none;padding:0}
+body.t6 .t6tabs{display:flex;gap:6px;justify-content:center}
+body.t6 .t6tab{background:none;border:0;padding:0;cursor:pointer;flex:0 1 72px;min-width:0}
+body.t6 .t6tab img{display:block;width:100%;image-rendering:auto}
+body.t6 .t6tab.on img{filter:drop-shadow(0 0 8px #b98cff) brightness(1.15)}
+body.t6 .t6tab:disabled{opacity:.4;filter:grayscale(.8)}
+body.t6 #tb .b.t6ib{background:none;border:0;box-shadow:none;padding:0;position:relative}
+body.t6 #tb .b.t6ib img{width:100%;height:100%;object-fit:contain;display:block}
+body.t6 #tb .b.t6ib i{position:absolute;right:2px;bottom:0;font-style:normal;font-weight:900;font-size:15px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000}
+body.t6 #w{box-shadow:0 0 0 2px #0b0810,0 0 40px 12px #000b}
+@media (max-height:520px){body.t6 .t6tab{flex-basis:52px}body.t6 .b.end.t6e img{max-width:210px}body.t6 #am,body.t6 #cf,body.t6 #ip{border-width:12px;border-image-width:12px}}
 /* 가로 화면: 배너는 맵 위 가운데, 간파·기록은 오른쪽 위 */
 body.land.t4 #gc #st{margin:0 0 8px;font-size:13px}
 body.land.t4 #gr #lg{max-height:3em;margin:0 0 6px;font-size:11px}
@@ -240,8 +278,8 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v92",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
-const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
+const GAME_VER="v93",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/ui/theme6.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
 window.removeEventListener("error",onErr);
