@@ -57,8 +57,10 @@
     "t2Cd": 1
   },
   "search": {
-    "searchAp": 1,
+    "searchAp": 2,
     "searchRange": 3,
-    "searchArea": 3
+    "searchArea": 3,
+    "searchUses": 2,
+    "searchMissAp": 4
   }
 }
