@@ -9,7 +9,7 @@ function art(k){const t2=T2(),g3=t2&&S&&S.champ=="gron",v2=t2&&!g3,s=g3?ART3:v2?
 [["2",ART2],["3",ART3]].forEach(([sk,s])=>{PRE[sk]=1;Object.keys(s).forEach(x=>artLoad(s,sk+x,x))});
 const fxR=()=>S&&S.fxT&&Date.now()-S.fxT<1500;
 function spI(k,mx,yb,w,h){const i=art(k);if(!i)return 0;const r=i.naturalWidth/i.naturalHeight;let dw=w,dh=w/r;if(dh>h){dh=h;dw=h*r}cx.imageSmoothingEnabled=true;cx.drawImage(i,mx-dw/2,yb-dh,dw,dh);cx.imageSmoothingEnabled=false;return 1}
-function g3(k){const kk="G"+k;let i=IM[kk];if(!i){i=IM[kk]=new Image();i.onload=()=>{if(L.scr=="game")draw()};i.src=ART3[k]}return i.complete&&i.naturalWidth?i:null}
+function g3(k){const s6=typeof t6Art=="function"?t6Art(k):null,kk=(s6?"G6":"G")+k;let i=IM[kk];if(!i){i=IM[kk]=new Image();i.onload=()=>{if(L.scr=="game")draw()};i.src=s6||ART3[k]}return i.complete&&i.naturalWidth?i:null}
 function g3T(k,x,y,w,h){const i=g3(k);if(!i)return 0;cx.imageSmoothingEnabled=true;cx.drawImage(i,x,y,w,h);cx.imageSmoothingEnabled=false;return 1}
 function spT(k,x,y,w,h){const i=art(k);if(!i)return 0;cx.imageSmoothingEnabled=true;cx.drawImage(i,x,y,w,h);cx.imageSmoothingEnabled=false;return 1}
 const MOBA=IMG.MOBA;

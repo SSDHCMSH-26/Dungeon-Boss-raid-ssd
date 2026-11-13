@@ -7,7 +7,8 @@
    "t2",
    "t3",
    "t4",
-   "t5"
+   "t5",
+   "t6"
   ],
   "legacy": {
    "vince2": "t2",
@@ -331,6 +332,38 @@
    "b": "art/crystal/b.png"
   },
   "FACE": "art/face/face.png",
-  "FACEG": "art/face/faceg.png"
+  "FACEG": "art/face/faceg.png",
+  "T6": {
+   "bomb": "art/t6/bomb.png",
+   "btn_end": "art/t6/btn_end.png",
+   "btn_ok": "art/t6/btn_ok.png",
+   "btn_x": "art/t6/btn_x.png",
+   "card": "art/t6/card.png",
+   "floor_c": "art/t6/floor_c.png",
+   "floor_d": "art/t6/floor_d.png",
+   "floor_l": "art/t6/floor_l.png",
+   "frame": "art/t6/frame.png",
+   "gear": "art/t6/gear.png",
+   "gem": "art/t6/gem.png",
+   "grate": "art/t6/grate.png",
+   "ib_ff": "art/t6/ib_ff.png",
+   "ib_gear": "art/t6/ib_gear.png",
+   "ib_grid": "art/t6/ib_grid.png",
+   "ib_help": "art/t6/ib_help.png",
+   "ib_map": "art/t6/ib_map.png",
+   "ib_next": "art/t6/ib_next.png",
+   "ib_search": "art/t6/ib_search.png",
+   "pit_l": "art/t6/pit_l.png",
+   "pit_s": "art/t6/pit_s.png",
+   "portal": "art/t6/portal.png",
+   "spike_t": "art/t6/spike_t.png",
+   "spikes": "art/t6/spikes.png",
+   "tab_item": "art/t6/tab_item.png",
+   "tab_move": "art/t6/tab_move.png",
+   "tab_scan": "art/t6/tab_scan.png",
+   "tab_skill": "art/t6/tab_skill.png",
+   "wall_a": "art/t6/wall_a.png",
+   "wall_hole": "art/t6/wall_hole.png"
+  }
  }
 }
