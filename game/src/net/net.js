@@ -67,3 +67,8 @@ if(fbm&&L.role=="boss"){const pv=await pref().get();S=fixState(JSON.parse(pv.exi
 function resume(){const d=loadSave();if(!d)return;S=d.S;L.mode=d.m;L.role=d.r;fixState(S,d);L.si=d.si||0;L.code=d.c||"";L.wait=0;L.act=null;L.picks=[];L.menu=1;L.fit=0;if(L.mode=="multi"){L.scr="game";rejoin()}else{L.scr="game";ui();tick()}}
 /* 행동 뒤: 규칙 정리(settle: 상자 열기 판정·숨김 정보 복사) → 화면 → 전송 → 진행 */
 function sync(){try{apply({type:"settle"})}catch(e){}ui();push();tick()}
+
+/* 게임 중 메뉴로 나가기 (혼자 하기는 저장되어 "이어하기"로 다시 들어올 수 있음, 둘이서 하기는 방 코드로 다시 입장) */
+function exitGame(){if(!confirm(L.mode=="multi"?"메뉴로 나갈까요? (방은 그대로라 이어하기로 다시 들어올 수 있어요)":"메뉴로 나갈까요? (지금 판은 저장돼서 이어하기로 다시 할 수 있어요)"))return;L.scr="menu";L.wait=0;L.act=null;L.picks=[];L.menu=0;L.uc=0;L.skl=0;ui()}
+/* 저장된 판 지우기 */
+function clearSave(){if(!confirm("저장된 판을 지울까요? (되돌릴 수 없어요)"))return;try{localStorage.removeItem(SAVEK)}catch(e){}ui()}
