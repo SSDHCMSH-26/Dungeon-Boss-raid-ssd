@@ -55,3 +55,4 @@
 - 패치 후에는 반드시 `node --check` 와 테스트(`tools/`)로 확인.
 
 - `src/ui/theme4.js` · `theme5.js` · `theme6.js` — 디자인 테마 4(보랏빛 카드)·5(꽉 찬 맵 배치)·6(사용자 그림 스킨, 그림은 `game/art/t6/`, 원본·자르기 도구는 `art_src/t6/`).
+- `src/ui/theme5b.js` — 테마 5 브론즈 스킨 + 꽉 찬 맵(body.fs): 맵 그림·벽 앞면·장식(`t5Tiles`·`t5Cell`), 그림 버튼, 전체 지도(`t5Mini`), 마우스 끌기. 그림은 `game/art/t5/`, 원본은 `art_src/t5/`.

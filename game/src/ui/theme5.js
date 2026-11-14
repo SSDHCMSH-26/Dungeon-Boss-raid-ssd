@@ -41,7 +41,7 @@ function t5Detail(hint, ok) {
   let nm = f.n, em = ""; const me = /^(\p{Extended_Pictographic}️?)\s*/u.exec(nm); if (me) { em = me[1]; nm = nm.slice(me[0].length); }
   const pic = f.src ? '<img src="' + f.src + '" alt="">' : '<span class="t4em">' + (em || "◆") + "</span>";
   return '<div class="t5dt">' + nm + '</div><div class="t5pic">' + pic + '</div><div class="t5cost">◆ AP 소모 <b>' + f.ap + '</b></div><p class="t5desc">' + f.d + '</p><div class="t5sep">→ 효과 범위 ←</div>' + t5Grid(f.r, f.cross) +
-    '<div class="t5hint">' + hint + '</div><div class="r">' + (t6On() ? t6Ok(!ok, need() > 1 ? L.picks.length + "/" + need() : "") : BT("✔ 확정 (" + L.picks.length + "/" + need() + ")", "okAct()", "go s", !ok)) + BT(T("cfH.9"), "pickA(null)", "s") + "</div>";
+    '<div class="t5hint">' + hint + '</div><div class="r">' + (t5Bz() ? t5Ok(!ok, need() > 1 ? L.picks.length + "/" + need() : "") + t5No() : (t6On() ? t6Ok(!ok, need() > 1 ? L.picks.length + "/" + need() : "") : BT("✔ 확정 (" + L.picks.length + "/" + need() + ")", "okAct()", "go s", !ok)) + BT(T("cfH.9"), "pickA(null)", "s")) + "</div>";
 }
 // 턴 종료: 모래시계 + 두 줄
 function t5End(lab, fn) {
