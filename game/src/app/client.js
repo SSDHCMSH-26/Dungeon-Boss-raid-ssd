@@ -21,7 +21,8 @@ if(t4||t5){if(st.parentElement!==E("gc"))E("gc").insertBefore(st,E("mw"))}
 if(t4){if(lg.parentElement!==gr||gr.firstChild!==ins){gr.insertBefore(lg,gr.firstChild);gr.insertBefore(ins,lg)}}
 else if(t5){if(ins.parentElement!==gl2||lg.parentElement!==gl2){gl2.insertBefore(lg,E("un").nextSibling);gl2.insertBefore(ins,lg)}}
 else if(st.parentElement!==gl||ins.parentElement!==gl){gl.insertBefore(lg,gl.firstChild);gl.insertBefore(ins,lg);gl.insertBefore(st,ins);const lo=E("t4logo");if(lo)gl.insertBefore(lo,st)}}}
-try{t6Toolbar(tb,g&&L.design=="t6")}catch(e){}try{t5Toolbar(tb,g&&L.design=="t5")}catch(e){}
+try{t6Toolbar(tb,g&&L.design=="t6")}catch(e){}
+/* 테마 5 꽉 찬 맵: 상대·물건 정보 창(#ip)은 왼쪽 위(유닛 카드 자리), 그 밖엔 오른쪽 칸 */{const ip=E("ip"),cf=E("cf"),un=E("un");if(ip&&cf&&un){if(g&&L.design=="t5"){if(ip.parentElement!==gl2)gl2.insertBefore(ip,un)}else if(ip.parentElement!==gr)gr.insertBefore(ip,cf)}}try{t5Toolbar(tb,g&&L.design=="t5")}catch(e){}
 tb.querySelectorAll("[data-t]").forEach(b=>{const f=T(b.dataset.t);b.title=f;if(!b.dataset.o)b.textContent=g?f.split(" ")[0]:f})}
 /* 폭이 크게 바뀌거나 가로↔세로가 바뀔 때만 다시 맞춤(주소창이 숨거나 스크롤바가 생기는 정도로는 확대 상태 유지) */
 let fitT=0,fitW=window.innerWidth,fitH=window.innerHeight,fitL=isLand();window.addEventListener("resize",()=>{clearTimeout(fitT);fitT=setTimeout(()=>{const w=window.innerWidth,l=isLand();const hc=l&&Math.abs(window.innerHeight-fitH)>=16&&Z==L.zfit;if(Math.abs(w-fitW)<60&&l==fitL&&!hc)return;fitW=w;fitL=l;L.fit=0;try{if(L.scr!="menu")ui()}catch(e){}},150)});

@@ -317,6 +317,11 @@ body.land.fs .t5ic{width:22px;height:22px}body.land.fs .t5ic img{max-width:20px;
 body.land.fs .t5tx b{font-size:11px}body.land.fs .t5tx small{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.land.fs .t5ap{padding:0 4px;font-size:9px}body.land.fs .t5ap b{font-size:11px}
 body.land.fs #am .r .b.s{font-size:10.5px;padding:1px 2px;border-width:5px;border-image-width:5px}
+/* 상대(또는 물건) 정보 창: 왼쪽 위(내 유닛 카드 자리), 작게 */
+body.land.fs #ip{position:static;width:auto;max-height:calc(100vh - 150px);overflow:auto;margin:0 0 4px;padding:2px 4px;font-size:11px;border-width:9px;border-image-width:9px}
+body.land.fs #ip .ipn b{font-size:13px}body.land.fs #ip .ipn img{width:26px;height:26px}body.land.fs #ip .iphp{font-size:11px;margin:2px 0}
+body.land.fs #ip .ipr{font-size:10.5px;padding:1px 0}body.land.fs #ip .ips{font-size:10.5px;padding:2px 0}body.land.fs #ip .ips span{font-size:10px}
+body.land.fs #ip .r{margin:3px 0}body.land.fs #ip .b{font-size:10.5px;padding:1px 4px;border-width:5px;border-image-width:5px}body.land.fs #ip .x{font-size:10px;padding:0 5px;white-space:nowrap;flex:none}
 /* 간파: 맨 위 가운데, 가로 */
 body.land.fs #ins{position:fixed;top:36px;left:50%;transform:translateX(-50%);width:230px;z-index:6;padding:2px 6px;font-size:10px;background:#0b0806d8;border:1px solid #5a3a1c}
 body.land.fs #ins .in{display:none}body.land.fs #ins .ig{height:7px}
@@ -382,7 +387,7 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v98",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const GAME_VER="v99",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
 const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/ui/theme6.js", "src/ui/theme5b.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
