@@ -367,6 +367,7 @@
   },
   "T5": {
    "bomb": "art/t5/bomb.png",
+   "boulder": "art/t5/boulder.png",
    "btn_cancel": "art/t5/btn_cancel.png",
    "btn_end": "art/t5/btn_end.png",
    "btn_frame": "art/t5/btn_frame.png",
@@ -392,6 +393,7 @@
    "ic_zin": "art/t5/ic_zin.png",
    "ic_zout": "art/t5/ic_zout.png",
    "pit": "art/t5/pit.png",
+   "rubble": "art/t5/rubble.png",
    "rune": "art/t5/rune.png",
    "spike": "art/t5/spike.png",
    "spike_blood": "art/t5/spike_blood.png",
