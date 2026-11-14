@@ -302,6 +302,24 @@ body.land.fs #gr #pn{margin-top:auto;background:none;padding:0}
 body.land.fs #gr>#am{flex:1 1 auto;min-height:60px;overflow:auto;margin:0 0 6px}
 body.land.fs #gr #pn{flex:none;padding-top:4px}
 body.t4.bz #am .r .b.s{white-space:nowrap;min-width:0;font-size:11.5px;padding:3px 2px}
+/* 꽉 찬 맵: 유닛 옆 행동 선택 */
+#uq{display:none;position:absolute;z-index:8;padding:4px;background:#0b0806e8;border:1px solid #c08a4a;box-shadow:0 6px 16px #000d}
+#uq .t5tabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:150px}#uq .t5tab{font-size:12px;padding:3px 2px;white-space:nowrap}
+/* 꽉 찬 맵: 세로 간파 줄(왼쪽 카드 오른쪽) */
+body.land.fs #ins.insv{position:fixed;left:calc(min(220px,24vw) + 18px);top:58px;width:34px;height:min(46vh,300px);display:flex!important;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;font-size:10px;text-align:center}
+#ins.insv span{line-height:1.1}#ins.insv b{display:block;font-size:12px}#ins.insv .ig{flex:1;width:9px;position:relative;background:#0b0705;border:1px solid #6a4523}
+#ins.insv .ig i{position:absolute;left:0;right:0}#ins.insv .ig u{position:absolute;left:-2px;right:-2px;height:1px;background:#fff6}#ins.insv small{font-size:9px;color:#b9a184}
+/* 꽉 찬 맵: 왼쪽 작게, 스킬 목록 작게 */
+body.land.fs #gl,body.land.fs #gl2{width:min(220px,24vw)}
+body.land.fs #un .u.t4b,body.land.fs #un .u.t4h{gap:5px;padding:0 2px}body.land.fs .t4n{font-size:11.5px;margin:0}body.land.fs .t4r{font-size:10px}body.land.fs .t4r b{font-size:11px}body.land.fs .t4bar{height:5px;margin:1px 0 2px}
+body.land.fs .t4ap{padding:1px 5px}body.land.fs .t4ap b{font-size:12px}
+body.land.fs #un .u.t4b img{width:38px;height:38px}body.land.fs #un .u.t4h img{width:26px;height:26px}
+body.land.fs #t4logo b{font-size:12px}body.land.fs #t4logo small{font-size:9.5px}body.land.fs #t4logo .t4gear{font-size:20px}
+body.land.fs #lg{font-size:10px}body.land.fs #tb .b{width:38px;height:38px}
+body.land.fs #gr{width:min(250px,26vw)}body.land.fs #gr>#am{flex:0 1 auto}
+body.land.fs #am .b.t5r{padding:3px 6px;gap:6px}body.land.fs .t5ic{width:30px;height:30px}body.land.fs .t5ic img{max-width:28px;max-height:28px}
+body.land.fs .t5tx b{font-size:12px}body.land.fs .t5tx small{font-size:9.5px}body.land.fs .t5ap{padding:1px 5px;font-size:10px}body.land.fs .t5ap b{font-size:12px}
+body.land.fs .t5pic{height:70px}body.land.fs .t5pic img{max-height:70px}body.land.fs .t5dt{font-size:14px;padding:5px}body.land.fs .t5desc{font-size:11px}
 .t5ul{width:100%;margin:0 0 5px;font-size:12px!important;padding:3px 6px!important}
 body.land.fs #un .u.t4b img{width:46px;height:46px}body.land.fs #un .u.t4h img{width:30px;height:30px}body.land.fs #un .u{margin:0 0 4px}
 #mini{display:none;align-self:flex-end;padding:5px;margin:0 0 6px;background:#0b0806e0;border:1px solid #8a5a2b;box-shadow:0 6px 16px #000c;text-align:center}
@@ -347,7 +365,7 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v95",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const GAME_VER="v96",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
 const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/ui/theme6.js", "src/ui/theme5b.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
