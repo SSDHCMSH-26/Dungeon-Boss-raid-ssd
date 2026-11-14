@@ -116,3 +116,13 @@ function t5Ring() {
     am.style.left = (ax - m.left) + "px"; am.style.top = (ay - m.top) + "px";
   }
 }
+
+/* 꽉 찬 맵: 메뉴로 나가기는 왼쪽 아래(도구 줄 위)에 짧게 */
+function t5Exit() {
+  let e = $("exit5"); const on = fsOn() && S && !S.end && !L.edTest;
+  if (!on) { if (e) e.style.display = "none"; return; }
+  if (!e) { document.body.insertAdjacentHTML("beforeend", '<button id="exit5" class="b s" onclick="exitGame()">🏠 메뉴</button>'); e = $("exit5"); }
+  e.style.display = "block";
+}
+// 메뉴 화면으로 가면 숨김
+document.addEventListener("click", () => { try { if (L.scr != "game") { const e = $("exit5"); if (e) e.style.display = "none"; } } catch (x) {} });

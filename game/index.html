@@ -21,6 +21,10 @@ canvas{display:block;image-rendering:pixelated}
 #am .b{background:rgba(58,47,91,.72)}#am .b.go{background:rgba(63,155,74,.8)}#am .b:disabled{opacity:.3}
 #ins{display:none;margin:4px 0;font-size:11px}#ins .ib{display:flex;align-items:center;gap:6px}#ins .ig{flex:1;height:9px;position:relative;background:#0008;border:1px solid var(--ln)}#ins .ig i{position:absolute;top:0;bottom:0}#ins .ig u{position:absolute;top:-2px;bottom:-2px;width:1px;background:#fff6}#ins .in{opacity:.85;margin-top:2px}
 #fq{display:none;position:absolute;z-index:8;gap:4px;padding:3px;background:#000b;border:2px solid var(--gd);box-shadow:0 3px 10px #000c;border-radius:4px}#fq .b{min-width:0;flex:none;padding:7px 12px;font-size:14px}
+#rescue{position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:99;max-width:94vw;padding:8px 10px;background:#3a1010f2;border:2px solid #ff8a7a;color:#fff;font:13px sans-serif;box-shadow:0 6px 20px #000c;text-align:center}
+#rescue small{display:block;opacity:.75;font-size:11px;margin:2px 0 6px}#rescue button{margin:2px;padding:6px 8px;font:12px sans-serif;cursor:pointer}
+#exit5{display:none;position:fixed;left:10px;bottom:48px;z-index:6;width:auto;min-width:0;font-size:11px;padding:1px 8px}@media (max-height:520px){#exit5{bottom:58px}}
+.exitr{margin-top:4px;justify-content:flex-end}.b.exitb{flex:none!important;width:auto!important;min-width:0;font-size:11px!important;padding:3px 8px!important;opacity:.85}
 #qk{display:none;margin:6px 0;padding:6px;background:var(--pn);border:3px solid var(--gd);box-shadow:0 0 0 3px var(--ln)}#qk .r{margin:4px 0}#ip{display:none;margin:6px 0;padding:8px;background:var(--pn);border:3px solid var(--gd);box-shadow:0 0 0 3px var(--ln)}
 #ip .iph{display:flex;justify-content:space-between;align-items:center;gap:8px}#ip .ipn b{font-size:16px}#ip .ipn img{vertical-align:middle}
 #ip .ipt{font-size:11px;padding:1px 6px;border:1px solid var(--m);margin-left:6px;color:var(--m)}#ip .ipt.foe{border-color:#e55;color:#f99}
@@ -309,9 +313,11 @@ body.land.fs #mw>#am{position:absolute;z-index:8;width:210px;max-height:calc(100
 body.land.fs #am .ah{font-size:11px;margin:-2px -2px 3px;padding:1px 2px 3px;white-space:nowrap;gap:4px}body.land.fs #am .ah>span{overflow:hidden;text-overflow:ellipsis}body.land.fs #am .ah .x{font-size:10px;padding:0 4px;flex:none;white-space:nowrap}
 body.land.fs .t5l{gap:2px}
 /* 스킬 목록: 2열 · 3행까지 보이고 나머지는 스크롤 */
-body.land.fs #mw>#am{width:330px;overflow:visible;max-height:none}
-body.land.fs #mw>#am .t5l{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:calc(3 * 40px + 2 * 3px);overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
-body.land.fs #mw>#am .t5l .b.t5r{height:40px;min-height:0}
+body.land.fs #mw>#am{width:180px;overflow:visible;max-height:none}
+body.land.fs #mw>#am .t5l{display:grid;grid-template-columns:1fr;gap:3px;max-height:calc(3 * 32px + 2 * 3px);overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+body.land.fs #mw>#am .t5l .b.t5r{height:32px;min-height:0}
+/* 테마 5 스킬 목록: 줄마다 설명 글은 빼고 이름·AP만 (설명은 고른 뒤 상세 창에) */
+body.bz .t5tx small{display:none}
 body.land.fs #mw>#am .t5tx{min-width:0}body.land.fs #mw>#am .t5tx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.land.fs #am .b.t5r{padding:1px 4px;gap:5px;border-width:5px;border-image-width:5px}
 body.land.fs .t5ic{width:22px;height:22px}body.land.fs .t5ic img{max-width:20px;max-height:20px}body.land.fs .t5ic .t4em{font-size:14px}
 body.land.fs .t5tx b{font-size:11px}body.land.fs .t5tx small{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -387,7 +393,7 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v100",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const GAME_VER="v102",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
 const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/ui/theme6.js", "src/ui/theme5b.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
