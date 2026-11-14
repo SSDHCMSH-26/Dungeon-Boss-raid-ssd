@@ -22,7 +22,7 @@ function t4Src(a) {
   const m = /^'([ae])(\d+)'$/.exec(String(a)); if (!m) return null;
   const c = CH[S.champ];
   if (m[1] == "a") return S.champ == "gron" ? ART3["g" + (1 + (+m[2] % 4))] : ART2["v" + (1 + (+m[2] % 2))];
-  const e = c.ex[+m[2]]; if (!e) return null; if (typeof t6Icon == "function" && t6Icon(e.id)) return t6Icon(e.id); const k = T4EX[e.id];
+  const e = c.ex[+m[2]]; if (!e) return null; if (typeof t6Icon == "function" && t6Icon(e.id)) return t6Icon(e.id); if (typeof t5Icon == "function" && t5Icon(e.id)) return t5Icon(e.id); const k = T4EX[e.id];
   if (!k) return null;
   if (S.champ == "vince" && ART2[k]) return ART2[k];
   return t3(k);
