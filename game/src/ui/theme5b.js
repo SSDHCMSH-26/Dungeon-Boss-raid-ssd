@@ -82,3 +82,12 @@ function t5Mini() {
   window.addEventListener("pointerup", () => { if (d && d.m) L.dragged = Date.now(); d = null; });
   W.addEventListener("scroll", () => { try { t5Mini(); } catch (e) {} }, { passive: true });
 })();
+
+/* 왼쪽 유닛 목록(꽉 찬 맵): 기본은 고른 유닛 하나만, 버튼으로 전체 목록을 열고 닫음. 목록에서 누르면 그 유닛만 남기고 닫힘 */
+function t5Units(bsd) {
+  const box = document.createElement("div"); box.innerHTML = t4Units(bsd); const cs = [...box.children];
+  cs.forEach((c, i) => c.setAttribute("onclick", "L.ulOpen=0;" + c.getAttribute("onclick")));
+  const cur = S.ph == "boss" ? 0 : (L.si || 0) + 1, open = !!L.ulOpen;
+  const bt = '<button class="b s t5ul" onclick="L.ulOpen=' + (open ? 0 : 1) + ';ui()">' + (open ? "▴ 유닛 목록 닫기" : "▾ 유닛 목록 열기 (" + cs.length + ")") + "</button>";
+  return bt + (open ? cs.map(c => c.outerHTML).join("") : (cs[cur] || cs[0]).outerHTML);
+}

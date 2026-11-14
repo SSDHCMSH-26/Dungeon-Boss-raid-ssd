@@ -269,10 +269,10 @@ body.t4.bz .b.t5ok,body.t4.bz .b.t5no{background:none;border:0;border-image:none
 body.t4.bz .b.t5ok img,body.t4.bz .b.t5no img{display:block;width:100%;max-width:200px;margin:0 auto}
 body.t4.bz .b.t5ok i{position:absolute;right:12%;top:50%;transform:translateY(-50%);font-style:normal;font-size:11px;color:#eaf6d8}
 body.t4.bz .b.t5ok:disabled{opacity:.45;filter:grayscale(.7)}
-body.t4.bz #cf .r .b.t5ok{flex:1.4}
-body.t4.bz #fq{background:#0b0806e0;border-color:#c08a4a;align-items:center}body.t4.bz #fq .b.t5ok,body.t4.bz #fq .b.t5no{flex:none}body.t4.bz #fq .b.t5ok img{width:118px}body.t4.bz #fq .b.t5no img{width:92px}
+body.t4.bz #cf .r .b.t5ok,body.t4.bz #cf .r .b.t5no{flex:1 1 0}body.t4.bz #cf .r .b.t5ok img,body.t4.bz #cf .r .b.t5no img{max-width:130px}
+body.t4.bz #fq{background:#0b0806e0;border-color:#c08a4a;align-items:center}body.t4.bz #fq .b.t5ok,body.t4.bz #fq .b.t5no{flex:none}body.t4.bz #fq .b.t5ok img,body.t4.bz #fq .b.t5no img{width:96px}
 body.t4.bz .b.end.t5be{display:flex;flex-direction:column;align-items:center;background:none;border:0;border-image:none;padding:0;width:100%;clip-path:none;box-shadow:none}
-body.t4.bz .b.end.t5be img{width:100%;max-width:290px;display:block;filter:drop-shadow(0 0 12px #d89a4a88)}
+body.t4.bz .b.end.t5be img{width:100%;max-width:200px;display:block;filter:drop-shadow(0 0 12px #d89a4a88)}
 body.t4.bz .b.end.t5be small{font-size:11px;color:#d8c2a0;margin-top:1px}
 body.t4.bz #qk{background:none;border:0;box-shadow:none;padding:0}
 body.t4.bz .t5tabs{display:flex;gap:4px}body.t4.bz .t5tab{flex:1;min-width:0;font-size:12.5px;padding:6px 2px}
@@ -283,7 +283,6 @@ body.t4.bz #lg{color:#e3d3b8;text-shadow:0 1px 2px #000}
 body.land.fs main{padding:0;max-width:none}
 body.land.fs #g{display:block!important;height:100vh;height:100dvh}
 body.land.fs #gc{position:fixed;inset:0;z-index:1}
-body.land.fs #gc::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;background:linear-gradient(#0b0806d8 0,#0b080600 90px,#0b080600 calc(100% - 120px),#0b0806e0 100%),linear-gradient(90deg,#0b0806b8 0,#0b080600 22%,#0b080600 78%,#0b0806b8 100%)}
 body.land.fs #mw{position:absolute;inset:0}
 body.land.fs #w{width:100vw!important;height:100vh!important;height:100dvh!important;border:0!important;box-shadow:none!important;display:flex;overflow:auto;scrollbar-width:none;background:#0b0806}
 body.land.fs #w::-webkit-scrollbar{display:none}
@@ -300,10 +299,15 @@ body.land.fs #gr{position:fixed;right:10px;top:6px;bottom:10px;z-index:5;width:m
 body.land.fs #gr>*{pointer-events:auto}
 body.land.fs #gr #cf,body.land.fs #gr>#am{overflow:auto;flex:0 1 auto;min-height:0}body.land.fs #gr>#am{max-height:none}
 body.land.fs #gr #pn{margin-top:auto;background:none;padding:0}
+body.land.fs #gr>#am{flex:1 1 auto;min-height:60px;overflow:auto;margin:0 0 6px}
+body.land.fs #gr #pn{flex:none;padding-top:4px}
+body.t4.bz #am .r .b.s{white-space:nowrap;min-width:0;font-size:11.5px;padding:3px 2px}
+.t5ul{width:100%;margin:0 0 5px;font-size:12px!important;padding:3px 6px!important}
+body.land.fs #un .u.t4b img{width:46px;height:46px}body.land.fs #un .u.t4h img{width:30px;height:30px}body.land.fs #un .u{margin:0 0 4px}
 #mini{display:none;align-self:flex-end;padding:5px;margin:0 0 6px;background:#0b0806e0;border:1px solid #8a5a2b;box-shadow:0 6px 16px #000c;text-align:center}
 #mini canvas{display:block;width:150px;height:150px;cursor:pointer}#mini small{display:block;font-size:10.5px;color:#b9a184;margin-top:2px}
 @media (max-height:520px){body.land.fs #gl2{top:8px}body.land.fs #t4logo{display:none}#mini canvas{width:84px;height:84px}#mini small{display:none}
- body.land.fs #tb .b{width:34px;height:34px}body.land.fs #gc #st{font-size:11px;padding:3px 20px}body.t4.bz .b.end.t5be img{max-width:190px}body.t4.bz .t5tab{font-size:10.5px;padding:3px 0;white-space:nowrap;letter-spacing:-.5px}body.land.fs #mini{margin-bottom:4px}body.land.fs #gr>#am{flex:1 1 auto}
+ body.land.fs #tb .b{width:34px;height:34px}body.land.fs #gc #st{font-size:11px;padding:3px 20px}body.t4.bz .b.end.t5be img{max-width:150px}body.t4.bz .t5tab{font-size:10.5px;padding:3px 0;white-space:nowrap;letter-spacing:-.5px}body.land.fs #mini{margin-bottom:4px}body.land.fs #gr>#am{flex:1 1 auto}
  body.t4.bz #am,body.t4.bz #cf,body.t4.bz #ip{border-width:10px;border-image-width:10px}}
 /* 가로 화면: 배너는 맵 위 가운데, 간파·기록은 오른쪽 위 */
 body.land.t4 #gc #st{margin:0 0 8px;font-size:13px}
@@ -343,7 +347,7 @@ if(!err.length)err.push(...V.links(DATA));
 if(err.length){show("게임 데이터에 문제가 있어요 (data/*.json 을 확인하세요):",err);return}
 /* 게임 코드: 역할별 파일을 이 순서대로 실행 (core=규칙 계산, render=그리기, ui=화면, input=입력, net=통신·저장, app=진행·시작) */
 /* 버전: GAME_VER 는 바뀔 때마다 올림, BUILD 는 배포(pages.yml)가 커밋 번호로 바꿔 넣음 → 파일 주소에 붙여서 폰이 옛 파일을 쓰지 않게 */
-const GAME_VER="v94",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
+const GAME_VER="v95",BUILD="__BUILD__",VQ=BUILD.indexOf("__")==0?String(Date.now()):BUILD.slice(0,7);try{document.getElementById("ver").textContent=" · "+GAME_VER+(BUILD.indexOf("__")==0?"":" · "+VQ)}catch(e){}
 const SRC=["src/ui/text.js", "src/core/env.js", "src/core/data.js", "src/core/state.js", "src/core/view.js", "src/core/map.js", "src/core/rules.js", "src/core/insight.js", "src/core/actions.js", "src/core/ai.js", "src/core/sim.js", "src/render/sprites.js", "src/render/canvas.js", "src/app/client.js", "src/render/images.js", "src/ui/design.js", "src/render/draw.js", "src/ui/panels.js", "src/ui/theme4.js", "src/ui/theme5.js", "src/ui/theme6.js", "src/ui/theme5b.js", "src/input/input.js", "src/ui/editor.js", "src/app/loop.js", "src/net/net.js", "src/app/commands.js", "src/app/main.js"];
 let bad="";const onErr=e=>{if(!bad&&e.filename&&SRC.some(f=>e.filename.split("?")[0].endsWith(f)))bad=e.filename.split("/").slice(-3).join("/")+" "+e.lineno+"줄: "+e.message};window.addEventListener("error",onErr);
 for(const f of SRC){const ok=await new Promise(res=>{const s=document.createElement("script");s.src=f+"?v="+VQ;s.onload=()=>res(1);s.onerror=()=>res(0);document.body.appendChild(s)});if(!ok||bad){show("게임 코드 파일에 문제가 있어요: "+(bad||f));return}}
