@@ -50,7 +50,7 @@ function t5End(lab, fn) {
 }
 // 행동 메뉴 팝업을 고른 유닛 옆에 (가로 화면만, 맵 안에서)
 function t5Pop() {
-  const am = $("am"); if (!am) return;
+  const am = $("am"); if (!am) return; if (typeof fsOn == "function" && fsOn()) return;
   if (!(t5On() && isLand() && L.scr == "game") || am.style.display == "none" || am.parentElement !== $("mw")) { am.style.left = am.style.top = ""; return; }
   const u = S.ph == "boss" ? S.boss : sel(); if (!u) return;
   const c = cv.getBoundingClientRect(), m = $("mw").getBoundingClientRect(), v = $("w").getBoundingClientRect(), cs = c.width / N;

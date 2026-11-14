@@ -2,8 +2,8 @@
 function pickChamp(id){if(!apply({type:"pickChamp",id})){$("lg").textContent="🔒 아직 준비 중인 챔피언이에요 (캐릭터·맵 디자인만 공개)";return}sync()}
 function afterStartUI(){L.bag=0;L.si=0;L.menu=1;sync();setTimeout(()=>jump(0),50)}
 function start(){if(!apply({type:"start"}))return;afterStartUI()}
-function afterBossTurnUI(){L.act=null;L.picks=[];L.menu=1;L.si=Math.max(0,S.heroes.findIndex(h=>!h.dead))}
-function afterHeroTurnUI(){L.act=null;L.picks=[]}
+function afterBossTurnUI(){L.uc=0;L.skl=0;L.act=null;L.picks=[];L.menu=1;L.si=Math.max(0,S.heroes.findIndex(h=>!h.dead))}
+function afterHeroTurnUI(){L.uc=0;L.skl=0;L.act=null;L.picks=[]}
 function endBoss(){apply({type:"endBoss"});afterBossTurnUI();sync()}
 function endHero(){apply({type:"endHero"});afterHeroTurnUI();sync()}
 function useItem(k){const side=S.ph=="boss"?"b":"h";if(!mine()||!S.bag||!S.bag[side][k])return;const bs=S.ph=="boss";let r;
