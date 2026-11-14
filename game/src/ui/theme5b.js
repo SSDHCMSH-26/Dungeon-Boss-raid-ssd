@@ -47,10 +47,10 @@ function t5EndB(lab, fn) { const t = String(lab), k = t.indexOf("→"), b = k >=
 // 아래 탭(글자 버튼): 스킬 · 이동 · 탐지(용사) · 아이템
 function t5Tabs(mvDis, bs) {
   const e = bs ? null : sel(), Q = RULE.search;
-  const tb = (lb, on, fn, dis) => '<button class="b s t5tab' + (on ? " on" : "") + '"' + (dis ? " disabled" : "") + ' onclick="' + fn + '">' + lb + "</button>";
-  let h = '<div class="t5tabs">' + tb(isLand() && innerHeight <= 520 ? "✦스킬" : "✦ 스킬", fsOn() ? !!L.skl : (L.menu && L.act === null && !L.bag), "L.menu=1;L.skl=" + (fsOn() && L.skl ? 0 : 1) + ";L.act=null;L.picks=[];L.bag=0;ui()", false) + tb(isLand() && innerHeight <= 520 ? "이동" : "🦶 이동", L.act == "m", "pickA('m')", mvDis);
-  if (!bs && Q) h += tb(isLand() && innerHeight <= 520 ? "탐지" : "🔍 탐지", L.act == "q", "pickA('q')", !e || e.ap < Q.searchAp || srchUsed() >= Q.searchUses);
-  return h + tb(isLand() && innerHeight <= 520 ? "가방" : "🎒 아이템", L.bag, "pickA('bag')", false) + "</div>";
+  const sh = fsOn() || (isLand() && innerHeight <= 520), tb = (lb, on, fn, dis) => '<button class="b s t5tab' + (on ? " on" : "") + '"' + (dis ? " disabled" : "") + ' onclick="' + fn + '">' + lb + "</button>";
+  let h = '<div class="t5tabs">' + tb(sh ? "✦ 스킬" : "✦ 스킬", fsOn() ? !!L.skl : (L.menu && L.act === null && !L.bag), "L.menu=1;L.skl=" + (fsOn() && L.skl ? 0 : 1) + ";L.act=null;L.picks=[];L.bag=0;ui()", false) + tb(sh ? "🦶 이동" : "🦶 이동", L.act == "m", "pickA('m')", mvDis);
+  if (!bs && Q) h += tb(sh ? "🔍 탐지" : "🔍 탐지", L.act == "q", "pickA('q')", !e || e.ap < Q.searchAp || srchUsed() >= Q.searchUses);
+  return h + tb(sh ? "🎒 가방" : "🎒 아이템", L.bag, "pickA('bag')", false) + "</div>";
 }
 // 도구 줄 그림: 축소·확대·보스 찾기·용사 찾기·디자인
 const T5TB = ["ic_zout", "ic_zin", "ic_search", "ic_grid", "ic_gear"];
@@ -87,15 +87,15 @@ function t5Mini() {
 function t5Units(bsd) {
   const box = document.createElement("div"); box.innerHTML = t4Units(bsd); const cs = [...box.children];
   cs.forEach((c, i) => c.setAttribute("onclick", "L.ulOpen=0;L.skl=0;" + c.getAttribute("onclick")));
-  const cur = S.ph == "boss" ? 0 : (L.si || 0) + 1, open = !!L.ulOpen;
-  const bt = '<button class="b s t5ul" onclick="L.ulOpen=' + (open ? 0 : 1) + ';ui()">' + (open ? "▴ 유닛 목록 닫기" : "▾ 유닛 목록 열기 (" + cs.length + ")") + "</button>";
-  return bt + (open ? cs.map(c => c.outerHTML).join("") : (cs[cur] || cs[0]).outerHTML);
+  if (!L.uc) return ""; // 유닛을 눌렀을 때만 그 유닛 카드 하나
+  const cur = S.ph == "boss" ? 0 : (L.si || 0) + 1;
+  return (cs[cur] || cs[0]).outerHTML;
 }
 
 /* 꽉 찬 맵: 유닛을 누르면 그 유닛 왼쪽 위에 행동 선택(스킬·이동·탐지·아이템)이 확정 말풍선처럼 뜸.
    스킬을 누르면 오른쪽 칸에 스킬 목록, 이동·탐지는 바로 칸 고르기, 아이템은 가방 */
 function t5Ring() {
-  let r = $("uq"); const on = fsOn() && S && mine() && S.ph != "setup" && !S.end && L.menu && L.act === null && (S.ph == "boss" || (sel() && !sel().dead));
+  let r = $("uq"); const on = fsOn() && S && mine() && S.ph != "setup" && !S.end && L.uc && L.menu && L.act === null && (S.ph == "boss" || (sel() && !sel().dead));
   if (!on) { if (r) r.style.display = "none"; return; }
   if (!r) { $("mw").insertAdjacentHTML("beforeend", '<div id="uq"></div>'); r = $("uq"); }
   const bs = S.ph == "boss"; let dis;
@@ -108,4 +108,11 @@ function t5Ring() {
   if (x < v.left + 6) x = ux + cs * (big ? 2.2 : 1.25); if (y < v.top + 44) y = uy + cs * (big ? 2.2 : 1.25);
   x = Math.max(v.left + 6, Math.min(v.right - w - 6, x)); y = Math.max(v.top + 6, Math.min(v.bottom - h - 6, y));
   r.style.left = (x - m.left) + "px"; r.style.top = (y - m.top) + "px";
+  // 스킬 목록: 링 바로 옆(오른쪽, 자리가 없으면 왼쪽), 위는 링과 맞춤
+  const am = $("am");
+  if (am && am.parentElement === $("mw") && am.style.display != "none") {
+    const aw = am.offsetWidth, ah = am.offsetHeight; let ax = x + w + 4; if (ax + aw > v.right - 6) ax = x - aw - 4;
+    ax = Math.max(v.left + 6, Math.min(v.right - aw - 6, ax)); const ay = Math.max(v.top + 6, Math.min(v.bottom - ah - 6, y));
+    am.style.left = (ax - m.left) + "px"; am.style.top = (ay - m.top) + "px";
+  }
 }
